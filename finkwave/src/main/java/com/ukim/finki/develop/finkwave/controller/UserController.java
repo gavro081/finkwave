@@ -1,7 +1,8 @@
 package com.ukim.finki.develop.finkwave.controller;
 
-import com.ukim.finki.develop.finkwave.model.Users;
-import com.ukim.finki.develop.finkwave.service.UsersService;
+import com.ukim.finki.develop.finkwave.model.User;
+import com.ukim.finki.develop.finkwave.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -12,15 +13,12 @@ import java.util.List;
 
 @RestController
 @CrossOrigin("*")
-public class UsersController {
-    private final UsersService usersService;
-
-    public UsersController(UsersService usersService) {
-        this.usersService = usersService;
-    }
+@RequiredArgsConstructor
+public class UserController {
+    private final UserService usersService;
 
     @GetMapping
-    public HttpEntity<List<Users>> getAllUsers(){
+    public HttpEntity<List<User>> getAllUsers(){
         return ResponseEntity.ok(usersService.getAll());
     }
 }

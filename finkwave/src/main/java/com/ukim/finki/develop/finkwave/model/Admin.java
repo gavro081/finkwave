@@ -14,6 +14,6 @@ public class Admin {
     @MapsId
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private Users users;
+    private User users;
 
 }

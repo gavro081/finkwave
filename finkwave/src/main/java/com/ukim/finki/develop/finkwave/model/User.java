@@ -1,7 +1,13 @@
 package com.ukim.finki.develop.finkwave.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,6 +17,7 @@ import lombok.Setter;
 @Entity
 @NoArgsConstructor
 @Table(name = "users")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class User {
     @Id
     @Column(name = "user_id", nullable = false)
@@ -19,24 +26,24 @@ public class User {
     @Column(name = "full_name", nullable = false, length = Integer.MAX_VALUE)
     private String fullName;
 
-    @Column(name = "email", nullable = false, length = Integer.MAX_VALUE)
+    @Column(nullable = false, length = Integer.MAX_VALUE)
     private String email;
 
-    @Column(name = "password", nullable = false, length = Integer.MAX_VALUE)
+    @Column(nullable = false, length = Integer.MAX_VALUE)
     @JsonIgnore
     private String password;
 
-    @Column(name = "username", nullable = false, length = Integer.MAX_VALUE)
+    @Column(nullable = false, length = Integer.MAX_VALUE)
     private String username;
 
     @Column(name = "profile_photo", length = Integer.MAX_VALUE)
     private String profilePhoto;
 
-    @OneToOne(mappedBy = "users")
+    @OneToOne(mappedBy = "user")
     @JsonIgnore
     private Admin admin;
 
-    @OneToOne(mappedBy = "users")
+    @OneToOne(mappedBy = "user")
     @JsonIgnore
     private NonAdminUser nonAdminUser;
 

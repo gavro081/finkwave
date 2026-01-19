@@ -14,8 +14,8 @@ public class NonAdminUser {
     private Long id;
 
     @MapsId
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne
     @JoinColumn(name = "user_id")
-    private User users;
+    private User user;
 
 }

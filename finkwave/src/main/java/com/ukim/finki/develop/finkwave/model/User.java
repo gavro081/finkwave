@@ -3,11 +3,7 @@ package com.ukim.finki.develop.finkwave.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,6 +17,7 @@ import lombok.Setter;
 public class User {
     @Id
     @Column(name = "user_id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_id_seq")
     private Long id;
 
     @Column(name = "full_name", nullable = false, length = Integer.MAX_VALUE)
@@ -42,6 +39,10 @@ public class User {
     @OneToOne(mappedBy = "user")
     @JsonIgnore
     private Admin admin;
+
+    // todo: is this column needed? if so, add to entities and documentation
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     @OneToOne(mappedBy = "user")
     @JsonIgnore

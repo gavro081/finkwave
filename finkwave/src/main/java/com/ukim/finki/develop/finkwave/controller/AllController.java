@@ -27,7 +27,7 @@ public class AllController {
     private final ListenRepository listenRepository;
 
     @GetMapping("/admins")
-    public HttpEntity<List<Admin>> getAllAdmins(){
+        public HttpEntity<List<Admin>> getAllAdmins(){
         return ResponseEntity.ok(adminRepository.findAll());
     }
     @GetMapping("/events")

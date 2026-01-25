@@ -3,7 +3,6 @@ package com.ukim.finki.develop.finkwave.service;
 import com.ukim.finki.develop.finkwave.model.User;
 import com.ukim.finki.develop.finkwave.repository.UserRepository;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

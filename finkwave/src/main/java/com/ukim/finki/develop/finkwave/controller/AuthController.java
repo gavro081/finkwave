@@ -12,9 +12,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.ukim.finki.develop.finkwave.dto.AuthRequestDto;
-import com.ukim.finki.develop.finkwave.dto.LoginRequestDto;
-import com.ukim.finki.develop.finkwave.dto.UserResponseDto;
+import com.ukim.finki.develop.finkwave.model.dto.AuthRequestDto;
+import com.ukim.finki.develop.finkwave.model.dto.LoginRequestDto;
+import com.ukim.finki.develop.finkwave.model.dto.UserResponseDto;
 import com.ukim.finki.develop.finkwave.service.AuthService;
 
 import jakarta.servlet.http.HttpServletResponse;

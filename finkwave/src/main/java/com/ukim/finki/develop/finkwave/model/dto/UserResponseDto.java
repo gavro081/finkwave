@@ -1,4 +1,4 @@
-package com.ukim.finki.develop.finkwave.dto;
+package com.ukim.finki.develop.finkwave.model.dto;
 
 import com.ukim.finki.develop.finkwave.model.Role;
 import jakarta.annotation.Nullable;

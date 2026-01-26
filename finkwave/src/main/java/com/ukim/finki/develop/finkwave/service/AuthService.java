@@ -4,9 +4,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.ukim.finki.develop.finkwave.config.AuthProperties;
-import com.ukim.finki.develop.finkwave.dto.AuthRequestDto;
-import com.ukim.finki.develop.finkwave.dto.LoginRequestDto;
-import com.ukim.finki.develop.finkwave.dto.UserResponseDto;
+import com.ukim.finki.develop.finkwave.model.dto.AuthRequestDto;
+import com.ukim.finki.develop.finkwave.model.dto.LoginRequestDto;
+import com.ukim.finki.develop.finkwave.model.dto.UserResponseDto;
 import com.ukim.finki.develop.finkwave.model.NonAdminUser;
 import com.ukim.finki.develop.finkwave.model.RefreshToken;
 import com.ukim.finki.develop.finkwave.model.Role;
@@ -99,8 +99,8 @@ public class AuthService {
 
     private User createNonAdminUser(AuthRequestDto authRequestDto) throws IOException {
         User.UserBuilder userBuilder = User.builder()
-                .fullName(authRequestDto.fullname())
                 .username(authRequestDto.username())
+                .fullName(authRequestDto.fullname())
                 .email(authRequestDto.email())
                 .password(passwordEncoder.encode(authRequestDto.password()))
                 .role(Role.NONADMIN);

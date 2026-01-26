@@ -1,4 +1,4 @@
-package com.ukim.finki.develop.finkwave.dto;
+package com.ukim.finki.develop.finkwave.model.dto;
 
 import jakarta.annotation.Nullable;
 import org.springframework.web.multipart.MultipartFile;
@@ -8,6 +8,5 @@ public record AuthRequestDto(
         String fullname,
         String email,
         String password,
-        @Nullable MultipartFile profilePhoto
-){
+        @Nullable MultipartFile profilePhoto){
 }

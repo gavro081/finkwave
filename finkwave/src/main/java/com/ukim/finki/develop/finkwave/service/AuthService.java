@@ -28,30 +28,15 @@ public class AuthService {
     private final int accessTokenMaxAge = 900;
     private final int refreshTokenMaxAge = 10 * 24 * 60 * 60;
 
-    // todo: should it be transactional?
-//    @Transactional
+
     public UserResponseDto registerAndLogIn(HttpServletResponse response, AuthRequestDto authRequestDto){
         if (userRepository.findByUsername(authRequestDto.username()).isPresent()){
             throw new RuntimeException("User already exists");
         }
-        User user = new User();
-
-        // todo: builder / private createUser method
-        user.setUsername(authRequestDto.username());
-        user.setRole(Role.NONADMIN);
-        user.setFullName(authRequestDto.fullname());
-        user.setProfilePhoto(authRequestDto.profilePhoto());
-        user.setEmail(authRequestDto.email());
-        user.setPassword(passwordEncoder.encode(authRequestDto.password()));
-        NonAdminUser nonAdminUser = new NonAdminUser();
-        nonAdminUser.setUser(user);
-        user.setNonAdminUser(nonAdminUser);
-        nonAdminUserRepository.save(nonAdminUser);
-        userRepository.save(user);
+        createNonAdminUser(authRequestDto);
         // todo: could also be redirect in controller, which one is better?
-        return login(response, new LoginRequestDto(user.getUsername(), authRequestDto.password()));
+        return login(response, new LoginRequestDto(authRequestDto.username(), authRequestDto.password()));
     }
-
 
     // todo: dto in arguments or the standalone values?
     public UserResponseDto login(HttpServletResponse response, LoginRequestDto loginRequestDto){
@@ -102,27 +87,44 @@ public class AuthService {
     public void clearCookies(HttpServletResponse httpServletResponse, String refreshToken) {
         if (refreshToken != null){
             invalidateRefreshToken(refreshToken);
-            Cookie clearCookie = new Cookie("refreshToken", null);
-            clearCookie.setHttpOnly(true);
-            clearCookie.setSecure(false);
-            clearCookie.setPath("/");
-            clearCookie.setMaxAge(0);
-            httpServletResponse.addCookie(clearCookie);
+            clearCookieByName(httpServletResponse, "refreshToken");
         }
+        clearCookieByName(httpServletResponse, "accessToken");
+    }
 
-        Cookie clearAccess = new Cookie("accessToken", null);
+    // todo: should it be transactional?
+//    @Transactional
+    private void createNonAdminUser(AuthRequestDto authRequestDto){
+        User user = User.builder()
+                .fullName(authRequestDto.fullname())
+                .username(authRequestDto.username())
+                .email(authRequestDto.email())
+                .profilePhoto(authRequestDto.profilePhoto())
+                .password(passwordEncoder.encode(authRequestDto.password()))
+                .role(Role.NONADMIN)
+                .build();
+
+        NonAdminUser nonAdminUser = new NonAdminUser();
+        nonAdminUser.setUser(user);
+        user.setNonAdminUser(nonAdminUser);
+        nonAdminUserRepository.save(nonAdminUser);
+        userRepository.save(user);
+    }
+
+    private void clearCookieByName(HttpServletResponse response, String cookieName){
+        Cookie clearAccess = new Cookie(cookieName, null);
         clearAccess.setHttpOnly(true);
         clearAccess.setSecure(false);
         clearAccess.setPath("/");
         clearAccess.setMaxAge(0);
-        httpServletResponse.addCookie(clearAccess);
+        response.addCookie(clearAccess);
     }
 
 
     private void addTokensToResponse(HttpServletResponse response, RefreshToken refreshToken, String accessToken){
         Cookie refreshCookie = new Cookie("refreshToken", refreshToken.getToken());
-        refreshCookie.setSecure(false);
         refreshCookie.setHttpOnly(true);
+        refreshCookie.setSecure(false);
         refreshCookie.setPath("/");
         refreshCookie.setMaxAge(refreshTokenMaxAge);
         response.addCookie(refreshCookie);

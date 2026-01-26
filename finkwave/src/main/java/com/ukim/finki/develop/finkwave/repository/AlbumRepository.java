@@ -5,6 +5,10 @@ import org.springframework.stereotype.Repository;
 
 import com.ukim.finki.develop.finkwave.model.Album;
 
+import java.util.List;
+
 @Repository
 public interface AlbumRepository extends JpaRepository<Album, Long> {
+
+    List<Album>findAllByIdIn(List<Long>ids);
 }

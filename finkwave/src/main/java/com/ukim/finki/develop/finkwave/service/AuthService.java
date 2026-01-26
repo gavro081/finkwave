@@ -1,11 +1,11 @@
 package com.ukim.finki.develop.finkwave.service;
 
-import com.ukim.finki.develop.finkwave.config.AuthProperties;
-import com.ukim.finki.develop.finkwave.dto.LoginRequestDto;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.ukim.finki.develop.finkwave.config.AuthProperties;
 import com.ukim.finki.develop.finkwave.dto.AuthRequestDto;
+import com.ukim.finki.develop.finkwave.dto.LoginRequestDto;
 import com.ukim.finki.develop.finkwave.dto.UserResponseDto;
 import com.ukim.finki.develop.finkwave.model.NonAdminUser;
 import com.ukim.finki.develop.finkwave.model.RefreshToken;
@@ -16,6 +16,7 @@ import com.ukim.finki.develop.finkwave.repository.UserRepository;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -29,29 +30,24 @@ public class AuthService {
     private final AuthProperties authProperties;
 
 
+    @Transactional
     public UserResponseDto registerAndLogIn(HttpServletResponse response, AuthRequestDto authRequestDto){
         if (userRepository.findByUsername(authRequestDto.username()).isPresent()){
             throw new RuntimeException("User already exists");
         }
-        createNonAdminUser(authRequestDto);
-        // todo: could also be redirect in controller, which one is better?
-        return login(response, new LoginRequestDto(authRequestDto.username(), authRequestDto.password()));
+        User user = createNonAdminUser(authRequestDto);
+        return authenticateAndRespond(response, user);
     }
 
-    // todo: dto in arguments or the standalone values?
     public UserResponseDto login(HttpServletResponse response, LoginRequestDto loginRequestDto){
         User user = userRepository.findByUsername(loginRequestDto.username())
                 .orElseThrow(() -> new RuntimeException("Invalid credentials"));
+
         if (!passwordEncoder.matches(loginRequestDto.password(), user.getPassword())){
             throw new RuntimeException("Invalid credentials");
         }
 
-        String accessToken = jwtService.generateToken(loginRequestDto.username(), user.getRole().name());
-        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
-
-        UserResponseDto userResponseDto = new UserResponseDto(user.getUsername(), user.getRole());
-        addTokensToResponse(response, refreshToken, accessToken);
-        return userResponseDto;
+        return authenticateAndRespond(response, user);
     }
 
     public String refreshAccessToken(String refreshTokenString) {
@@ -92,9 +88,7 @@ public class AuthService {
         clearCookieByName(httpServletResponse, "accessToken");
     }
 
-    // todo: should it be transactional?
-//    @Transactional
-    private void createNonAdminUser(AuthRequestDto authRequestDto){
+    private User createNonAdminUser(AuthRequestDto authRequestDto){
         User user = User.builder()
                 .fullName(authRequestDto.fullname())
                 .username(authRequestDto.username())
@@ -108,7 +102,16 @@ public class AuthService {
         nonAdminUser.setUser(user);
         user.setNonAdminUser(nonAdminUser);
         nonAdminUserRepository.save(nonAdminUser);
-        userRepository.save(user);
+        return user;
+    }
+
+    private UserResponseDto authenticateAndRespond(HttpServletResponse response, User user){
+        String accessToken = jwtService.generateToken(user.getUsername(), user.getRole().name());
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
+
+        UserResponseDto userResponseDto = new UserResponseDto(user.getUsername(), user.getRole());
+        addTokensToResponse(response, refreshToken, accessToken);
+        return userResponseDto;
     }
 
     private void clearCookieByName(HttpServletResponse response, String cookieName){

@@ -1,38 +1,38 @@
 package com.ukim.finki.develop.finkwave.service;
 
-import com.ukim.finki.develop.finkwave.model.Album;
-import com.ukim.finki.develop.finkwave.model.Like;
-import com.ukim.finki.develop.finkwave.model.MusicalEntity;
-import com.ukim.finki.develop.finkwave.model.Song;
-import com.ukim.finki.develop.finkwave.model.dto.ArtistMusicalEntitiesDTO;
+import com.ukim.finki.develop.finkwave.model.Playlist;
 import com.ukim.finki.develop.finkwave.model.dto.ListenerLikesDTO;
-import com.ukim.finki.develop.finkwave.repository.AlbumRepository;
+import com.ukim.finki.develop.finkwave.model.dto.MusicalEntityDTO;
+import com.ukim.finki.develop.finkwave.model.dto.PlaylistDTO;
 import com.ukim.finki.develop.finkwave.repository.LikeRepository;
-import com.ukim.finki.develop.finkwave.repository.SongRepository;
+import com.ukim.finki.develop.finkwave.repository.PlaylistRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 public class ListenerService {
     private final LikeRepository likeRepository;
-    private final MusicalEntityService musicalEntityService;
+    private final PlaylistRepository playlistRepository;
+    @Transactional(readOnly = true)
+    public ListenerLikesDTO getLikedEntities(Long listenerId) {
+        List<Object[]> results = likeRepository.findLikedEntitiesWithTypeByListenerId(listenerId);
 
-    public List<ListenerLikesDTO>getLikedEntities(Long listenerId){
-        List<Like>likes=likeRepository.getLikesByListener_Id(listenerId);
-
-
-        return likes.stream().map(l -> new ListenerLikesDTO(
-                l.getMusicalEntity().getId(),
-                l.getMusicalEntity().getTitle(),
-                l.getMusicalEntity().getGenre(),
-                musicalEntityService.getEntityType(l.getMusicalEntity().getId())
-        )).toList();
+        List<MusicalEntityDTO>likedEntities=results.stream()
+        .map(row->new MusicalEntityDTO((Long)row[0], (String)row[1], (String)row[2],(String)row[3]))
+        .toList();
+        
+        ListenerLikesDTO dto=new ListenerLikesDTO();
+        dto.setLikedEntities(likedEntities);
+        return dto;
     }
 
-
+    @Transactional(readOnly = true)
+    public List<Playlist>getPlaylistsCreatedByUser(Long listenerId){
+        return playlistRepository.findByCreatorId(listenerId);
+    }
 }
+
+

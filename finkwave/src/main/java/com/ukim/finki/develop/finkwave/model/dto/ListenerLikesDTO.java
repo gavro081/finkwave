@@ -1,15 +1,16 @@
 package com.ukim.finki.develop.finkwave.model.dto;
-
+import java.util.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Setter
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 public class ListenerLikesDTO {
-    private Long entityId;
-    private String entityTitle;
-    private String entityGenre;
-    private String entityType;
+    private List<MusicalEntityDTO> likedEntities;
+    
+
 }

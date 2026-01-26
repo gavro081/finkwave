@@ -1,6 +1,5 @@
 package com.ukim.finki.develop.finkwave.controller;
 
-import com.ukim.finki.develop.finkwave.model.NonAdminUser;
 import com.ukim.finki.develop.finkwave.model.dto.NonAdminUserDTO;
 import com.ukim.finki.develop.finkwave.service.NonAdminUserService;
 import lombok.RequiredArgsConstructor;

@@ -4,12 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+@AllArgsConstructor
 @Getter
 @Setter
-@AllArgsConstructor
-public class ArtistContributionDTO {
-    private Long musicalEntityId;
+public class MusicalEntityDTO {
+    private Long id;
     private String title;
-    private String role;
-    private String entityType;
+    private String genre;
+    private String type;
 }

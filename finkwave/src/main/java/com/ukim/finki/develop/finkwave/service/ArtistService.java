@@ -1,14 +1,12 @@
 package com.ukim.finki.develop.finkwave.service;
 
-import com.ukim.finki.develop.finkwave.model.ArtistContribution;
-import com.ukim.finki.develop.finkwave.model.Song;
 import com.ukim.finki.develop.finkwave.model.dto.ArtistContributionDTO;
-import com.ukim.finki.develop.finkwave.model.dto.ArtistMusicalEntitiesDTO;
 import com.ukim.finki.develop.finkwave.repository.ArtistContributionRepository;
+
+import org.springframework.transaction.annotation.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,25 +14,16 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class ArtistService {
 
-    private final MusicalEntityService musicalEntityService;
-    private final ArtistContributionRepository contributionRepository;
+    private final ArtistContributionRepository artistContributionRepository;
 
 
-    public List<ArtistContributionDTO> getArtistContributions(Long id){
+    @Transactional(readOnly=true)
+    public List<ArtistContributionDTO> getArtistContributions(Long artistId){
+        List<Object[]>results=artistContributionRepository.findContributionsByArtistId(artistId);
 
-        ArtistMusicalEntitiesDTO artistMusicalEntities=musicalEntityService.getArtistMusicalEntities(id);
-        List<ArtistContribution>contributions=contributionRepository.findAllByArtist_Id(id);
-        return contributions.stream().map(c -> {
-            boolean isSong = artistMusicalEntities.getSongs().stream()
-                    .anyMatch(s -> s.getId().equals(c.getMusicalEntity().getId()));
-
-            return new ArtistContributionDTO(
-                    c.getRole(),
-                    c.getMusicalEntity().getId(),
-                    c.getMusicalEntity().getTitle(),
-                    isSong ? "Song" : "Album"
-            );
-        }).collect(Collectors.toList());
+        return results.stream()
+        .map(row->new ArtistContributionDTO((Long)row[0], (String)row[1], (String)row[2], (String)row[3]))
+        .collect(Collectors.toList());
     }
 
 }

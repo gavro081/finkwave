@@ -31,7 +31,6 @@ import lombok.RequiredArgsConstructor;
 public class AuthController {
     // todo: read from config
     private final int accessTokenMaxAge = 900;
-    private final int refreshTokenMaxAge = 10 * 24 * 60 * 60;
     private final AuthService authService;
 
     @PostMapping("/register")
@@ -39,8 +38,7 @@ public class AuthController {
             @RequestBody AuthRequestDto authRequestDto,
             HttpServletResponse httpServletResponse){
         try {
-            AuthResponseDto authResponse = authService.registerAndLogIn(authRequestDto);
-            addTokensToResponse(httpServletResponse, authResponse);
+            AuthResponseDto authResponse = authService.registerAndLogIn(httpServletResponse, authRequestDto);
             return ResponseEntity.ok(Map.of(
                     "user", authResponse.userResponseDto(),
                     "tokenExpiresIn", accessTokenMaxAge
@@ -57,8 +55,7 @@ public class AuthController {
             @RequestBody LoginRequestDto loginRequestDto,
             HttpServletResponse httpServletResponse){
         try {
-            AuthResponseDto authResponse = authService.login(loginRequestDto.username(), loginRequestDto.password());
-            addTokensToResponse(httpServletResponse, authResponse);
+            AuthResponseDto authResponse = authService.login(httpServletResponse, loginRequestDto);
             return ResponseEntity.ok(Map.of(
                     "user", authResponse.userResponseDto(),
                     "tokenExpiresIn", accessTokenMaxAge
@@ -89,7 +86,7 @@ public class AuthController {
     public ResponseEntity<Map<String, String>> logout(
             HttpServletResponse httpServletResponse,
             @CookieValue(name = "refreshToken", required = false) String refreshToken){
-        clearCookies(httpServletResponse, refreshToken);
+        authService.clearCookies(httpServletResponse, refreshToken);
         SecurityContextHolder.clearContext();
         return ResponseEntity.ok(Map.of("message", "Successful log out"));
     }
@@ -111,34 +108,4 @@ public class AuthController {
         ));
     }
 
-    private void clearCookies(HttpServletResponse httpServletResponse, String refreshToken) {
-        if (refreshToken != null){
-            authService.invalidateRefreshToken(refreshToken);
-            Cookie clearCookie = new Cookie("refreshToken", null);
-            clearCookie.setHttpOnly(true);
-            clearCookie.setSecure(false);
-            clearCookie.setPath("/");
-            clearCookie.setMaxAge(0);
-            httpServletResponse.addCookie(clearCookie);
-        }
-
-        Cookie clearAccess = new Cookie("accessToken", null);
-        clearAccess.setHttpOnly(true);
-        clearAccess.setSecure(false);
-        clearAccess.setPath("/");
-        clearAccess.setMaxAge(0);
-        httpServletResponse.addCookie(clearAccess);
-    }
-
-
-    private void addTokensToResponse(HttpServletResponse response, AuthResponseDto authResponse){
-        Cookie refreshCookie = new Cookie("refreshToken", authResponse.refreshToken().getToken());
-        refreshCookie.setSecure(false);
-        refreshCookie.setHttpOnly(true);
-        refreshCookie.setPath("/");
-        refreshCookie.setMaxAge(refreshTokenMaxAge);
-        response.addCookie(refreshCookie);
-
-        authService.addAccessCookieToResponse(response, authResponse.accessToken());
-    }
 }

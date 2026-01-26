@@ -5,7 +5,7 @@ import { useAuth } from "./context/authContext";
 import type { User, UserResponse } from "./types";
 
 const Register = () => {
-	const { setUser, user } = useAuth();
+	const { setUser } = useAuth();
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
 	const [fullname, setFullname] = useState("");
@@ -44,7 +44,7 @@ const Register = () => {
 	};
 
 	return (
-		<div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+		<div className="flex flex-col items-center justify-center min-h-[90vh] bg-gray-100">
 			<h2 className="text-2xl mb-4">Register</h2>
 			<form className="bg-white p-6 rounded shadow-md w-80">
 				<div className="mb-4">
@@ -100,6 +100,7 @@ const Register = () => {
 						Profile Photo URL
 					</label>
 					<input
+						placeholder="todo"
 						type="text"
 						id="profilePhoto"
 						className="w-full p-2 border border-gray-300 rounded"

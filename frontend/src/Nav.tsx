@@ -1,11 +1,13 @@
 import { Link } from "react-router-dom";
 import axiosInstance from "./api/axiosInstance";
+import Logo from "./assets/logo-finkwave.png";
 import { useAuth } from "./context/authContext";
 
 const Nav = () => {
 	const { user, setUser, isAuthLoading } = useAuth();
 
-	const handleLogout = async () => {
+	const handleLogout = async (e: React.MouseEvent<HTMLButtonElement>) => {
+		e.preventDefault();
 		try {
 			await axiosInstance.post("/auth/logout");
 			setUser(undefined);
@@ -17,7 +19,7 @@ const Nav = () => {
 	return (
 		<div className="bg-gray-800 p-4 flex justify-between items-center">
 			<Link to="/" className="text-white text-lg font-semibold">
-				Finkwave
+				<img src={Logo} alt="Finkwave Logo" className="h-12 w-auto" />
 			</Link>
 
 			<div className="flex items-center space-x-4">
@@ -39,22 +41,30 @@ const Nav = () => {
 									</div>
 								</div>
 								<button
-									onClick={(e) => {
-										e.preventDefault();
-										handleLogout();
-									}}
-									className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 flex items-center space-x-1"
+									onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
+										handleLogout(e)
+									}
+									className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm 
+                                    font-medium transition-colors duration-200 flex items-center space-x-1 cursor-pointer"
 								>
 									Logout
 								</button>
 							</div>
 						) : (
-							<div className="flex items-center space-x-2">
+							<div className="flex items-center space-x-4">
 								<Link
 									to="/login"
-									className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200"
+									className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm 
+                                    font-medium transition-colors duration-200 cursor-pointer"
 								>
 									Login
+								</Link>
+								<Link
+									to="/register"
+									className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm
+                                    font-medium transition-colors duration-200 cursor-pointer"
+								>
+									Register
 								</Link>
 							</div>
 						)}

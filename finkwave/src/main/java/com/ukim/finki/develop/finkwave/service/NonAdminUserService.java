@@ -83,6 +83,18 @@ public class NonAdminUserService {
         return mapper.toListenerDTO(listener, likesDTO,followers,following,playlists);
     }
 
+
+    public List<NonAdminUserDTO>searchUsers(String name){
+        return nonAdminUserRepository.searchByName(name).stream()
+                .map(user -> {
+                    String type = determineType(user.getId());
+                    Long followers = followRepository.countByFolloweeId(user.getId());
+                    Long following = followRepository.countByFollowerId(user.getId());
+                    return mapper.toDTO(user, type, followers, following);
+                })
+                .collect(Collectors.toList());
+    }
+
     private String determineType(Long id) {
         if (artistRepository.existsById(id)) {
             return "Artist";

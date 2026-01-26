@@ -26,4 +26,9 @@ public class NonAdminUserController {
     public HttpEntity<NonAdminUserDTO>getById(@PathVariable Long id){
         return ResponseEntity.ok(nonAdminUserService.getById(id));
     }
+
+    @GetMapping("/search")
+    public HttpEntity<List<NonAdminUserDTO>>searchUsers(@RequestParam String name){
+        return ResponseEntity.ok(nonAdminUserService.searchUsers(name));
+    }
 }

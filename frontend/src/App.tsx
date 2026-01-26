@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AllUsers from "./components/userProfile/AllUsersHelper";
-import UserDetail from "./components/userProfile/UserDetail";
+import UserDetail from "./components/userProfile/UserDetailView";
 
 function Home() {
   useEffect(() => {

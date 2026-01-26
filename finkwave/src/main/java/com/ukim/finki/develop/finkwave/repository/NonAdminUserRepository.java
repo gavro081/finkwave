@@ -15,6 +15,11 @@ public interface NonAdminUserRepository extends JpaRepository<NonAdminUser, Long
     @Query("SELECT n FROM NonAdminUser n JOIN FETCH n.user")
     List<NonAdminUser> findAllWithUser();
 
+    @Query("SELECT u FROM NonAdminUser u " +
+            "WHERE LOWER(u.user.fullName) LIKE LOWER(CONCAT('%', :name, '%') )"+
+            "OR  LOWER(u.user.username) LIKE LOWER(CONCAT('%', :name, '%' )) ")
+    List<NonAdminUser> searchByName(String name);
+
 
 
 }

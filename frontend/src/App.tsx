@@ -1,12 +1,13 @@
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 import LandingPage from "./LandingPage";
 import Login from "./Login";
+import Nav from "./Nav";
 import Register from "./Register";
 
 const Layout = () => {
 	return (
 		<div className="flex flex-col min-h-screen">
-			{/* <Nav /> */}
+			<Nav />
 			<main className="grow">
 				<Outlet />
 			</main>

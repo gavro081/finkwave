@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 				const response = await axiosInstance.get<{
 					tokenExpiresIn: number;
 					user: User;
-				}>("/user");
+				}>("/auth/user");
 				setUser(response.data.user);
 				scheduleTokenRefresh(response.data.tokenExpiresIn);
 			} catch (error) {

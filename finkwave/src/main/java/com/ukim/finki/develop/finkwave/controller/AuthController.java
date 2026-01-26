@@ -80,7 +80,7 @@ public class AuthController {
         ));
     }
 
-    @GetMapping("/logout")
+    @PostMapping("/logout")
     public ResponseEntity<Map<String, String>> logout(
             HttpServletResponse httpServletResponse,
             @CookieValue(name = "refreshToken", required = false) String refreshToken){

@@ -14,7 +14,8 @@ const Register = () => {
 
 	const navigate = useNavigate();
 
-	const handleRegister = async () => {
+	const handleRegister = async (e: React.FormEvent) => {
+		e.preventDefault();
 		const newUser: User = {
 			username,
 			fullName: fullname,
@@ -34,6 +35,7 @@ const Register = () => {
 			});
 			scheduleTokenRefresh(response.data.tokenExpiresIn);
 			setUser(newUser);
+			// todo
 			// setUser(response.data.user);
 			navigate("/");
 		} catch (error) {
@@ -108,10 +110,9 @@ const Register = () => {
 				<button
 					type="submit"
 					className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
-					onClick={(e) => {
-						e.preventDefault();
-						handleRegister();
-					}}
+					onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
+						handleRegister(e)
+					}
 				>
 					Register
 				</button>

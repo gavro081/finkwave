@@ -1,4 +1,6 @@
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
+import AllUsers from "./components/userProfile/AllUsersHelper";
+import UserDetail from "./components/userProfile/UserDetailView";
 import LandingPage from "./LandingPage";
 import Login from "./Login";
 import Nav from "./Nav";
@@ -27,6 +29,14 @@ const router = createBrowserRouter([
 			{
 				path: "/login",
 				element: <Login />,
+			},
+			{
+				path: "/users",
+				element: <AllUsers />,
+			},
+			{
+				path: "/users/:userId",
+				element: <UserDetail />,
 			},
 			{
 				path: "/register",

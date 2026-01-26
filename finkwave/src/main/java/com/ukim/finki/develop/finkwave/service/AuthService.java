@@ -5,7 +5,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.ukim.finki.develop.finkwave.dto.AuthRequestDto;
-import com.ukim.finki.develop.finkwave.dto.AuthResponseDto;
 import com.ukim.finki.develop.finkwave.dto.UserResponseDto;
 import com.ukim.finki.develop.finkwave.model.NonAdminUser;
 import com.ukim.finki.develop.finkwave.model.RefreshToken;
@@ -31,7 +30,7 @@ public class AuthService {
 
     // todo: should it be transactional?
 //    @Transactional
-    public AuthResponseDto registerAndLogIn(HttpServletResponse response, AuthRequestDto authRequestDto){
+    public UserResponseDto registerAndLogIn(HttpServletResponse response, AuthRequestDto authRequestDto){
         if (userRepository.findByUsername(authRequestDto.username()).isPresent()){
             throw new RuntimeException("User already exists");
         }
@@ -55,7 +54,7 @@ public class AuthService {
 
 
     // todo: dto in arguments or the standalone values?
-    public AuthResponseDto login(HttpServletResponse response, LoginRequestDto loginRequestDto){
+    public UserResponseDto login(HttpServletResponse response, LoginRequestDto loginRequestDto){
         User user = userRepository.findByUsername(loginRequestDto.username())
                 .orElseThrow(() -> new RuntimeException("Invalid credentials"));
         if (!passwordEncoder.matches(loginRequestDto.password(), user.getPassword())){
@@ -66,10 +65,8 @@ public class AuthService {
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
 
         UserResponseDto userResponseDto = new UserResponseDto(user.getUsername(), user.getRole());
-        // todo: dto inside a dto??
-        AuthResponseDto authResponseDto = new AuthResponseDto(accessToken, refreshToken, userResponseDto);
-        addTokensToResponse(response, authResponseDto);
-        return authResponseDto;
+        addTokensToResponse(response, refreshToken, accessToken);
+        return userResponseDto;
     }
 
     public String refreshAccessToken(String refreshTokenString) {
@@ -122,14 +119,14 @@ public class AuthService {
     }
 
 
-    private void addTokensToResponse(HttpServletResponse response, AuthResponseDto authResponse){
-        Cookie refreshCookie = new Cookie("refreshToken", authResponse.refreshToken().getToken());
+    private void addTokensToResponse(HttpServletResponse response, RefreshToken refreshToken, String accessToken){
+        Cookie refreshCookie = new Cookie("refreshToken", refreshToken.getToken());
         refreshCookie.setSecure(false);
         refreshCookie.setHttpOnly(true);
         refreshCookie.setPath("/");
         refreshCookie.setMaxAge(refreshTokenMaxAge);
         response.addCookie(refreshCookie);
 
-        addAccessCookieToResponse(response, authResponse.accessToken());
+        addAccessCookieToResponse(response, accessToken);
     }
 }

@@ -16,12 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.ukim.finki.develop.finkwave.dto.AuthRequestDto;
-import com.ukim.finki.develop.finkwave.dto.AuthResponseDto;
 import com.ukim.finki.develop.finkwave.dto.LoginRequestDto;
 import com.ukim.finki.develop.finkwave.dto.UserResponseDto;
 import com.ukim.finki.develop.finkwave.service.AuthService;
 
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
@@ -38,9 +36,9 @@ public class AuthController {
             @RequestBody AuthRequestDto authRequestDto,
             HttpServletResponse httpServletResponse){
         try {
-            AuthResponseDto authResponse = authService.registerAndLogIn(httpServletResponse, authRequestDto);
+            UserResponseDto userResponseDto = authService.registerAndLogIn(httpServletResponse, authRequestDto);
             return ResponseEntity.ok(Map.of(
-                    "user", authResponse.userResponseDto(),
+                    "user", userResponseDto,
                     "tokenExpiresIn", accessTokenMaxAge
             ));
         } catch (Exception e){
@@ -55,9 +53,9 @@ public class AuthController {
             @RequestBody LoginRequestDto loginRequestDto,
             HttpServletResponse httpServletResponse){
         try {
-            AuthResponseDto authResponse = authService.login(httpServletResponse, loginRequestDto);
+            UserResponseDto userResponseDto = authService.login(httpServletResponse, loginRequestDto);
             return ResponseEntity.ok(Map.of(
-                    "user", authResponse.userResponseDto(),
+                    "user", userResponseDto,
                     "tokenExpiresIn", accessTokenMaxAge
                     )
             );

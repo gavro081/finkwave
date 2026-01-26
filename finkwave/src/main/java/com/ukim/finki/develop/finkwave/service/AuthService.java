@@ -1,5 +1,6 @@
 package com.ukim.finki.develop.finkwave.service;
 
+import com.ukim.finki.develop.finkwave.config.AuthProperties;
 import com.ukim.finki.develop.finkwave.dto.LoginRequestDto;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -25,8 +26,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
-    private final int accessTokenMaxAge = 900;
-    private final int refreshTokenMaxAge = 10 * 24 * 60 * 60;
+    private final AuthProperties authProperties;
 
 
     public UserResponseDto registerAndLogIn(HttpServletResponse response, AuthRequestDto authRequestDto){
@@ -80,7 +80,7 @@ public class AuthService {
         accessCookie.setHttpOnly(true);
         accessCookie.setSecure(false);
         accessCookie.setPath("/");
-        accessCookie.setMaxAge(accessTokenMaxAge);
+        accessCookie.setMaxAge(authProperties.getAccessTokenMaxAge());
         response.addCookie(accessCookie);
     }
 
@@ -126,7 +126,7 @@ public class AuthService {
         refreshCookie.setHttpOnly(true);
         refreshCookie.setSecure(false);
         refreshCookie.setPath("/");
-        refreshCookie.setMaxAge(refreshTokenMaxAge);
+        refreshCookie.setMaxAge(authProperties.getRefreshTokenMaxAge());
         response.addCookie(refreshCookie);
 
         addAccessCookieToResponse(response, accessToken);

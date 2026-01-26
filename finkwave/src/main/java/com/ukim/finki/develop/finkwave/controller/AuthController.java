@@ -2,6 +2,7 @@ package com.ukim.finki.develop.finkwave.controller;
 
 import java.util.Map;
 
+import com.ukim.finki.develop.finkwave.config.AuthProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -27,8 +28,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
-    // todo: read from config
-    private final int accessTokenMaxAge = 900;
+    private final AuthProperties authProperties;
     private final AuthService authService;
 
     @PostMapping("/register")
@@ -39,7 +39,7 @@ public class AuthController {
             UserResponseDto userResponseDto = authService.registerAndLogIn(httpServletResponse, authRequestDto);
             return ResponseEntity.ok(Map.of(
                     "user", userResponseDto,
-                    "tokenExpiresIn", accessTokenMaxAge
+                    "tokenExpiresIn", authProperties.getAccessTokenMaxAge()
             ));
         } catch (Exception e){
             return ResponseEntity
@@ -56,7 +56,7 @@ public class AuthController {
             UserResponseDto userResponseDto = authService.login(httpServletResponse, loginRequestDto);
             return ResponseEntity.ok(Map.of(
                     "user", userResponseDto,
-                    "tokenExpiresIn", accessTokenMaxAge
+                    "tokenExpiresIn", authProperties.getAccessTokenMaxAge()
                     )
             );
         } catch (Exception e){
@@ -76,7 +76,7 @@ public class AuthController {
         }
         authService.refreshAccessTokenAndAddCookie(httpServletResponse, refreshToken);
         return ResponseEntity.ok(Map.of(
-                "tokenExpiresIn", accessTokenMaxAge
+                "tokenExpiresIn", authProperties.getAccessTokenMaxAge()
         ));
     }
 
@@ -101,7 +101,7 @@ public class AuthController {
                 : (principal != null ? principal.toString() : "");
         UserResponseDto userDto = authService.getUserDtoByUsername(username);
         return ResponseEntity.ok(Map.of(
-                "tokenExpiresIn", accessTokenMaxAge,
+                "tokenExpiresIn", authProperties.getAccessTokenMaxAge(),
                 "user", userDto
         ));
     }

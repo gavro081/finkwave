@@ -1,5 +1,6 @@
 package com.ukim.finki.develop.finkwave.service;
 
+import com.ukim.finki.develop.finkwave.config.AuthProperties;
 import com.ukim.finki.develop.finkwave.model.RefreshToken;
 import com.ukim.finki.develop.finkwave.model.User;
 import com.ukim.finki.develop.finkwave.repository.RefreshTokenRepository;
@@ -15,12 +16,13 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class RefreshTokenService {
     private final RefreshTokenRepository refreshTokenRepository;
+    private final AuthProperties authProperties;
 
     public RefreshToken createRefreshToken(User user){
         RefreshToken refreshToken = new RefreshToken();
         refreshToken.setUser(user);
         refreshToken.setToken(UUID.randomUUID().toString());
-        refreshToken.setExpiresAt(Instant.now().plus(14, ChronoUnit.DAYS));
+        refreshToken.setExpiresAt(Instant.now().plus(authProperties.getRefreshTokenMaxAge(), ChronoUnit.SECONDS));
         return refreshTokenRepository.save(refreshToken);
     }
 

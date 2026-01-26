@@ -32,6 +32,7 @@ public class JwtFilter extends OncePerRequestFilter {
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain) throws ServletException, IOException {
+        
         String token = null;
         if (request.getCookies() != null){
             for (Cookie cookie: request.getCookies()){
@@ -57,9 +58,11 @@ public class JwtFilter extends OncePerRequestFilter {
                 return;
             } catch (JwtException e){
                 System.out.println("Invalid jwt token.");
+                response.setStatus(HttpStatus.UNAUTHORIZED.value());
                 return;
             } catch (Exception e){
                 System.out.println(e.getMessage());
+                response.setStatus(HttpStatus.UNAUTHORIZED.value());
                 return;
             }
         }

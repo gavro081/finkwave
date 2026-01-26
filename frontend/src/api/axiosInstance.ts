@@ -4,10 +4,15 @@ export const baseURL = import.meta.env.VITE_API_BASE_URL;
 
 export const axiosInstance = axios.create({
 	baseURL,
-	headers: {
-		"Content-Type": "application/json",
-	},
 	withCredentials: true,
+});
+
+// set content-type to application/json unless sending FormData
+axiosInstance.interceptors.request.use((config) => {
+	if (!(config.data instanceof FormData)) {
+		config.headers["Content-Type"] = "application/json";
+	}
+	return config;
 });
 
 let refreshPromise: Promise<void> | null = null;
@@ -22,6 +27,10 @@ export const clearRefreshTimeout = () => {
 
 export const scheduleTokenRefresh = (expiryTimeSeconds: number) => {
 	clearRefreshTimeout();
+
+	if (!expiryTimeSeconds || expiryTimeSeconds <= 0) {
+		return;
+	}
 
 	const refreshTime = (expiryTimeSeconds - 60) * 1000;
 	if (refreshTime <= 0) {
@@ -43,6 +52,7 @@ export const refreshTokenMethod = async (): Promise<void | null> => {
 			}>("/auth/refresh");
 			scheduleTokenRefresh(refreshResponse.data.tokenExpiresIn);
 		} catch (err) {
+			clearRefreshTimeout();
 			console.error(err);
 			throw err;
 		} finally {
@@ -52,7 +62,7 @@ export const refreshTokenMethod = async (): Promise<void | null> => {
 	return refreshPromise;
 };
 
-axios.interceptors.response.use(
+axiosInstance.interceptors.response.use(
 	(response) => response,
 	async (error) => {
 		const originalConfig = error.config;

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import axiosInstance, { scheduleTokenRefresh } from "./api/axiosInstance";
 import { useAuth } from "./context/authContext";
@@ -10,23 +10,45 @@ const Register = () => {
 	const [password, setPassword] = useState("");
 	const [fullname, setFullname] = useState("");
 	const [email, setEmail] = useState("");
-	const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
+	const [profilePhotoFile, setProfilePhotoFile] = useState<File | null>(null);
+	const [previewProfilePhoto, setPreviewProfilePhoto] = useState<string | null>(
+		null,
+	);
 
 	const navigate = useNavigate();
 
+	useEffect(() => {
+		return () => {
+			if (previewProfilePhoto) {
+				URL.revokeObjectURL(previewProfilePhoto);
+			}
+		};
+	}, [previewProfilePhoto]);
+
 	const handleRegister = async (e: React.FormEvent) => {
 		e.preventDefault();
+		// todo: add proper error handling
+		if (profilePhotoFile && profilePhotoFile.size > 5 * 1024 * 1024) {
+			alert("Max file size is 5MB");
+			return;
+		}
+
+		if (profilePhotoFile && !profilePhotoFile.type.startsWith("image/")) {
+			alert("Only images allowed");
+			return;
+		}
+		const formData = new FormData();
+		if (profilePhotoFile) formData.append("profilePhoto", profilePhotoFile);
+		formData.append("username", username);
+		formData.append("fullname", fullname);
+		formData.append("email", email);
+		formData.append("password", password);
+
 		try {
 			const response = await axiosInstance.post<{
 				user: User;
 				tokenExpiresIn: number;
-			}>("/auth/register", {
-				username,
-				fullname,
-				email,
-				password,
-				profilePhoto,
-			});
+			}>("/auth/register", formData);
 			scheduleTokenRefresh(response.data.tokenExpiresIn);
 			setUser(response.data.user);
 			navigate("/");
@@ -88,24 +110,45 @@ const Register = () => {
 					/>
 				</div>
 				<div className="mb-4">
-					<label className="block text-gray-700 mb-2" htmlFor="profilePhoto">
-						Profile Photo URL
-					</label>
+					<label className="block text-gray-700 mb-2">Profile Photo</label>
+					<div className="flex items-center gap-3">
+						<label
+							htmlFor="profilePhoto"
+							className="px-4 py-2 bg-blue-500 text-white rounded cursor-pointer hover:bg-blue-600 transition-colors text-sm font-medium"
+						>
+							Choose File
+						</label>
+						<span className="text-gray-600 text-sm">
+							{profilePhotoFile ? profilePhotoFile.name : "No file chosen"}
+						</span>
+					</div>
 					<input
-						placeholder="todo"
-						type="text"
+						type="file"
+						accept="image/*"
 						id="profilePhoto"
-						className="w-full p-2 border border-gray-300 rounded"
-						value={profilePhoto || ""}
-						onChange={(e) => setProfilePhoto(e.target.value)}
+						className="hidden"
+						onChange={(e) => {
+							if (e.target.files && e.target.files[0]) {
+								setProfilePhotoFile(e.target.files[0]);
+								setPreviewProfilePhoto(URL.createObjectURL(e.target.files[0]));
+							}
+						}}
 					/>
 				</div>
+				{previewProfilePhoto && (
+					<div className="mb-4">
+						<p className="block text-gray-700 mb-2">Profile Photo Preview:</p>
+						<img
+							src={previewProfilePhoto}
+							alt="Profile Preview"
+							className="w-20 h-20 object-cover rounded-full"
+						/>
+					</div>
+				)}
 				<button
 					type="submit"
 					className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 cursor-pointer"
-					onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
-						handleRegister(e)
-					}
+					onClick={handleRegister}
 				>
 					Register
 				</button>

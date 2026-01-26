@@ -19,12 +19,7 @@ const Login = () => {
 				tokenExpiresIn: number;
 			}>("/auth/login", { username, password });
 			scheduleTokenRefresh(response.data.tokenExpiresIn);
-			setUser({
-				username: response.data.user.username,
-				fullName: "demo",
-				email: "demo@demo.com",
-				role: response.data.user.role,
-			});
+			setUser(response.data.user);
 			navigate("/");
 		} catch (error) {
 			setError("Login failed. Please check your credentials.");

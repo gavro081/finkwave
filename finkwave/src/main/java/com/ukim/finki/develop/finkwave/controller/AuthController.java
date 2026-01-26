@@ -4,16 +4,12 @@ import java.util.Map;
 
 import com.ukim.finki.develop.finkwave.config.AuthProperties;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.ukim.finki.develop.finkwave.dto.AuthRequestDto;
@@ -31,9 +27,9 @@ public class AuthController {
     private final AuthProperties authProperties;
     private final AuthService authService;
 
-    @PostMapping("/register")
+    @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Map<String, Object>> register(
-            @RequestBody AuthRequestDto authRequestDto,
+            @ModelAttribute AuthRequestDto authRequestDto,
             HttpServletResponse httpServletResponse){
         try {
             UserResponseDto userResponseDto = authService.registerAndLogIn(httpServletResponse, authRequestDto);

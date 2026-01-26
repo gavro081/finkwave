@@ -18,6 +18,13 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +38,8 @@ public class AuthService {
 
 
     @Transactional
-    public UserResponseDto registerAndLogIn(HttpServletResponse response, AuthRequestDto authRequestDto){
+    public UserResponseDto registerAndLogIn(HttpServletResponse response, AuthRequestDto authRequestDto)
+    throws IOException {
         if (userRepository.findByUsername(authRequestDto.username()).isPresent()){
             throw new RuntimeException("User already exists");
         }
@@ -89,15 +97,31 @@ public class AuthService {
         clearCookieByName(httpServletResponse, "accessToken");
     }
 
-    private User createNonAdminUser(AuthRequestDto authRequestDto){
-        User user = User.builder()
+    private User createNonAdminUser(AuthRequestDto authRequestDto) throws IOException {
+        User.UserBuilder userBuilder = User.builder()
                 .fullName(authRequestDto.fullname())
                 .username(authRequestDto.username())
                 .email(authRequestDto.email())
-                .profilePhoto(authRequestDto.profilePhoto())
                 .password(passwordEncoder.encode(authRequestDto.password()))
-                .role(Role.NONADMIN)
-                .build();
+                .role(Role.NONADMIN);
+
+
+        MultipartFile profilePhoto = authRequestDto.profilePhoto();
+        if (profilePhoto != null) {
+            if (profilePhoto.getContentType() != null && !profilePhoto.getContentType().startsWith("image/"))
+                throw new IllegalArgumentException("Invalid fyle type");
+
+            if (profilePhoto.getSize() > 5_000_000) {
+                throw new IllegalArgumentException(("File too large."));
+            }
+
+            String filename = UUID.randomUUID() + "-" + profilePhoto.getOriginalFilename();
+            Path path = Paths.get("uploads/profile-pictures", filename);
+            Files.copy(profilePhoto.getInputStream(), path);
+            userBuilder.profilePhoto("profile-pictures/" + filename);
+        }
+
+        User user = userBuilder.build();
 
         NonAdminUser nonAdminUser = new NonAdminUser();
         nonAdminUser.setUser(user);

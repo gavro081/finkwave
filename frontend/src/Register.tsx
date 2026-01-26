@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import axiosInstance, { scheduleTokenRefresh } from "./api/axiosInstance";
 import { useAuth } from "./context/authContext";
-import type { User, UserResponse } from "./types";
+import type { User } from "./types";
 
 const Register = () => {
 	const { setUser } = useAuth();
@@ -16,15 +16,9 @@ const Register = () => {
 
 	const handleRegister = async (e: React.FormEvent) => {
 		e.preventDefault();
-		const newUser: User = {
-			username,
-			fullName: fullname,
-			email: email,
-			profilePhoto: profilePhoto,
-		};
 		try {
 			const response = await axiosInstance.post<{
-				user: UserResponse;
+				user: User;
 				tokenExpiresIn: number;
 			}>("/auth/register", {
 				username,
@@ -34,9 +28,7 @@ const Register = () => {
 				profilePhoto,
 			});
 			scheduleTokenRefresh(response.data.tokenExpiresIn);
-			setUser(newUser);
-			// todo
-			// setUser(response.data.user);
+			setUser(response.data.user);
 			navigate("/");
 		} catch (error) {
 			console.error("Registration failed:", error);
@@ -110,7 +102,7 @@ const Register = () => {
 				</div>
 				<button
 					type="submit"
-					className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+					className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 cursor-pointer"
 					onClick={(e: React.MouseEvent<HTMLButtonElement>) =>
 						handleRegister(e)
 					}

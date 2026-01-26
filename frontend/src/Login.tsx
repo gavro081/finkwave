@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance, { scheduleTokenRefresh } from "./api/axiosInstance";
 import { useAuth } from "./context/authContext";
-import type { UserResponse } from "./types";
+import type { User } from "./types";
 
 const Login = () => {
 	const [username, setUsername] = useState("");
@@ -15,7 +15,7 @@ const Login = () => {
 		e.preventDefault();
 		try {
 			const response = await axiosInstance.post<{
-				user: UserResponse;
+				user: User;
 				tokenExpiresIn: number;
 			}>("/auth/login", { username, password });
 			scheduleTokenRefresh(response.data.tokenExpiresIn);
@@ -64,7 +64,7 @@ const Login = () => {
 				</div>
 				<button
 					type="submit"
-					className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 w-full"
+					className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200 w-full cursor-pointer"
 				>
 					Login
 				</button>

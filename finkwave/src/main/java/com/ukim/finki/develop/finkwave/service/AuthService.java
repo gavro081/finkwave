@@ -64,7 +64,8 @@ public class AuthService {
     public UserResponseDto getUserDtoByUsername(String username){
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Invalid credentials"));
-        return new UserResponseDto(user.getUsername(), user.getRole());
+
+        return userResponseFromUser(user);
     }
 
     public void invalidateRefreshToken(String refreshToken) {
@@ -109,7 +110,8 @@ public class AuthService {
         String accessToken = jwtService.generateToken(user.getUsername(), user.getRole().name());
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
 
-        UserResponseDto userResponseDto = new UserResponseDto(user.getUsername(), user.getRole());
+        UserResponseDto userResponseDto = userResponseFromUser(user);
+
         addTokensToResponse(response, refreshToken, accessToken);
         return userResponseDto;
     }
@@ -133,5 +135,14 @@ public class AuthService {
         response.addCookie(refreshCookie);
 
         addAccessCookieToResponse(response, accessToken);
+    }
+
+    private UserResponseDto userResponseFromUser(User user){
+        return UserResponseDto.builder()
+                .fullname(user.getFullName())
+                .username(user.getUsername())
+                .profilePhoto(user.getProfilePhoto())
+                .role(user.getRole())
+                .build();
     }
 }

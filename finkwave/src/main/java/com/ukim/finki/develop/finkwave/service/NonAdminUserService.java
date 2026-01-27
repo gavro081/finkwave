@@ -1,5 +1,6 @@
 package com.ukim.finki.develop.finkwave.service;
 
+import com.ukim.finki.develop.finkwave.exceptions.UserNotFoundException;
 import com.ukim.finki.develop.finkwave.model.*;
 import com.ukim.finki.develop.finkwave.model.dto.*;
 import com.ukim.finki.develop.finkwave.repository.*;
@@ -65,7 +66,7 @@ public class NonAdminUserService {
 
     private NonAdminUserDTO getArtistProfile(Long artistId, Long followers,Long following) {
         Artist artist = artistRepository.findByIdWithUser(artistId)
-            .orElseThrow(() -> new RuntimeException("Artist not found with id: " + artistId));
+            .orElseThrow(()->new UserNotFoundException("Artist not found with id: " + artistId));
 
 
         ArtistMusicalEntitiesDTO entitiesDTO = new ArtistMusicalEntitiesDTO();
@@ -76,7 +77,7 @@ public class NonAdminUserService {
 
     private NonAdminUserDTO getListenerProfile(Long listenerId, Long followers,Long following) {
         Listener listener = listenerRepository.findByIdWithUser(listenerId)
-            .orElseThrow(() -> new RuntimeException("Listener not found with id: " + listenerId));
+            .orElseThrow(()->new UserNotFoundException("Listener not found with id: " + listenerId));
 
 
         ListenerLikesDTO likesDTO = listenerService.getLikedEntities(listenerId);
@@ -96,7 +97,7 @@ public class NonAdminUserService {
 
         List<NonAdminUser>nonAdminUsers=nonAdminUserRepository.searchByName(name);
         if (nonAdminUsers.isEmpty()){
-            throw new RuntimeException("No user found");
+            throw new UserNotFoundException("No users matched the criteria");
         }
 
         return nonAdminUserRepository.searchByName(name).stream()

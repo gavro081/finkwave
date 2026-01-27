@@ -2,7 +2,9 @@ package com.ukim.finki.develop.finkwave.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.Hibernate;
 
@@ -12,6 +14,8 @@ import java.util.Objects;
 @Getter
 @Setter
 @Embeddable
+@NoArgsConstructor
+@AllArgsConstructor
 public class FollowId implements Serializable {
     private static final long serialVersionUID = -915670330063692538L;
     @Column(name = "follower", nullable = false)

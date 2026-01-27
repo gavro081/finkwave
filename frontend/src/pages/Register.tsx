@@ -27,10 +27,23 @@ const Register = () => {
 		};
 	}, [previewProfilePhoto]);
 
+	const handleRemoveFile = () => {
+		if (previewProfilePhoto) {
+			URL.revokeObjectURL(previewProfilePhoto);
+		}
+		setProfilePhotoFile(null);
+		setPreviewProfilePhoto(null);
+	};
+
 	const handleRegister = async (e: React.FormEvent) => {
 		e.preventDefault();
 		if (profilePhotoFile && profilePhotoFile.size > 5 * 1024 * 1024) {
 			alert("Max file size is 5MB");
+			return;
+		}
+
+		if (username === "" || password === "" || fullname === "" || email === "") {
+			setError("Please fill in all required fields.");
 			return;
 		}
 
@@ -55,8 +68,7 @@ const Register = () => {
 			navigate("/");
 			toast.success("Registration successful!");
 		} catch (error: any) {
-			const errorMessage =
-				error.response?.data?.error || "Registration failed. Please try again.";
+			const errorMessage = error.response?.data?.error || "Please try again.";
 			setError(`Registration failed: ${errorMessage}`);
 		}
 	};
@@ -64,7 +76,7 @@ const Register = () => {
 	return (
 		<div className="flex flex-col items-center justify-center min-h-[90vh] bg-gray-100">
 			<h2 className="text-2xl mb-4">Register</h2>
-			<form className="bg-white p-6 rounded shadow-md w-80">
+			<form className="bg-white p-6 rounded shadow-md w-full max-w-md">
 				{error && <p className="text-red-500 mb-4">{error}</p>}
 				<div className="mb-4">
 					<label className="block text-gray-700 mb-2" htmlFor="username">
@@ -119,13 +131,22 @@ const Register = () => {
 					<div className="flex items-center gap-3">
 						<label
 							htmlFor="profilePhoto"
-							className="px-4 py-2 bg-blue-500 text-white rounded cursor-pointer hover:bg-blue-600 transition-colors text-sm font-medium"
+							className="px-4 py-2 bg-blue-500 text-white rounded cursor-pointer hover:bg-blue-600 transition-colors text-sm font-medium text-center"
 						>
 							Choose File
 						</label>
-						<span className="text-gray-600 text-sm">
+						<span className="text-gray-600 text-sm flex-1">
 							{profilePhotoFile ? profilePhotoFile.name : "No file chosen"}
 						</span>
+						{profilePhotoFile && (
+							<button
+								type="button"
+								onClick={handleRemoveFile}
+								className="px-3 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors text-sm font-medium"
+							>
+								Remove
+							</button>
+						)}
 					</div>
 					<input
 						type="file"

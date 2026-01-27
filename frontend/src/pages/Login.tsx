@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axiosInstance, { scheduleTokenRefresh } from "./api/axiosInstance";
-import { useAuth } from "./context/authContext";
-import type { User } from "./types";
+import axiosInstance, { scheduleTokenRefresh } from "../api/axiosInstance";
+import { useAuth } from "../context/authContext";
+import type { User } from "../utils/types";
 
 const Login = () => {
 	const [username, setUsername] = useState("");

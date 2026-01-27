@@ -1,10 +1,10 @@
 import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
-import AllUsers from "./components/userProfile/AllUsersHelper";
-import UserDetail from "./components/userProfile/UserDetailView";
-import LandingPage from "./LandingPage";
-import Login from "./Login";
-import Nav from "./Nav";
-import Register from "./Register";
+import AllUsers from "./pages/AllUsers";
+import LandingPage from "./pages/LandingPage";
+import Login from "./pages/Login";
+import Nav from "./pages/Nav";
+import Register from "./pages/Register";
+import UserDetailView from "./pages/UserDetailView";
 
 const Layout = () => {
 	return (
@@ -36,7 +36,7 @@ const router = createBrowserRouter([
 			},
 			{
 				path: "/users/:userId",
-				element: <UserDetail />,
+				element: <UserDetailView />,
 			},
 			{
 				path: "/register",

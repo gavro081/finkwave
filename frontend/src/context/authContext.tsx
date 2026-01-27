@@ -11,7 +11,7 @@ import axiosInstance, {
 	refreshTokenMethod,
 	scheduleTokenRefresh,
 } from "../api/axiosInstance";
-import { type User } from "../types";
+import { type User } from "../utils/types";
 
 interface AuthContextType {
 	user: User | undefined;

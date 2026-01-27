@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
-import axiosInstance, { baseURL } from "./api/axiosInstance";
-import Logo from "./assets/logo-finkwave.png";
-import { useAuth } from "./context/authContext";
+import axiosInstance, { baseURL } from "../api/axiosInstance";
+import Logo from "../assets/logo-finkwave.png";
+import { useAuth } from "../context/authContext";
 
 const Nav = () => {
 	const { user, setUser, isAuthLoading } = useAuth();

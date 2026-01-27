@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import axiosInstance, { scheduleTokenRefresh } from "../api/axiosInstance";
 import { useAuth } from "../context/authContext";
 import type { User } from "../utils/types";
@@ -21,8 +22,12 @@ const Login = () => {
 			scheduleTokenRefresh(response.data.tokenExpiresIn);
 			setUser(response.data.user);
 			navigate("/");
-		} catch (error) {
-			setError("Login failed. Please check your credentials.");
+			toast.success("Login successful!");
+		} catch (error: any) {
+			const errorMessage =
+				error.response?.data?.error ||
+				"Login failed. Please check your credentials.";
+			setError(`Login failed: ${errorMessage}`);
 		}
 	};
 	return (

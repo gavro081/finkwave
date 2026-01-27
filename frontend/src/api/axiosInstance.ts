@@ -69,7 +69,9 @@ axiosInstance.interceptors.response.use(
 		if (
 			[401, 403].includes(error.response?.status) &&
 			!originalConfig._retry &&
-			originalConfig.url !== "/auth/refresh"
+			originalConfig.url !== "/auth/refresh" &&
+			originalConfig.url !== "/auth/login" &&
+			originalConfig.url !== "/auth/register"
 		) {
 			originalConfig._retry = true;
 

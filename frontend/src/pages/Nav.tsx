@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 import axiosInstance, { baseURL } from "../api/axiosInstance";
 import Logo from "../assets/logo-finkwave.png";
 import { useAuth } from "../context/authContext";
@@ -11,8 +12,10 @@ const Nav = () => {
 		try {
 			await axiosInstance.post("/auth/logout");
 			setUser(undefined);
+			toast.success("Logout successful!");
 		} catch (error) {
 			console.error("Logout failed:", error);
+			toast.error("Logout failed!");
 		}
 	};
 

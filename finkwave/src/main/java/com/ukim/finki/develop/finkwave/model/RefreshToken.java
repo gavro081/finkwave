@@ -8,6 +8,7 @@ import java.time.Instant;
 
 @Entity
 @Getter @Setter
+@Table(name = "refresh_token")
 public class RefreshToken {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

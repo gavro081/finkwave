@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
+import { toast } from "react-toastify";
 import axiosInstance, { scheduleTokenRefresh } from "../api/axiosInstance";
 import { useAuth } from "../context/authContext";
 import type { User } from "../utils/types";
@@ -14,6 +15,7 @@ const Register = () => {
 	const [previewProfilePhoto, setPreviewProfilePhoto] = useState<string | null>(
 		null,
 	);
+	const [error, setError] = useState<string | null>(null);
 
 	const navigate = useNavigate();
 
@@ -27,7 +29,6 @@ const Register = () => {
 
 	const handleRegister = async (e: React.FormEvent) => {
 		e.preventDefault();
-		// todo: add proper error handling
 		if (profilePhotoFile && profilePhotoFile.size > 5 * 1024 * 1024) {
 			alert("Max file size is 5MB");
 			return;
@@ -52,8 +53,12 @@ const Register = () => {
 			scheduleTokenRefresh(response.data.tokenExpiresIn);
 			setUser(response.data.user);
 			navigate("/");
-		} catch (error) {
-			console.error("Registration failed:", error);
+			toast.success("Registration successful!");
+		} catch (error: any) {
+			const errorMessage =
+				error.response?.data?.error || "Registration failed. Please try again.";
+			setError(errorMessage);
+			toast.error(errorMessage);
 		}
 	};
 
@@ -61,6 +66,7 @@ const Register = () => {
 		<div className="flex flex-col items-center justify-center min-h-[90vh] bg-gray-100">
 			<h2 className="text-2xl mb-4">Register</h2>
 			<form className="bg-white p-6 rounded shadow-md w-80">
+				{error && <p className="text-red-500 mb-4">{error}</p>}
 				<div className="mb-4">
 					<label className="block text-gray-700 mb-2" htmlFor="username">
 						Username

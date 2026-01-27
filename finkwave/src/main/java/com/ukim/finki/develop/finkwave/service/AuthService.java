@@ -43,7 +43,7 @@ public class AuthService {
     public UserResponseDto registerAndLogIn(HttpServletResponse response, AuthRequestDto authRequestDto)
     throws IOException {
         if (userRepository.findByUsername(authRequestDto.username()).isPresent()){
-            throw new RuntimeException("User already exists");
+            throw new RuntimeException("Error creating user.");
         }
         User user = createNonAdminUser(authRequestDto);
         return authenticateAndRespond(response, user);
@@ -51,10 +51,10 @@ public class AuthService {
 
     public UserResponseDto login(HttpServletResponse response, LoginRequestDto loginRequestDto){
         User user = userRepository.findByUsername(loginRequestDto.username())
-                .orElseThrow(() -> new RuntimeException("Invalid credentials"));
+                .orElseThrow(() -> new RuntimeException("Invalid credentials."));
 
         if (!passwordEncoder.matches(loginRequestDto.password(), user.getPassword())){
-            throw new RuntimeException("Invalid credentials");
+            throw new RuntimeException("Invalid credentials.");
         }
 
         return authenticateAndRespond(response, user);
@@ -73,7 +73,7 @@ public class AuthService {
 
     public UserResponseDto getUserDtoByUsername(String username){
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Invalid credentials"));
+                .orElseThrow(() -> new RuntimeException("Invalid credentials."));
 
         return userResponseFromUser(user);
     }
@@ -102,14 +102,14 @@ public class AuthService {
     public Long getCurrentUserID(){
         Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new RuntimeException("User not authenticated");
+            throw new RuntimeException("User not authenticated.");
         }
 
         String username=authentication.getName();
 
 
         return userRepository.findByUsername(username).map(User::getId)
-                .orElseThrow(()->new RuntimeException("User not found"));
+                .orElseThrow(()->new RuntimeException("User not found."));
     }
 
 
@@ -125,9 +125,9 @@ public class AuthService {
         MultipartFile profilePhoto = authRequestDto.profilePhoto();
         if (profilePhoto != null) {
             if (profilePhoto.getContentType() != null && !profilePhoto.getContentType().startsWith("image/"))
-                throw new IllegalArgumentException("Invalid fyle type");
+                throw new IllegalArgumentException("Invalid fyle type.");
 
-            if (profilePhoto.getSize() > 5_000_000) {
+            if (profilePhoto.getSize() > 2_000_000) {
                 throw new IllegalArgumentException(("File too large."));
             }
 

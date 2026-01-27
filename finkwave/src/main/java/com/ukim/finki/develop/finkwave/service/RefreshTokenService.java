@@ -1,16 +1,19 @@
 package com.ukim.finki.develop.finkwave.service;
 
-import com.ukim.finki.develop.finkwave.config.AuthProperties;
-import com.ukim.finki.develop.finkwave.model.RefreshToken;
-import com.ukim.finki.develop.finkwave.model.User;
-import com.ukim.finki.develop.finkwave.repository.RefreshTokenRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.UUID;
+
+import org.springframework.stereotype.Service;
+
+import com.ukim.finki.develop.finkwave.config.AuthProperties;
+import com.ukim.finki.develop.finkwave.exceptions.InvalidTokenException;
+import com.ukim.finki.develop.finkwave.model.RefreshToken;
+import com.ukim.finki.develop.finkwave.model.User;
+import com.ukim.finki.develop.finkwave.repository.RefreshTokenRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -31,9 +34,13 @@ public class RefreshTokenService {
     }
 
     public RefreshToken validateRefreshToken(String token){
-        RefreshToken refreshToken = findByToken(token).orElseThrow(() -> new RuntimeException("Invalid token"));
-        if (refreshToken.isRevoked() || refreshToken.getExpiresAt().isBefore(Instant.now())){
-            throw new RuntimeException("Invalid refresh token");
+        RefreshToken refreshToken = findByToken(token)
+                .orElseThrow(() -> new InvalidTokenException("Invalid refresh token."));
+        if (refreshToken.isRevoked()){
+            throw new InvalidTokenException("Refresh token has been revoked.");
+        }
+        if (refreshToken.getExpiresAt().isBefore(Instant.now())){
+            throw new InvalidTokenException("Refresh token has expired.");
         }
         return refreshToken;
     }

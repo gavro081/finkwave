@@ -27,8 +27,7 @@ const Login = () => {
 			const errorMessage =
 				error.response?.data?.error ||
 				"Login failed. Please check your credentials.";
-			setError(errorMessage);
-			toast.error(errorMessage);
+			setError(`Login failed: ${errorMessage}`);
 		}
 	};
 	return (

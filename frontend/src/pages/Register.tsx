@@ -57,8 +57,7 @@ const Register = () => {
 		} catch (error: any) {
 			const errorMessage =
 				error.response?.data?.error || "Registration failed. Please try again.";
-			setError(errorMessage);
-			toast.error(errorMessage);
+			setError(`Registration failed: ${errorMessage}`);
 		}
 	};
 

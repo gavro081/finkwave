@@ -1,18 +1,30 @@
 package com.ukim.finki.develop.finkwave.service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.UUID;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ukim.finki.develop.finkwave.config.AuthProperties;
-import com.ukim.finki.develop.finkwave.model.dto.AuthRequestDto;
-import com.ukim.finki.develop.finkwave.model.dto.LoginRequestDto;
-import com.ukim.finki.develop.finkwave.model.dto.UserResponseDto;
+import com.ukim.finki.develop.finkwave.exceptions.InvalidCredentialsException;
+import com.ukim.finki.develop.finkwave.exceptions.InvalidFileException;
+import com.ukim.finki.develop.finkwave.exceptions.UnauthenticatedException;
+import com.ukim.finki.develop.finkwave.exceptions.UserAlreadyExistsException;
+import com.ukim.finki.develop.finkwave.exceptions.UserNotFoundException;
 import com.ukim.finki.develop.finkwave.model.NonAdminUser;
 import com.ukim.finki.develop.finkwave.model.RefreshToken;
 import com.ukim.finki.develop.finkwave.model.Role;
 import com.ukim.finki.develop.finkwave.model.User;
+import com.ukim.finki.develop.finkwave.model.dto.AuthRequestDto;
+import com.ukim.finki.develop.finkwave.model.dto.LoginRequestDto;
+import com.ukim.finki.develop.finkwave.model.dto.UserResponseDto;
 import com.ukim.finki.develop.finkwave.repository.NonAdminUserRepository;
 import com.ukim.finki.develop.finkwave.repository.UserRepository;
 
@@ -20,13 +32,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -38,12 +43,13 @@ public class AuthService {
     private final RefreshTokenService refreshTokenService;
     private final AuthProperties authProperties;
 
+    private static final long MAX_FILE_SIZE = 2_000_000;
 
     @Transactional
     public UserResponseDto registerAndLogIn(HttpServletResponse response, AuthRequestDto authRequestDto)
     throws IOException {
         if (userRepository.findByUsername(authRequestDto.username()).isPresent()){
-            throw new RuntimeException("Error creating user.");
+            throw new UserAlreadyExistsException();
         }
         User user = createNonAdminUser(authRequestDto);
         return authenticateAndRespond(response, user);
@@ -51,10 +57,10 @@ public class AuthService {
 
     public UserResponseDto login(HttpServletResponse response, LoginRequestDto loginRequestDto){
         User user = userRepository.findByUsername(loginRequestDto.username())
-                .orElseThrow(() -> new RuntimeException("Invalid credentials."));
+                .orElseThrow(InvalidCredentialsException::new);
 
         if (!passwordEncoder.matches(loginRequestDto.password(), user.getPassword())){
-            throw new RuntimeException("Invalid credentials.");
+            throw new InvalidCredentialsException();
         }
 
         return authenticateAndRespond(response, user);
@@ -73,7 +79,7 @@ public class AuthService {
 
     public UserResponseDto getUserDtoByUsername(String username){
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Invalid credentials."));
+                .orElseThrow(UserNotFoundException::new);
 
         return userResponseFromUser(user);
     }
@@ -102,14 +108,13 @@ public class AuthService {
     public Long getCurrentUserID(){
         Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new RuntimeException("User not authenticated.");
+            throw new UnauthenticatedException();
         }
 
         String username=authentication.getName();
 
-
         return userRepository.findByUsername(username).map(User::getId)
-                .orElseThrow(()->new RuntimeException("User not found."));
+                .orElseThrow(UserNotFoundException::new);
     }
 
 
@@ -123,12 +128,14 @@ public class AuthService {
 
 
         MultipartFile profilePhoto = authRequestDto.profilePhoto();
-        if (profilePhoto != null) {
-            if (profilePhoto.getContentType() != null && !profilePhoto.getContentType().startsWith("image/"))
-                throw new IllegalArgumentException("Invalid fyle type.");
+        if (profilePhoto != null && !profilePhoto.isEmpty()) {
+            String contentType = profilePhoto.getContentType();
+            if (contentType == null || !contentType.startsWith("image/")) {
+                throw InvalidFileException.invalidType();
+            }
 
-            if (profilePhoto.getSize() > 2_000_000) {
-                throw new IllegalArgumentException(("File too large."));
+            if (profilePhoto.getSize() > MAX_FILE_SIZE) {
+                throw InvalidFileException.tooLarge(MAX_FILE_SIZE);
             }
 
             String filename = UUID.randomUUID() + "-" + profilePhoto.getOriginalFilename();

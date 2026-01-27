@@ -12,9 +12,9 @@ import java.util.List;
 @Repository
 public interface ArtistContributionRepository extends JpaRepository<ArtistContribution, ArtistContributionId> {
 
-    @Query("SELECT ac.musicalEntity.id,ac.musicalEntity.title,ac.role, "+
-        "CASE WHEN s.id IS NOT NULL THEN 'Song' "+
-        "WHEN a.id IS NOT NULL THEN 'Album' "+
+    @Query("SELECT ac.musicalEntity.id,ac.musicalEntity.title,ac.musicalEntity.genre,ac.role, "+
+        "CASE WHEN s.id IS NOT NULL THEN 'SONG' "+
+        "WHEN a.id IS NOT NULL THEN 'ALBUM' "+
         "ELSE 'Unknown' END "+
         "FROM ArtistContribution ac "+
         "LEFT JOIN Song s  ON s.musicalEntities.id=ac.musicalEntity.id "+

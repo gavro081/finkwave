@@ -1,5 +1,7 @@
 package com.ukim.finki.develop.finkwave.service;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -96,6 +98,20 @@ public class AuthService {
         }
         clearCookieByName(httpServletResponse, "accessToken");
     }
+
+    public Long getCurrentUserID(){
+        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new RuntimeException("User not authenticated");
+        }
+
+        String username=authentication.getName();
+
+
+        return userRepository.findByUsername(username).map(User::getId)
+                .orElseThrow(()->new RuntimeException("User not found"));
+    }
+
 
     private User createNonAdminUser(AuthRequestDto authRequestDto) throws IOException {
         User.UserBuilder userBuilder = User.builder()

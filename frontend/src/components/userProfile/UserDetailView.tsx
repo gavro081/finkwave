@@ -2,27 +2,10 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import ArtistView from "./ArtistView";
 import ListenerView from "./ListenerView";
-
-interface MusicalEntityDTO {
-  id: number;
-  title: string;
-  genre: string;
-  type: string;
-}
-
-interface ArtistContributionDTO {
-  musicalEntityId: number;
-  title: string;
-  role: string;
-  entityType: string;
-}
-
-interface Playlist {
-  id: number;
-  name: string;
-  cover: string;
-  creatorName: string;
-}
+import axiosInstance from "../../api/axiosInstance";
+import type { ArtistContributionDTO } from "../../types";
+import type { MusicalEntityDTO } from "../../types";
+import type { Playlist } from "../../types";
 
 interface User {
   id: number;
@@ -31,6 +14,7 @@ interface User {
   userType: string;
   followers: number;
   following: number;
+  isFollowedByCurrentUser: boolean;
 
   musicalEntities?: {
     contributions: ArtistContributionDTO[];
@@ -44,6 +28,7 @@ interface User {
 }
 
 const UserDetail = () => {
+  // user refers to the selected user NOT to the user from context
   const { userId } = useParams();
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
@@ -53,17 +38,13 @@ const UserDetail = () => {
     const fetchUser = async () => {
       setError(null);
       try {
-        const response = await fetch(`http://localhost:8080/users/${userId}`);
+        const response = await axiosInstance.get(`/users/${userId}`);
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || "Failed to fetch user");
-        }
-
-        const data = await response.json();
-        setUser(data);
+        setUser(response.data);
       } catch (err: any) {
-        setError(err.message);
+        const errorMessage =
+          err.response?.data?.error || "Failed to fetch user";
+        setError(errorMessage);
       }
     };
     fetchUser();
@@ -114,8 +95,8 @@ const UserDetail = () => {
               </div>
             </div>
 
-            <button className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium">
-              Follow
+            <button className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg shadow-md transition-colors duration-200 cursor-pointer">
+              {user.isFollowedByCurrentUser ? "Unfollow" : "Follow"}
             </button>
           </div>
         </div>

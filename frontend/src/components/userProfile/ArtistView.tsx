@@ -1,12 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Music, Disc3, Mic2 } from "lucide-react";
-
-interface ArtistContributionDTO {
-  musicalEntityId: number;
-  title: string;
-  role: string;
-  entityType: string;
-}
+import type { ArtistContributionDTO } from "../../types";
 
 interface ArtistViewProps {
   contributions: ArtistContributionDTO[];
@@ -15,8 +9,8 @@ interface ArtistViewProps {
 const ArtistView = ({ contributions }: ArtistViewProps) => {
   const navigate = useNavigate();
 
-  const albums = contributions.filter((c) => c.entityType === "Album");
-  const songs = contributions.filter((c) => c.entityType === "Song");
+  const albums = contributions.filter((c) => c.entityType === "ALBUM");
+  const songs = contributions.filter((c) => c.entityType === "SONG");
 
   const getRoleColor = (role: string) => {
     const colors: { [key: string]: string } = {
@@ -30,7 +24,6 @@ const ArtistView = ({ contributions }: ArtistViewProps) => {
 
   return (
     <div className="mt-8">
-      {/* Albums Section */}
       {albums.length > 0 && (
         <div className="mb-12">
           <div className="flex items-center gap-3 mb-6">
@@ -90,7 +83,7 @@ const ArtistView = ({ contributions }: ArtistViewProps) => {
                     {song.title}
                   </h3>
                   <div className="flex items-center gap-2 mt-1">
-                    <Mic2 className="w-4 h-4 text-gray-400" />
+                    {song.genre}
                   </div>
                 </div>
                 <span

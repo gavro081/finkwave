@@ -22,7 +22,7 @@ public class ArtistService {
         List<Object[]>results=artistContributionRepository.findContributionsByArtistId(artistId);
 
         return results.stream()
-        .map(row->new ArtistContributionDTO((Long)row[0], (String)row[1], (String)row[2], (String)row[3]))
+        .map(row->new ArtistContributionDTO((Long)row[0], (String)row[1], (String)row[2],(String)row[3], (String)row[4]))
         .collect(Collectors.toList());
     }
 

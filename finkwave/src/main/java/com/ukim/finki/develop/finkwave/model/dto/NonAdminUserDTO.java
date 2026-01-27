@@ -17,6 +17,7 @@ public class NonAdminUserDTO {
     private String userType;
     private Long followers;
     private Long following;
+    private Boolean isFollowedByCurrentUser;
 
 
     

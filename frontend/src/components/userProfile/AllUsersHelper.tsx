@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import axiosInstance from "../../api/axiosInstance";
 interface User {
   id: number;
   username: string;
@@ -15,9 +15,8 @@ const AllUsers = () => {
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const response = await fetch("http://localhost:8080/users/all");
-      const data = await response.json();
-      setUsers(data);
+      const response = axiosInstance.get("/users/all");
+      setUsers((await response).data);
     };
     fetchUsers();
   }, []);
@@ -29,19 +28,25 @@ const AllUsers = () => {
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch(
-        `http://localhost:8080/users/search?name=${searchedUser}`,
-      );
-      if (!response.ok) throw new Error("Search failed");
-
-      const data = await response.json();
-      setUsers(data);
+      const response = await axiosInstance.get(`/users/search`, {
+        params: { name: searchedUser },
+      });
+      setUsers(response.data);
     } catch (err: any) {
-      setError(err.message);
+      const errorMessage = err.response?.data?.error || "Search failed";
+      setError(errorMessage);
     }
   };
 
   if (users.length == 0) return <div className="p-6">Loading...</div>;
+  if (error) {
+    return (
+      <div className="p-6 bg-red-50 border border-red-200 text-red-700 rounded-lg">
+        <h2 className="font-bold">Error</h2>
+        <p>{error}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-6">

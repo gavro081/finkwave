@@ -10,6 +10,7 @@ import lombok.Setter;
 public class ArtistContributionDTO {
     private Long musicalEntityId;
     private String title;
+    private String genre;
     private String role;
     private String entityType;
 }

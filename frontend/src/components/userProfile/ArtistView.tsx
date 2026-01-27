@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { Music, Disc3, Mic2 } from "lucide-react";
-import type { ArtistContributionDTO } from "../../types";
+import { Music, Disc3 } from "lucide-react";
+import type { ArtistContributionDTO } from "../../utils/types";
 
 interface ArtistViewProps {
   contributions: ArtistContributionDTO[];

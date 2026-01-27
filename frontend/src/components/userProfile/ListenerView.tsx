@@ -1,19 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Heart, ListMusic, Music, Album } from "lucide-react";
-
-interface MusicalEntityDTO {
-  id: number;
-  title: string;
-  genre: string;
-  type: string;
-}
-
-interface Playlist {
-  id: number;
-  name: string;
-  cover: string;
-  creatorName: string;
-}
+import type { Playlist, MusicalEntityDTO } from "../../utils/types";
 
 interface ListenerViewProps {
   likedEntities: MusicalEntityDTO[];

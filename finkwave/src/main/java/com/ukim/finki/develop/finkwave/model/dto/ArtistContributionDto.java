@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class ArtistContributionDTO {
+public class ArtistContributionDto {
     private Long musicalEntityId;
     private String title;
     private String genre;

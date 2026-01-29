@@ -1,16 +1,13 @@
 package com.ukim.finki.develop.finkwave.model.dto;
 
-import com.ukim.finki.develop.finkwave.model.Playlist;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.List;
 
 
 @Getter
 @Setter
 
-public class NonAdminUserDTO {
+public  class NonAdminUserDto {
     private Long id;
     private String username;
     private String fullName;
@@ -20,9 +17,4 @@ public class NonAdminUserDTO {
     private Boolean isFollowedByCurrentUser;
 
 
-    
-    private ArtistMusicalEntitiesDTO musicalEntities;
-    
-    private ListenerLikesDTO likes;
-    private List<PlaylistDTO>createdPlaylists;
 }

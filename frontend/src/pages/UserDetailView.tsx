@@ -4,36 +4,37 @@ import axiosInstance from "../api/axiosInstance";
 import ArtistView from "../components/userProfile/ArtistView";
 import ListenerView from "../components/userProfile/ListenerView";
 import type {
-  ArtistContributionDTO,
-  MusicalEntityDTO,
+  MusicalEntity,
   Playlist,
+  ArtistContribution,
 } from "../utils/types";
 
-interface User {
+interface BaseUser {
   id: number;
-  username: string;
   fullName: string;
   userType: string;
   followers: number;
   following: number;
   isFollowedByCurrentUser: boolean;
-
-  musicalEntities?: {
-    contributions: ArtistContributionDTO[];
-  };
-
-  likes?: {
-    likedEntities: MusicalEntityDTO[];
-  };
-
-  createdPlaylists?: Playlist[];
 }
+
+interface Artist extends BaseUser {
+  userType: "ARTIST";
+  contributions: ArtistContribution[];
+}
+interface Listener extends BaseUser {
+  userType: "LISTENER";
+  likedEntities: MusicalEntity[];
+  createdPlaylists: Playlist[];
+}
+
+type UserProfile = Artist | Listener;
 
 const UserDetail = () => {
   // user refers to the selected user NOT to the user from context
   const { userId } = useParams();
   const navigate = useNavigate();
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isFollowing, setIsFollowing] = useState(false);
 
@@ -42,10 +43,9 @@ const UserDetail = () => {
 
     setIsFollowing(true);
     try {
-      const response = await axiosInstance.post<User>(
+      const response = await axiosInstance.post<UserProfile>(
         `/users/follow/${userId}`,
       );
-      setUser(response.data);
     } catch (err: any) {
       console.error(err.response?.data?.error);
     } finally {
@@ -58,6 +58,7 @@ const UserDetail = () => {
       setError(null);
       try {
         const response = await axiosInstance.get(`/users/${userId}`);
+        console.log(response.data);
 
         setUser(response.data);
       } catch (err: any) {
@@ -134,13 +135,11 @@ const UserDetail = () => {
           </div>
         </div>
 
-        {user.userType === "ARTIST" && user.musicalEntities?.contributions && (
-          <ArtistView contributions={user.musicalEntities.contributions} />
-        )}
-
-        {user.userType === "LISTENER" && user.likes?.likedEntities && (
+        {user.userType === "ARTIST" ? (
+          <ArtistView contributions={user.contributions} />
+        ) : (
           <ListenerView
-            likedEntities={user.likes.likedEntities}
+            likedEntities={user.likedEntities}
             playlists={user.createdPlaylists}
           />
         )}

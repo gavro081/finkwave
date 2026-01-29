@@ -6,8 +6,6 @@ import com.ukim.finki.develop.finkwave.model.dto.*;
 import com.ukim.finki.develop.finkwave.repository.*;
 import com.ukim.finki.develop.finkwave.service.mappers.NonAdminUserMapper;
 import lombok.AllArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -26,19 +24,19 @@ public class NonAdminUserService {
     private final AuthService authService;
 
     @Transactional(readOnly = true)
-    public List<NonAdminUserDTO> getAllUsers() {
+    public List<NonAdminUserDto> getAllUsers() {
         return nonAdminUserRepository.findAllWithUser().stream()
                 .map(user -> {
                     String type = determineType(user.getId());
                     Long followers = followRepository.countByFolloweeId(user.getId());
                     Long following = followRepository.countByFollowerId(user.getId());
-                    return mapper.toDTO(user, type, followers, following);
+                    return mapper.toDto(user, type, followers, following);
                 })
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public NonAdminUserDTO getById(Long id) {
+    public NonAdminUserDto getById(Long id) {
         Long followers=followRepository.countByFolloweeId(id);
         Long following=followRepository.countByFollowerId(id);
         Long currentUserId= authService.getCurrentUserID();
@@ -47,7 +45,7 @@ public class NonAdminUserService {
         if (currentUserId != null) {
             isFollowedByCurrentUser = followRepository.isFollowing(currentUserId, id);
         }
-        NonAdminUserDTO dto;
+        NonAdminUserDto dto;
     
         if (artistRepository.existsById(id)) {
              dto=getArtistProfile(id, followers, following);
@@ -64,36 +62,35 @@ public class NonAdminUserService {
         throw new RuntimeException("User not found with id: " + id);
     }
 
-    private NonAdminUserDTO getArtistProfile(Long artistId, Long followers,Long following) {
+    private NonAdminUserDto getArtistProfile(Long artistId, Long followers, Long following) {
         Artist artist = artistRepository.findByIdWithUser(artistId)
             .orElseThrow(()->new UserNotFoundException("Artist not found with id: " + artistId));
 
 
-        ArtistMusicalEntitiesDTO entitiesDTO = new ArtistMusicalEntitiesDTO();
-        entitiesDTO.setContributions(artistService.getArtistContributions(artistId));
+        List<ArtistContributionDto>artistContributionDtos=artistService.getArtistContributions(artistId);
 
-        return mapper.toArtistDTO(artist, entitiesDTO,followers,following);
+        return mapper.toArtistDTO(artist, artistContributionDtos,followers,following);
     }
 
-    private NonAdminUserDTO getListenerProfile(Long listenerId, Long followers,Long following) {
+    private NonAdminUserDto getListenerProfile(Long listenerId, Long followers, Long following) {
         Listener listener = listenerRepository.findByIdWithUser(listenerId)
             .orElseThrow(()->new UserNotFoundException("Listener not found with id: " + listenerId));
 
 
-        ListenerLikesDTO likesDTO = listenerService.getLikedEntities(listenerId);
-        List<PlaylistDTO>playlists=listenerService.getPlaylistsCreatedByUser(listenerId).stream()
-                .map(p->new PlaylistDTO(
+        List<MusicalEntityDto>musicalEntityDtos=listenerService.getLikedEntities(listenerId);
+        List<PlaylistDto>playlists=listenerService.getPlaylistsCreatedByUser(listenerId).stream()
+                .map(p->new PlaylistDto(
                         p.getId(),
                         p.getName(),
                         p.getCover(),
                         p.getCreatedBy().getNonAdminUser().getUser().getFullName()
                 )).toList();
 
-        return mapper.toListenerDTO(listener, likesDTO,followers,following,playlists);
+        return mapper.toListenerDTO(listener, musicalEntityDtos,followers,following,playlists);
     }
 
 
-    public List<NonAdminUserDTO>searchUsers(String name){
+    public List<NonAdminUserDto>searchUsers(String name){
 
         List<NonAdminUser>nonAdminUsers=nonAdminUserRepository.searchByName(name);
         if (nonAdminUsers.isEmpty()){
@@ -105,7 +102,7 @@ public class NonAdminUserService {
                     String type = determineType(user.getId());
                     Long followers = followRepository.countByFolloweeId(user.getId());
                     Long following = followRepository.countByFollowerId(user.getId());
-                    return mapper.toDTO(user, type, followers, following);
+                    return mapper.toDto(user, type, followers, following);
                 })
                 .collect(Collectors.toList());
     }

@@ -1,9 +1,8 @@
 package com.ukim.finki.develop.finkwave.service;
 
 import com.ukim.finki.develop.finkwave.model.Playlist;
-import com.ukim.finki.develop.finkwave.model.dto.ListenerLikesDTO;
-import com.ukim.finki.develop.finkwave.model.dto.MusicalEntityDTO;
-import com.ukim.finki.develop.finkwave.model.dto.PlaylistDTO;
+import com.ukim.finki.develop.finkwave.model.dto.ListenerLikesDto;
+import com.ukim.finki.develop.finkwave.model.dto.MusicalEntityDto;
 import com.ukim.finki.develop.finkwave.repository.LikeRepository;
 import com.ukim.finki.develop.finkwave.repository.PlaylistRepository;
 import lombok.AllArgsConstructor;
@@ -17,16 +16,10 @@ public class ListenerService {
     private final LikeRepository likeRepository;
     private final PlaylistRepository playlistRepository;
     @Transactional(readOnly = true)
-    public ListenerLikesDTO getLikedEntities(Long listenerId) {
-        List<Object[]> results = likeRepository.findLikedEntitiesWithTypeByListenerId(listenerId);
+    public List<MusicalEntityDto> getLikedEntities(Long listenerId) {
+        return  likeRepository.findLikedEntitiesWithTypeByListenerId(listenerId);
 
-        List<MusicalEntityDTO>likedEntities=results.stream()
-        .map(row->new MusicalEntityDTO((Long)row[0], (String)row[1], (String)row[2],(String)row[3]))
-        .toList();
-        
-        ListenerLikesDTO dto=new ListenerLikesDTO();
-        dto.setLikedEntities(likedEntities);
-        return dto;
+
     }
 
     @Transactional(readOnly = true)

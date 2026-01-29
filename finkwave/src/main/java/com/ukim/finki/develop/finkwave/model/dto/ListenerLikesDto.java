@@ -9,8 +9,8 @@ import lombok.Setter;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ListenerLikesDTO {
-    private List<MusicalEntityDTO> likedEntities;
+public class ListenerLikesDto {
+    private List<MusicalEntityDto> likedEntities;
     
 
 }

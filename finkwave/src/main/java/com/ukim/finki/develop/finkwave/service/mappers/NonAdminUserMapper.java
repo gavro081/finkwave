@@ -4,12 +4,8 @@ import com.ukim.finki.develop.finkwave.model.Artist;
 
 import com.ukim.finki.develop.finkwave.model.Listener;
 
-import com.ukim.finki.develop.finkwave.model.Playlist;
-import com.ukim.finki.develop.finkwave.model.dto.ArtistMusicalEntitiesDTO;
-import com.ukim.finki.develop.finkwave.model.dto.ListenerLikesDTO;
-import com.ukim.finki.develop.finkwave.model.dto.NonAdminUserDTO;
+import com.ukim.finki.develop.finkwave.model.dto.*;
 import com.ukim.finki.develop.finkwave.model.NonAdminUser;
-import com.ukim.finki.develop.finkwave.model.dto.PlaylistDTO;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -18,41 +14,33 @@ import java.util.List;
 @Component
 public class NonAdminUserMapper {
 
-    public NonAdminUserDTO toArtistDTO(Artist artist, ArtistMusicalEntitiesDTO entitiesDTO, Long followers, Long following) {
-        NonAdminUserDTO dto = createBaseDTO(
-            artist.getNonAdminUser(), 
-            "ARTIST", 
-            followers, 
-            following
-        );
-        dto.setMusicalEntities(entitiesDTO);
+    public NonAdminUserDto toArtistDTO(Artist artist, List<ArtistContributionDto> entitiesDTO, Long followers, Long following) {
+        ArtistDto dto=new ArtistDto();
+        populateBaseClassFields(dto,artist.getNonAdminUser(),"ARTIST",followers,following);
+        dto.setContributions(entitiesDTO);
         return dto;
     }
 
-    public NonAdminUserDTO toListenerDTO(Listener listener, ListenerLikesDTO likesDTO, Long followers, Long following, List<PlaylistDTO>playlists) {
-        NonAdminUserDTO dto = createBaseDTO(
-            listener.getNonAdminUser(), 
-            "LISTENER", 
-            followers, 
-            following
-        );
-        dto.setLikes(likesDTO);
+    public NonAdminUserDto toListenerDTO(Listener listener, List<MusicalEntityDto> musicalEntityDtos, Long followers, Long following, List<PlaylistDto>playlists) {
+        ListenerDto dto=new ListenerDto();
+        populateBaseClassFields(dto,listener.getNonAdminUser(),"LISTENER",followers,following);
+        dto.setLikedEntities(musicalEntityDtos);
         dto.setCreatedPlaylists(playlists);
         return dto;
     }
 
-    public NonAdminUserDTO toDTO(NonAdminUser user, String type,Long followers,Long following) {
-        return createBaseDTO(user, type, followers, following);
+    public NonAdminUserDto toDto(NonAdminUser user,String type, Long followers,Long following){
+       NonAdminUserDto dto=new NonAdminUserDto();
+       populateBaseClassFields(dto,user,type,followers,following);
+       return dto;
     }
 
-    private NonAdminUserDTO createBaseDTO(NonAdminUser user, String userType, Long followers, Long following) {
-        NonAdminUserDTO dto = new NonAdminUserDTO();
+    private void populateBaseClassFields(NonAdminUserDto dto,NonAdminUser user,String type,Long followers,Long following){
         dto.setId(user.getId());
         dto.setUsername(user.getUser().getUsername());
         dto.setFullName(user.getUser().getFullName());
-        dto.setUserType(userType);
+        dto.setUserType(type);
         dto.setFollowers(followers);
         dto.setFollowing(following);
-        return dto;
     }
 }

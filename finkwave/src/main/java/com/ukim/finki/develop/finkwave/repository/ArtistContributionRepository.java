@@ -1,5 +1,6 @@
 package com.ukim.finki.develop.finkwave.repository;
 
+import com.ukim.finki.develop.finkwave.model.dto.ArtistContributionDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -12,13 +13,16 @@ import java.util.List;
 @Repository
 public interface ArtistContributionRepository extends JpaRepository<ArtistContribution, ArtistContributionId> {
 
-    @Query("SELECT ac.musicalEntity.id,ac.musicalEntity.title,ac.musicalEntity.genre,ac.role, "+
+    @Query("SELECT NEW com.ukim.finki.develop.finkwave.model.dto.ArtistContributionDto( ac.musicalEntity.id," +
+            "ac.musicalEntity.title," +
+            "ac.musicalEntity.genre," +
+            "ac.role, "+
         "CASE WHEN s.id IS NOT NULL THEN 'SONG' "+
         "WHEN a.id IS NOT NULL THEN 'ALBUM' "+
-        "ELSE 'Unknown' END "+
+        "ELSE 'Unknown' END) "+
         "FROM ArtistContribution ac "+
         "LEFT JOIN Song s  ON s.musicalEntities.id=ac.musicalEntity.id "+
         "LEFT JOIN Album a ON a.musicalEntities.id=ac.musicalEntity.id "+
         "WHERE ac.artist.id=:artistId")
-    List<Object[]>findContributionsByArtistId(@Param("artistId")Long artistId);
+    List<ArtistContributionDto>findContributionsByArtistId(@Param("artistId")Long artistId);
 }

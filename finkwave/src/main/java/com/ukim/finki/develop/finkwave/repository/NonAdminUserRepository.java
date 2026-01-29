@@ -1,6 +1,5 @@
 package com.ukim.finki.develop.finkwave.repository;
 
-import com.ukim.finki.develop.finkwave.model.dto.NonAdminUserDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

@@ -7,10 +7,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class PlaylistDTO {
+public class MusicalEntityDto {
     private Long id;
-    private String name;
-    private String cover;
-    private String creatorName;
-
+    private String title;
+    private String genre;
+    private String type;
 }

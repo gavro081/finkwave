@@ -1,6 +1,6 @@
 package com.ukim.finki.develop.finkwave.service;
 
-import com.ukim.finki.develop.finkwave.model.dto.ArtistContributionDTO;
+import com.ukim.finki.develop.finkwave.model.dto.ArtistContributionDto;
 import com.ukim.finki.develop.finkwave.repository.ArtistContributionRepository;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -18,12 +18,8 @@ public class ArtistService {
 
 
     @Transactional(readOnly=true)
-    public List<ArtistContributionDTO> getArtistContributions(Long artistId){
-        List<Object[]>results=artistContributionRepository.findContributionsByArtistId(artistId);
-
-        return results.stream()
-        .map(row->new ArtistContributionDTO((Long)row[0], (String)row[1], (String)row[2],(String)row[3], (String)row[4]))
-        .collect(Collectors.toList());
+    public List<ArtistContributionDto> getArtistContributions(Long artistId){
+        return artistContributionRepository.findContributionsByArtistId(artistId);
     }
 
 }

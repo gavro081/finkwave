@@ -1,17 +1,17 @@
 import { useNavigate } from "react-router-dom";
 import { Heart, ListMusic, Music, Album } from "lucide-react";
-import type { Playlist, MusicalEntityDTO } from "../../utils/types";
+import type { Playlist, MusicalEntity } from "../../utils/types";
 
 interface ListenerViewProps {
-  likedEntities: MusicalEntityDTO[];
-  playlists?: Playlist[];
+  likedEntities: MusicalEntity[] | [];
+  playlists: Playlist[] | [];
 }
 
 const ListenerView = ({ likedEntities, playlists }: ListenerViewProps) => {
   const navigate = useNavigate();
 
-  const likedSongs = likedEntities.filter((e) => e.type === "SONG");
-  const likedAlbums = likedEntities.filter((e) => e.type === "ALBUM");
+  const likedSongs = likedEntities?.filter((e) => e.type === "SONG");
+  const likedAlbums = likedEntities?.filter((e) => e.type === "ALBUM");
 
   return (
     <div className="mt-8 space-y-12">
@@ -54,13 +54,13 @@ const ListenerView = ({ likedEntities, playlists }: ListenerViewProps) => {
         </section>
       )}
 
-      {likedSongs.length > 0 && (
+      {likedSongs && likedSongs.length > 0 && (
         <section>
           <div className="flex items-center gap-2 mb-6 pb-2 border-b-2 border-gray-200">
             <Heart className="w-6 h-6 text-red-500 fill-red-500" />
             <h3 className="text-2xl font-bold text-gray-800">Liked Songs</h3>
             <span className="text-sm text-gray-400 ml-1">
-              ({likedSongs.length})
+              ({likedSongs?.length})
             </span>
           </div>
 
@@ -89,7 +89,7 @@ const ListenerView = ({ likedEntities, playlists }: ListenerViewProps) => {
         </section>
       )}
 
-      {likedAlbums.length > 0 && (
+      {likedAlbums && likedAlbums.length > 0 && (
         <section>
           <div className="flex items-center gap-2 mb-6 pb-2 border-b-2 border-gray-200">
             <Album className="w-6 h-6 text-blue-600" />
@@ -119,14 +119,18 @@ const ListenerView = ({ likedEntities, playlists }: ListenerViewProps) => {
         </section>
       )}
 
-      {likedEntities.length === 0 && (!playlists || playlists.length === 0) && (
-        <div className="flex flex-col items-center justify-center py-16 text-gray-300">
-          <p className="text-lg font-medium text-gray-400">Nothing here yet</p>
-          <p className="text-sm text-gray-400 mt-1">
-            Start exploring music to build your collection
-          </p>
-        </div>
-      )}
+      {likedEntities &&
+        likedEntities.length === 0 &&
+        (!playlists || playlists.length === 0) && (
+          <div className="flex flex-col items-center justify-center py-16 text-gray-300">
+            <p className="text-lg font-medium text-gray-400">
+              Nothing here yet
+            </p>
+            <p className="text-sm text-gray-400 mt-1">
+              Start exploring music to build your collection
+            </p>
+          </div>
+        )}
     </div>
   );
 };

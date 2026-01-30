@@ -7,61 +7,66 @@ import Login from "./pages/Login";
 import Nav from "./pages/Nav";
 import Register from "./pages/Register";
 import UserDetailView from "./pages/UserDetailView";
+import MusicalCollection from "./pages/MusicalCollection";
 
 const Layout = () => {
-	return (
-		<div className="flex flex-col min-h-screen">
-			<Nav />
-			<ToastContainer
-				position="top-right"
-				autoClose={2000}
-				hideProgressBar={false}
-				newestOnTop={false}
-				closeOnClick
-				rtl={false}
-				pauseOnFocusLoss
-				draggable
-				pauseOnHover
-				theme="light"
-			/>
-			<main className="grow">
-				<Outlet />
-			</main>
-		</div>
-	);
+  return (
+    <div className="flex flex-col min-h-screen">
+      <Nav />
+      <ToastContainer
+        position="top-right"
+        autoClose={2000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
+      <main className="grow">
+        <Outlet />
+      </main>
+    </div>
+  );
 };
 
 const router = createBrowserRouter([
-	{
-		path: "",
-		element: <Layout />,
-		children: [
-			{
-				path: "/",
-				element: <LandingPage />,
-			},
-			{
-				path: "/login",
-				element: <Login />,
-			},
-			{
-				path: "/users",
-				element: <AllUsers />,
-			},
-			{
-				path: "/users/:userId",
-				element: <UserDetailView />,
-			},
-			{
-				path: "/register",
-				element: <Register />,
-			},
-		],
-	},
+  {
+    path: "",
+    element: <Layout />,
+    children: [
+      {
+        path: "/",
+        element: <LandingPage />,
+      },
+      {
+        path: "/login",
+        element: <Login />,
+      },
+      {
+        path: "/users",
+        element: <AllUsers />,
+      },
+      {
+        path: "/users/:userId",
+        element: <UserDetailView />,
+      },
+      {
+        path: "/register",
+        element: <Register />,
+      },
+      {
+        path: "/collection/:type/:id",
+        element: <MusicalCollection />,
+      },
+    ],
+  },
 ]);
 
 function App() {
-	return <RouterProvider router={router} />;
+  return <RouterProvider router={router} />;
 }
 
 export default App;

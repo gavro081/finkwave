@@ -18,6 +18,7 @@ export interface MusicalEntity {
   title: string;
   genre: string;
   type: string;
+  releasedBy: string;
 }
 
 export interface Playlist {
@@ -25,4 +26,14 @@ export interface Playlist {
   name: string;
   cover: string;
   creatorName: string;
+}
+
+export interface BaseNonAdminUser {
+  id: number;
+  fullName: string;
+  userType: string;
+  profilePhoto: string;
+  followers: number;
+  following: number;
+  isFollowedByCurrentUser: boolean;
 }

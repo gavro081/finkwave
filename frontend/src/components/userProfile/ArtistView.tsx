@@ -36,7 +36,7 @@ const ArtistView = ({ contributions }: ArtistViewProps) => {
                 key={index}
                 className="group cursor-pointer"
                 onClick={() =>
-                  navigate(`/musical-entity/${album.musicalEntityId}`)
+                  navigate(`/collection/album/${album.musicalEntityId}`)
                 }
               >
                 <div className="relative aspect-square bg-linear-to-br from-purple-400 via-pink-400 to-blue-400 rounded-lg mb-3 overflow-hidden shadow-lg group-hover:shadow-2xl transition-all duration-300 group-hover:scale-105">

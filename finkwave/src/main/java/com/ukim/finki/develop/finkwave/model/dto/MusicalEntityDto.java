@@ -12,4 +12,6 @@ public class MusicalEntityDto {
     private String title;
     private String genre;
     private String type;
+    private String releasedBy;
+    private Boolean isLikedByCurrentUser;
 }

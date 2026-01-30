@@ -30,7 +30,7 @@ const ListenerView = ({ likedEntities, playlists }: ListenerViewProps) => {
               <div
                 key={playlist.id}
                 className="group cursor-pointer"
-                onClick={() => navigate(`/playlist/${playlist.id}`)}
+                onClick={() => navigate(`/playlists/${playlist.id}`)}
               >
                 <div className="aspect-square rounded-md overflow-hidden bg-gray-100 mb-2 relative shadow-sm group-hover:shadow-lg transition-all">
                   {playlist.cover ? (

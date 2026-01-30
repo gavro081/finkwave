@@ -3,26 +3,19 @@ import { useNavigate, useParams } from "react-router-dom";
 import axiosInstance from "../api/axiosInstance";
 import ArtistView from "../components/userProfile/ArtistView";
 import ListenerView from "../components/userProfile/ListenerView";
+import UserListModal from "../components/userProfile/UserListModal";
 import type {
   MusicalEntity,
   Playlist,
   ArtistContribution,
+  BaseNonAdminUser,
 } from "../utils/types";
 
-interface BaseUser {
-  id: number;
-  fullName: string;
-  userType: string;
-  followers: number;
-  following: number;
-  isFollowedByCurrentUser: boolean;
-}
-
-interface Artist extends BaseUser {
+interface Artist extends BaseNonAdminUser {
   userType: "ARTIST";
   contributions: ArtistContribution[];
 }
-interface Listener extends BaseUser {
+interface Listener extends BaseNonAdminUser {
   userType: "LISTENER";
   likedEntities: MusicalEntity[];
   createdPlaylists: Playlist[];
@@ -32,10 +25,15 @@ type UserProfile = Artist | Listener;
 
 const UserDetail = () => {
   // user refers to the selected user NOT to the user from context
+  const baseURL = import.meta.env.VITE_API_BASE_URL;
   const { userId } = useParams();
   const navigate = useNavigate();
   const [user, setUser] = useState<UserProfile | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [modalTitle, setModalTitle] = useState("");
+  const [modalUsers, setModalUsers] = useState<any[]>([]);
+  const [isLoadingModal, setIsLoadingModal] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
 
   const handleFollow = async () => {
@@ -46,10 +44,63 @@ const UserDetail = () => {
       const response = await axiosInstance.post<UserProfile>(
         `/users/follow/${userId}`,
       );
+      setUser(response.data);
     } catch (err: any) {
       console.error(err.response?.data?.error);
     } finally {
       setIsFollowing(false);
+    }
+  };
+
+  const displayFollowers = async () => {
+    setIsLoadingModal(true);
+    try {
+      const response = await axiosInstance.get(`/users/followers/${userId}`);
+      setModalUsers(response.data);
+      setModalTitle("Followers");
+      setShowModal(true);
+    } catch (err) {
+      console.error("Failed to fetch followers");
+    } finally {
+      setIsLoadingModal(false);
+    }
+  };
+  const displayFollowing = async () => {
+    setIsLoadingModal(true);
+    try {
+      const response = await axiosInstance.get(`/users/following/${userId}`);
+      setModalUsers(response.data);
+      setModalTitle("Following");
+      setShowModal(true);
+    } catch (err) {
+      console.error("Failed to fetch following users");
+    } finally {
+      setIsLoadingModal(false);
+    }
+  };
+
+  const handleFollowInModal = async (targetId: number) => {
+    try {
+      await axiosInstance.post(`/users/follow/${targetId}`);
+      setModalUsers((prevUsers) =>
+        prevUsers.map((u) => {
+          if (u.id === targetId) {
+            const isNowFollowing = !u.isFollowedByCurrentUser;
+            return {
+              ...u,
+              isFollowedByCurrentUser: isNowFollowing,
+            };
+          }
+          return u;
+        }),
+      );
+
+      if (user && user.id === targetId) {
+        const response = await axiosInstance.get(`/users/${targetId}`);
+        setUser(response.data);
+      }
+    } catch (err) {
+      console.error("Failed to toggle follow in modal", err);
     }
   };
 
@@ -59,7 +110,6 @@ const UserDetail = () => {
       try {
         const response = await axiosInstance.get(`/users/${userId}`);
         console.log(response.data);
-
         setUser(response.data);
       } catch (err: any) {
         const errorMessage =
@@ -83,6 +133,13 @@ const UserDetail = () => {
 
   return (
     <div className="container mx-auto p-6">
+      {isLoadingModal && (
+        <div className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm flex items-center justify-center">
+          <div className="flex items-center gap-3">
+            <div className="w-6 h-6 border-3 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        </div>
+      )}
       <button
         onClick={() => navigate(-1)}
         className="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors duration-200"
@@ -93,8 +150,16 @@ const UserDetail = () => {
       <div className="bg-white shadow-lg rounded-lg p-8">
         <div className="flex items-start gap-6 mb-8">
           <div className="shrink-0">
-            <div className="w-32 h-32 rounded-full bg-linear-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-4xl font-bold shadow-lg">
-              {user.fullName.charAt(0).toUpperCase()}
+            <div className="w-32 h-32 rounded-full bg-linear-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-4xl font-bold shadow-lg overflow-hidden">
+              {user.profilePhoto ? (
+                <img
+                  src={`${baseURL}/${user.profilePhoto}`}
+                  alt={user.fullName}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                user.fullName.charAt(0).toUpperCase()
+              )}
             </div>
           </div>
 
@@ -105,11 +170,21 @@ const UserDetail = () => {
             </span>
 
             <div className="flex gap-6 mb-4 text-gray-700">
-              <div className="flex flex-col">
+              <div
+                className={`flex flex-col ${user.userType == "LISTENER" ? "cursor-pointer" : "cursor-default"}`}
+                onClick={
+                  user.userType === "LISTENER" ? displayFollowers : undefined
+                }
+              >
                 <span className="text-2xl font-bold">{user.followers}</span>
                 <span className="text-sm text-gray-500">Followers</span>
               </div>
-              <div className="flex flex-col">
+              <div
+                className={`flex flex-col ${user.userType == "LISTENER" ? "cursor-pointer" : "cursor-default"}`}
+                onClick={
+                  user.userType === "LISTENER" ? displayFollowing : undefined
+                }
+              >
                 <span className="text-2xl font-bold">{user.following}</span>
                 <span className="text-sm text-gray-500">Following</span>
               </div>
@@ -141,6 +216,15 @@ const UserDetail = () => {
           <ListenerView
             likedEntities={user.likedEntities}
             playlists={user.createdPlaylists}
+          />
+        )}
+
+        {showModal && (
+          <UserListModal
+            title={modalTitle}
+            users={modalUsers}
+            onClose={() => setShowModal(false)}
+            onFollowToggle={handleFollowInModal}
           />
         )}
       </div>

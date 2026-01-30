@@ -28,9 +28,7 @@ public class NonAdminUserService {
         return nonAdminUserRepository.findAllWithUser().stream()
                 .map(user -> {
                     String type = determineType(user.getId());
-                    Long followers = followRepository.countByFolloweeId(user.getId());
-                    Long following = followRepository.countByFollowerId(user.getId());
-                    return mapper.toDto(user, type, followers, following);
+                    return mapper.toDto(user, type, null, null);
                 })
                 .collect(Collectors.toList());
     }

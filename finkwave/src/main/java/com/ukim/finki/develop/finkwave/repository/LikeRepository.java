@@ -1,5 +1,6 @@
 package com.ukim.finki.develop.finkwave.repository;
 
+import com.ukim.finki.develop.finkwave.model.MusicalEntity;
 import com.ukim.finki.develop.finkwave.model.dto.MusicalEntityDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -18,10 +19,22 @@ public interface LikeRepository extends JpaRepository<Like, LikeId> {
             "l.musicalEntity.genre, " +
            "CASE WHEN s.id IS NOT NULL THEN 'SONG' " +
            "WHEN a.id IS NOT NULL THEN 'ALBUM' " +
-           "ELSE 'UNKNOWN' END)" +
+           "ELSE 'UNKNOWN' END," +
+            "u.fullName," +
+            "true)" +
            "FROM Like l " +
            "LEFT JOIN Song s ON s.musicalEntities.id = l.musicalEntity.id " +
            "LEFT JOIN Album a ON a.musicalEntities.id = l.musicalEntity.id " +
+            "LEFT JOIN User u ON u.id=l.musicalEntity.releasedBy.id "+
            "WHERE l.listener.id = :listenerId")
     List<MusicalEntityDto> findLikedEntitiesWithTypeByListenerId(@Param("listenerId") Long listenerId);
+
+
+    @Query("SELECT CASE WHEN COUNT (l)>0 THEN true ELSE false END " +
+            "FROM MusicalEntity  me " +
+            "JOIN Like  l on l.musicalEntity.id=me.id " +
+            "WHERE l.listener.id=:userId"
+
+    )
+    boolean isLikedByUser(@Param("userId") Long userId);
 }

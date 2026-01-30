@@ -8,6 +8,8 @@ import org.springframework.stereotype.Repository;
 import com.ukim.finki.develop.finkwave.model.Follow;
 import com.ukim.finki.develop.finkwave.model.FollowId;
 
+import java.util.List;
+
 @Repository
 public interface FollowRepository extends JpaRepository<Follow, FollowId> {
 
@@ -21,5 +23,9 @@ public interface FollowRepository extends JpaRepository<Follow, FollowId> {
             "FROM Follow f "+
             "WHERE f.followee.id=:selectedUserId AND f.follower.id=:currentUserId")
     boolean isFollowing(@Param("currentUserId") Long currentUSerId,@Param("selectedUserId")Long selectedUserId);
+
+    List<Follow>getFollowsByFollowee_Id(Long id);
+
+    List<Follow>getFollowsByFollower_Id(Long id);
 
 }

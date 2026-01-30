@@ -35,10 +35,14 @@ public class NonAdminUserMapper {
        return dto;
     }
 
+
+
     private void populateBaseClassFields(NonAdminUserDto dto,NonAdminUser user,String type,Long followers,Long following){
+
         dto.setId(user.getId());
         dto.setUsername(user.getUser().getUsername());
         dto.setFullName(user.getUser().getFullName());
+        dto.setProfilePhoto(user.getUser().getProfilePhoto());
         dto.setUserType(type);
         dto.setFollowers(followers);
         dto.setFollowing(following);

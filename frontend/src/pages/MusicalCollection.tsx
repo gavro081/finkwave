@@ -1,32 +1,53 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axiosInstance from "../api/axiosInstance";
-
-interface Song {
+import type { Song, Album, Playlist } from "../utils/types";
+import { handleError } from "../utils/error";
+interface CollectionView {
   id: number;
   title: string;
-  genre: string;
-  type: "SONG";
-  releasedBy: string;
-  isLikedByCurrentUser?: boolean;
-}
-
-interface MusicalEntity {
-  id: number;
-  title: string;
-  genre: string;
+  genre?: string;
   type: string;
   releasedBy: string;
   isLikedByCurrentUser?: boolean;
-  songs?: Song[];
+  songs: Song[];
 }
 
 const MusicalCollection = () => {
   const { type, id } = useParams();
   const navigate = useNavigate();
-  const [collection, setCollection] = useState<MusicalEntity | null>(null);
+  const [collection, setCollection] = useState<CollectionView | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const normalizeCollection = (
+    data: Album | Playlist,
+    type: string,
+  ): CollectionView => {
+    if (type === "album") {
+      const album = data as Album;
+      return {
+        id: album.id,
+        title: album.title,
+        genre: album.genre,
+        type: album.type,
+        releasedBy: album.releasedBy,
+        isLikedByCurrentUser: album.isLikedByCurrentUser,
+        songs: album.songs,
+      };
+    } else {
+      const playlist = data as Playlist;
+      return {
+        id: playlist.id,
+        title: playlist.name,
+        genre: undefined,
+        type: "PLAYLIST",
+        releasedBy: playlist.creatorName,
+        isLikedByCurrentUser: undefined,
+        songs: playlist.songsInPlaylist,
+      };
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -36,10 +57,11 @@ const MusicalCollection = () => {
         const endpoint =
           type === "album" ? `/albums/${id}` : `/playlists/${id}`;
         const response = await axiosInstance.get(endpoint);
-        console.log(response.data);
-        setCollection(response.data);
+
+        const normalized = normalizeCollection(response.data, type!);
+        setCollection(normalized);
       } catch (err: any) {
-        setError(err.response?.data?.error || "Failed to load collection");
+        setError(handleError(err));
       } finally {
         setIsLoading(false);
       }
@@ -66,7 +88,7 @@ const MusicalCollection = () => {
     <div className="container mx-auto p-6">
       <button
         onClick={() => navigate(-1)}
-        className="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors duration-200"
+        className="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors duration-200 cursor-pointer"
       >
         ← Back
       </button>
@@ -87,8 +109,12 @@ const MusicalCollection = () => {
 
             <div className="flex items-center gap-3 text-gray-700 mb-4">
               <span className="font-semibold">{collection.releasedBy}</span>
-              <span>•</span>
-              <span className="text-gray-600">{collection.genre}</span>
+              {collection.genre && (
+                <>
+                  <span>•</span>
+                  <span className="text-gray-600">{collection.genre}</span>
+                </>
+              )}
               {collection.songs && (
                 <>
                   <span>•</span>
@@ -100,23 +126,27 @@ const MusicalCollection = () => {
               )}
             </div>
 
-            <button
-              className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200"
-              aria-label={collection.isLikedByCurrentUser ? "Unlike" : "Like"}
-            >
-              <svg
-                className="w-5 h-5"
-                fill={collection.isLikedByCurrentUser ? "#ef4444" : "none"}
-                stroke={collection.isLikedByCurrentUser ? "#ef4444" : "#6b7280"}
-                strokeWidth="2"
-                viewBox="0 0 24 24"
+            {type === "album" && (
+              <button
+                className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors duration-200"
+                aria-label={collection.isLikedByCurrentUser ? "Unlike" : "Like"}
               >
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-              </svg>
-              <span className="text-sm font-medium text-gray-700">
-                {collection.isLikedByCurrentUser ? "Liked" : "Like"}
-              </span>
-            </button>
+                <svg
+                  className="w-5 h-5"
+                  fill={collection.isLikedByCurrentUser ? "#ef4444" : "none"}
+                  stroke={
+                    collection.isLikedByCurrentUser ? "#ef4444" : "#6b7280"
+                  }
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                </svg>
+                <span className="text-sm font-medium text-gray-700">
+                  {collection.isLikedByCurrentUser ? "Liked" : "Like"}
+                </span>
+              </button>
+            )}
           </div>
         </div>
 

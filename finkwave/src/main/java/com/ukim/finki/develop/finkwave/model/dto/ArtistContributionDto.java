@@ -13,4 +13,5 @@ public class ArtistContributionDto {
     private String genre;
     private String role;
     private String entityType;
+    private Boolean isLikedByCurrentUser;
 }

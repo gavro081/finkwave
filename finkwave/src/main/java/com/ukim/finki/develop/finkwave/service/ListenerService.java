@@ -12,19 +12,20 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
+@Transactional(readOnly = true)
 public class ListenerService {
-    private final LikeRepository likeRepository;
-    private final PlaylistRepository playlistRepository;
-    @Transactional(readOnly = true)
+    private final LikeService likeService;
+    private final PlaylistService playlistService;
+
     public List<MusicalEntityDto> getLikedEntities(Long listenerId) {
-        return  likeRepository.findLikedEntitiesWithTypeByListenerId(listenerId);
+        return  likeService.findLikedEntitiesWithTypeByListenerId(listenerId);
 
 
     }
 
-    @Transactional(readOnly = true)
+
     public List<Playlist>getPlaylistsCreatedByUser(Long listenerId){
-        return playlistRepository.findByCreatorId(listenerId);
+        return playlistService.findByCreatorId(listenerId);
     }
 }
 

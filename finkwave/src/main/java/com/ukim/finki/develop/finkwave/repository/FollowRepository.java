@@ -24,8 +24,19 @@ public interface FollowRepository extends JpaRepository<Follow, FollowId> {
             "WHERE f.followee.id=:selectedUserId AND f.follower.id=:currentUserId")
     boolean isFollowing(@Param("currentUserId") Long currentUSerId,@Param("selectedUserId")Long selectedUserId);
 
-    List<Follow>getFollowsByFollowee_Id(Long id);
 
     List<Follow>getFollowsByFollower_Id(Long id);
+
+    @Query("SELECT f FROM Follow f " +
+            "JOIN FETCH f.follower nu " +
+            "JOIN FETCH nu.user " +
+            "WHERE f.followee.id = :id")
+    List<Follow> findFollowersWithProfile(@Param("id") Long id);
+
+    @Query("SELECT f FROM Follow f " +
+            "JOIN FETCH f.followee nu " +
+            "JOIN FETCH nu.user " +
+            "WHERE f.follower.id = :id")
+    List<Follow> findFollowingWithProfile(@Param("id") Long id);
 
 }

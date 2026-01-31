@@ -34,17 +34,17 @@ public class NonAdminUserController {
         return ResponseEntity.ok(nonAdminUserService.searchUsers(name));
     }
 
-    @GetMapping("/followers/{id}")
+    @GetMapping("/{id}/followers")
     public HttpEntity<List<NonAdminUserDto>>getFollowersForUser(@PathVariable Long id){
         return ResponseEntity.ok(followService.getFollowersForUser(id));
     }
 
-    @GetMapping("/following/{id}")
+    @GetMapping("/{id}/following")
     public HttpEntity<List<NonAdminUserDto>>getFollowingForUser(@PathVariable Long id){
         return ResponseEntity.ok(followService.getFollowingForUser(id));
     }
 
-    @PostMapping("/follow/{id}")
+    @PostMapping("/{id}/follow")
     public HttpEntity<NonAdminUserDto>followUser(@PathVariable Long id){
         followService.toggleFollow(id);
 

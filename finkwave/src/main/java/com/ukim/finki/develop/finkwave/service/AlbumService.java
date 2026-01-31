@@ -1,5 +1,6 @@
 package com.ukim.finki.develop.finkwave.service;
 
+import com.ukim.finki.develop.finkwave.exceptions.AlbumNotFoundException;
 import com.ukim.finki.develop.finkwave.model.Album;
 import com.ukim.finki.develop.finkwave.model.MusicalEntity;
 import com.ukim.finki.develop.finkwave.model.dto.AlbumDto;
@@ -22,11 +23,11 @@ public class AlbumService {
 
     public MusicalEntityDto getAlbum(Long id){
         if (!albumRepository.existsById(id)){
-            throw new RuntimeException("Album not found");
+            throw new AlbumNotFoundException(id);
         }
         Long currentUserId=authService.getCurrentUserID();
 
-        Album album=albumRepository.findById(id).orElseThrow(()->new RuntimeException("Album not found"));
+        Album album=albumRepository.findById(id).orElseThrow(()->new AlbumNotFoundException(id));
         AlbumDto dto=new AlbumDto(album.getId(),
                 album.getMusicalEntities().getTitle(),
                 album.getMusicalEntities().getGenre(),

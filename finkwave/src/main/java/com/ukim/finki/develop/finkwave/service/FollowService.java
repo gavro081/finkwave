@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,18 +29,29 @@ public class FollowService {
     private final NonAdminUserMapper mapper;
 
 
+    private boolean isFollowedByCurrentUser(Long currentUserId,Long otherUserId){
+        Set<Long> currentUserFollows = followRepository.getFollowsByFollower_Id(currentUserId)
+                .stream()
+                .map(f -> f.getFollowee().getId())
+                .collect(Collectors.toSet());
+        return currentUserFollows.contains(otherUserId);
+    }
 
     public List<NonAdminUserDto>getFollowersForUser(Long id){
         if (artistRepository.existsById(id)){
             throw new FollowException("Cannot view for artist");
         }
-        List<Follow>followers=followRepository.getFollowsByFollowee_Id(id);
+        List<Follow> followers = followRepository.findFollowersWithProfile(id);
         Long currentUserId=authService.getCurrentUserID();
+
+
         return followers.stream()
-                .map(f->{
-                   NonAdminUserDto dto=mapper.toDto(f.getFollower(),null,null,null);
-                   dto.setIsFollowedByCurrentUser(followRepository.isFollowing(currentUserId,f.getFollower().getId()));
-                   return dto;
+                .map(f -> {
+                    NonAdminUser follower = f.getFollower();
+                    NonAdminUserDto dto = mapper.toDto(follower, null, null, null);
+
+                    dto.setIsFollowedByCurrentUser(isFollowedByCurrentUser(currentUserId,follower.getId()));
+                    return dto;
                 })
                 .toList();
     }
@@ -48,12 +60,13 @@ public class FollowService {
         if (artistRepository.existsById(id)){
             throw new FollowException("Cannot view for artist");
         }
-        List<Follow>followers=followRepository.getFollowsByFollower_Id(id);
+        List<Follow>followings=followRepository.getFollowsByFollower_Id(id);
         Long currentUserId=authService.getCurrentUserID();
-        return followers.stream()
+        return followings.stream()
                 .map(f->{
+                    NonAdminUser followee=f.getFollowee();
                     NonAdminUserDto dto=mapper.toDto(f.getFollowee(),null,null,null);
-                    dto.setIsFollowedByCurrentUser(followRepository.isFollowing(currentUserId,f.getFollowee().getId()));
+                    dto.setIsFollowedByCurrentUser(isFollowedByCurrentUser(currentUserId,followee.getId()));
                     return dto;
                 })
                 .toList();
@@ -61,7 +74,7 @@ public class FollowService {
 
 
 
-    public boolean toggleFollow(Long id){
+    public void toggleFollow(Long id){
         Long currentUserId=authService.getCurrentUserID();
 
         if (currentUserId.equals(id)){
@@ -73,7 +86,7 @@ public class FollowService {
 
         if (followRepository.existsById(followId)){
             followRepository.deleteById(followId);
-            return false;
+
         }else{
             NonAdminUser follower = nonAdminUserRepository.findById(currentUserId)
                     .orElseThrow(UserNotFoundException::new);
@@ -81,7 +94,7 @@ public class FollowService {
                     .orElseThrow(UserNotFoundException::new);
 
             followRepository.save(new Follow(follower, followee));
-            return true;
+
         }
 
     }

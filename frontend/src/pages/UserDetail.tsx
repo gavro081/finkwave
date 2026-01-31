@@ -4,6 +4,7 @@ import axiosInstance from "../api/axiosInstance";
 import ArtistView from "../components/userProfile/ArtistView";
 import ListenerView from "../components/userProfile/ListenerView";
 import UserListModal from "../components/userProfile/UserListModal";
+import { handleError } from "../utils/error";
 import type {
   MusicalEntity,
   Playlist,
@@ -42,11 +43,11 @@ const UserDetail = () => {
     setIsFollowing(true);
     try {
       const response = await axiosInstance.post<UserProfile>(
-        `/users/follow/${userId}`,
+        `/users/${userId}/follow`,
       );
       setUser(response.data);
     } catch (err: any) {
-      console.error(err.response?.data?.error);
+      setError(handleError(err));
     } finally {
       setIsFollowing(false);
     }
@@ -55,12 +56,12 @@ const UserDetail = () => {
   const displayFollowers = async () => {
     setIsLoadingModal(true);
     try {
-      const response = await axiosInstance.get(`/users/followers/${userId}`);
+      const response = await axiosInstance.get(`/users/${userId}/followers`);
       setModalUsers(response.data);
       setModalTitle("Followers");
       setShowModal(true);
     } catch (err) {
-      console.error("Failed to fetch followers");
+      setError(handleError(err));
     } finally {
       setIsLoadingModal(false);
     }
@@ -68,12 +69,12 @@ const UserDetail = () => {
   const displayFollowing = async () => {
     setIsLoadingModal(true);
     try {
-      const response = await axiosInstance.get(`/users/following/${userId}`);
+      const response = await axiosInstance.get(`/users/${userId}/following`);
       setModalUsers(response.data);
       setModalTitle("Following");
       setShowModal(true);
-    } catch (err) {
-      console.error("Failed to fetch following users");
+    } catch (err: any) {
+      setError(handleError(err));
     } finally {
       setIsLoadingModal(false);
     }
@@ -81,7 +82,7 @@ const UserDetail = () => {
 
   const handleFollowInModal = async (targetId: number) => {
     try {
-      await axiosInstance.post(`/users/follow/${targetId}`);
+      await axiosInstance.post(`/users/${targetId}/follow`);
       setModalUsers((prevUsers) =>
         prevUsers.map((u) => {
           if (u.id === targetId) {
@@ -95,12 +96,12 @@ const UserDetail = () => {
         }),
       );
 
-      if (user && user.id === targetId) {
-        const response = await axiosInstance.get(`/users/${targetId}`);
-        setUser(response.data);
-      }
-    } catch (err) {
-      console.error("Failed to toggle follow in modal", err);
+      // if (user && user.id === targetId) {
+      //   const response = await axiosInstance.get(`/users/${targetId}`);
+      //   setUser(response.data);
+      // }
+    } catch (err: any) {
+      setError(handleError(err));
     }
   };
 
@@ -109,12 +110,9 @@ const UserDetail = () => {
       setError(null);
       try {
         const response = await axiosInstance.get(`/users/${userId}`);
-        console.log(response.data);
         setUser(response.data);
       } catch (err: any) {
-        const errorMessage =
-          err.response?.data?.error || "Failed to fetch user";
-        setError(errorMessage);
+        setError(handleError(err));
       }
     };
     fetchUser();
@@ -142,7 +140,7 @@ const UserDetail = () => {
       )}
       <button
         onClick={() => navigate(-1)}
-        className="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors duration-200"
+        className="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors duration-200 cursor-pointer"
       >
         ← Back
       </button>

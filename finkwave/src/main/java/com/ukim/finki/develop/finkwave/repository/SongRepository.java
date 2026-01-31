@@ -14,19 +14,38 @@ import java.util.List;
 public interface SongRepository extends JpaRepository<Song, Long> {
 
 
-    @Query("SELECT NEW com.ukim.finki.develop.finkwave.model.dto.MusicalEntityDto( "+
+    @Query("SELECT NEW com.ukim.finki.develop.finkwave.model.dto.MusicalEntityDto(" +
             "s.id, " +
             "me.title, " +
             "me.genre, " +
-            "'SONG'," +
+            "'SONG', " +
             "u.fullName, " +
-            "(CASE WHEN l.id IS NOT NULL THEN true ELSE false END)) "+
-            "FROM Song s "+
-            "JOIN MusicalEntity  me on me.id=s.musicalEntities.id "+
-            "JOIN User u on u.id=me.releasedBy.id "+
-            "LEFT JOIN Like  l on l.musicalEntity.id=s.id AND l.listener.id=:currentUserId "+
-            "WHERE s.album.id=:albumId"
-
+            "(CASE WHEN :currentUserId IS NOT NULL AND l.id IS NOT NULL THEN true ELSE false END)) " +
+            "FROM Song s " +
+            "JOIN s.musicalEntities me " +
+            "JOIN me.releasedBy a " +
+            "JOIN a.nonAdminUser nau " +
+            "JOIN nau.user u "+
+            "LEFT JOIN Like l ON l.musicalEntity.id = s.id AND l.listener.id = :currentUserId " +
+            "WHERE s.album.id = :albumId"
     )
     List<MusicalEntityDto>findSongsByAlbum(@Param("albumId") Long albumId, @Param("currentUserId")Long currentUserId);
+
+
+    @Query("SELECT NEW com.ukim.finki.develop.finkwave.model.dto.MusicalEntityDto(" +
+            "s.id, " +
+            "me.title, " +
+            "me.genre, " +
+            "'SONG', " +
+            "u.fullName, " +
+            "(CASE WHEN :currentUserId IS NOT NULL AND l.id IS NOT NULL THEN true ELSE false END)) " +
+            "FROM Song s "+
+            "JOIN s.musicalEntities me "+
+            "JOIN me.releasedBy a "+
+            "JOIN a.nonAdminUser nau "+
+            "JOIN nau.user u "+
+            "JOIN PlaylistSong ps ON ps.song.id=s.id "+
+            "LEFT JOIN Like l ON l.musicalEntity.id=s.id AND l.listener.id=:currentUserId "+
+            "WHERE ps.playlist.id=:playlistId")
+    List<MusicalEntityDto>findSongsByPlaylistId(@Param("playlistId")Long playlistId, @Param("currentUserId")Long currentUserId);
 }

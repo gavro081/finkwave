@@ -6,7 +6,7 @@ import LandingPage from "./pages/LandingPage";
 import Login from "./pages/Login";
 import Nav from "./pages/Nav";
 import Register from "./pages/Register";
-import UserDetailView from "./pages/UserDetailView";
+import UserDetail from "./pages/UserDetail";
 import MusicalCollection from "./pages/MusicalCollection";
 
 const Layout = () => {
@@ -51,7 +51,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/users/:userId",
-        element: <UserDetailView />,
+        element: <UserDetail />,
       },
       {
         path: "/register",

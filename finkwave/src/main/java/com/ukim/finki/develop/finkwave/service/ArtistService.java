@@ -15,11 +15,13 @@ import java.util.stream.Collectors;
 public class ArtistService {
 
     private final ArtistContributionRepository artistContributionRepository;
+    private final AuthService authService;
 
 
     @Transactional(readOnly=true)
     public List<ArtistContributionDto> getArtistContributions(Long artistId){
-        return artistContributionRepository.findContributionsByArtistId(artistId);
+        Long currentUserId=authService.getCurrentUserID();
+        return artistContributionRepository.findContributionsByArtistId(currentUserId,artistId);
     }
 
 }

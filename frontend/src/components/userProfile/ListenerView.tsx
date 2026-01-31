@@ -19,7 +19,9 @@ const ListenerView = ({ likedEntities, playlists }: ListenerViewProps) => {
         <section>
           <div className="flex items-center gap-2 mb-6 pb-2 border-b-2 border-gray-200">
             <ListMusic className="w-6 h-6 text-gray-700" />
-            <h3 className="text-2xl font-bold text-gray-800">My Playlists</h3>
+            <h3 className="text-2xl font-bold text-gray-800">
+              Created Playlists
+            </h3>
             <span className="text-sm text-gray-400 ml-1">
               ({playlists.length})
             </span>
@@ -30,7 +32,7 @@ const ListenerView = ({ likedEntities, playlists }: ListenerViewProps) => {
               <div
                 key={playlist.id}
                 className="group cursor-pointer"
-                onClick={() => navigate(`/playlists/${playlist.id}`)}
+                onClick={() => navigate(`/collection/playlist/${playlist.id}`)}
               >
                 <div className="aspect-square rounded-md overflow-hidden bg-gray-100 mb-2 relative shadow-sm group-hover:shadow-lg transition-all">
                   {playlist.cover ? (
@@ -104,7 +106,7 @@ const ListenerView = ({ likedEntities, playlists }: ListenerViewProps) => {
               <div
                 key={album.id}
                 className="group cursor-pointer"
-                onClick={() => navigate(`/musical-entity/${album.id}`)}
+                onClick={() => navigate(`/collection/album/${album.id}`)}
               >
                 <div className="aspect-square rounded-lg overflow-hidden bg-gradient-to-br from-blue-100 to-indigo-100 mb-3 flex items-center justify-center shadow-sm group-hover:shadow-md transition-all">
                   <Album className="w-16 h-16 text-blue-600 opacity-60" />

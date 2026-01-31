@@ -2,6 +2,7 @@ package com.ukim.finki.develop.finkwave.controller;
 
 import java.util.Map;
 
+import com.ukim.finki.develop.finkwave.exceptions.AlbumNotFoundException;
 import com.ukim.finki.develop.finkwave.exceptions.FollowException;
 import com.ukim.finki.develop.finkwave.exceptions.UserNotFoundException;
 import org.slf4j.Logger;
@@ -43,6 +44,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(FollowException.class)
     public ResponseEntity<Map<String, String>> handleSelfFollow(FollowException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(AlbumNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleAlbumNotFound(AlbumNotFoundException ex) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(Map.of("error", ex.getMessage()));

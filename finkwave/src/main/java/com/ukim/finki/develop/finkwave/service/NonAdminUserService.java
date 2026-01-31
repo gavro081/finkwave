@@ -81,7 +81,8 @@ public class NonAdminUserService {
                         p.getId(),
                         p.getName(),
                         p.getCover(),
-                        p.getCreatedBy().getNonAdminUser().getUser().getFullName()
+                        p.getCreatedBy().getNonAdminUser().getUser().getFullName(),
+                        null
                 )).toList();
 
         return mapper.toListenerDTO(listener, musicalEntityDtos,followers,following,playlists);

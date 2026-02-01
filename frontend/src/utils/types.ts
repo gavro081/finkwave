@@ -7,7 +7,7 @@ export interface User {
 }
 
 export interface ArtistContribution {
-  musicalEntityId: number;
+  id: number;
   title: string;
   genre: string;
   role: string;
@@ -39,6 +39,7 @@ export interface Playlist {
   cover: string;
   creatorName: string;
   songsInPlaylist: Song[];
+  isSavedByCurrentUser: boolean;
 }
 
 export interface BaseNonAdminUser {

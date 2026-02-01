@@ -17,8 +17,8 @@ public class ListenerService {
     private final LikeService likeService;
     private final PlaylistService playlistService;
 
-    public List<MusicalEntityDto> getLikedEntities(Long listenerId) {
-        return  likeService.findLikedEntitiesWithTypeByListenerId(listenerId);
+    public List<MusicalEntityDto> getLikedEntities(Long currentUserId,Long listenerId) {
+        return  likeService.findLikedEntitiesWithTypeByListenerId(currentUserId,listenerId);
 
 
     }

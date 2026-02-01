@@ -1,5 +1,6 @@
 package com.ukim.finki.develop.finkwave.controller;
 
+import com.ukim.finki.develop.finkwave.model.dto.FollowStatusDto;
 import com.ukim.finki.develop.finkwave.model.dto.NonAdminUserDto;
 import com.ukim.finki.develop.finkwave.service.FollowService;
 import com.ukim.finki.develop.finkwave.service.NonAdminUserService;
@@ -45,10 +46,9 @@ public class NonAdminUserController {
     }
 
     @PostMapping("/{id}/follow")
-    public HttpEntity<NonAdminUserDto>followUser(@PathVariable Long id){
-        followService.toggleFollow(id);
+    public HttpEntity<FollowStatusDto>followUser(@PathVariable Long id){
 
-        return ResponseEntity.ok(nonAdminUserService.getById(id));
+        return ResponseEntity.ok(followService.toggleFollow(id));
     }
 
 

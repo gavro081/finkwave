@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,6 +23,7 @@ public class NonAdminUserService {
     private final ListenerService listenerService;
     private final FollowRepository followRepository;
     private final AuthService authService;
+    private final SavedPlaylistRepository savedPlaylistRepository;
 
     @Transactional(readOnly = true)
     public List<NonAdminUserDto> getAllUsers() {
@@ -52,7 +54,7 @@ public class NonAdminUserService {
         }
       
         if (listenerRepository.existsById(id)) {
-            dto=getListenerProfile(id, followers, following);
+            dto=getListenerProfile(id,currentUserId, followers, following);
             dto.setIsFollowedByCurrentUser(isFollowedByCurrentUser);
             return dto;
         }
@@ -70,19 +72,22 @@ public class NonAdminUserService {
         return mapper.toArtistDTO(artist, artistContributionDtos,followers,following);
     }
 
-    private NonAdminUserDto getListenerProfile(Long listenerId, Long followers, Long following) {
+    private NonAdminUserDto getListenerProfile(Long listenerId,Long currentUserId, Long followers, Long following) {
         Listener listener = listenerRepository.findByIdWithUser(listenerId)
             .orElseThrow(()->new UserNotFoundException("Listener not found with id: " + listenerId));
 
 
-        List<MusicalEntityDto>musicalEntityDtos=listenerService.getLikedEntities(listenerId);
+        List<MusicalEntityDto>musicalEntityDtos=listenerService.getLikedEntities(currentUserId,listenerId);
+        Set<Long> savedIds = savedPlaylistRepository.findAllByListener_Id(currentUserId)
+                .stream().map(sp -> sp.getPlaylist().getId()).collect(Collectors.toSet());
         List<PlaylistDto>playlists=listenerService.getPlaylistsCreatedByUser(listenerId).stream()
                 .map(p->new PlaylistDto(
                         p.getId(),
                         p.getName(),
                         p.getCover(),
                         p.getCreatedBy().getNonAdminUser().getUser().getFullName(),
-                        null
+                        null,
+                        savedIds.contains(p.getId())
                 )).toList();
 
         return mapper.toListenerDTO(listener, musicalEntityDtos,followers,following,playlists);

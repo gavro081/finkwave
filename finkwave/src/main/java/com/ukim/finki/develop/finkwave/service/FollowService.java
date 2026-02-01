@@ -5,6 +5,7 @@ import com.ukim.finki.develop.finkwave.exceptions.UserNotFoundException;
 import com.ukim.finki.develop.finkwave.model.Follow;
 import com.ukim.finki.develop.finkwave.model.FollowId;
 import com.ukim.finki.develop.finkwave.model.NonAdminUser;
+import com.ukim.finki.develop.finkwave.model.dto.FollowStatusDto;
 import com.ukim.finki.develop.finkwave.model.dto.NonAdminUserDto;
 import com.ukim.finki.develop.finkwave.repository.ArtistRepository;
 import com.ukim.finki.develop.finkwave.repository.FollowRepository;
@@ -74,8 +75,9 @@ public class FollowService {
 
 
 
-    public void toggleFollow(Long id){
+    public FollowStatusDto toggleFollow(Long id){
         Long currentUserId=authService.getCurrentUserID();
+        boolean isFollowing;
 
         if (currentUserId.equals(id)){
             throw new FollowException("Cannot follow yourself");
@@ -86,6 +88,7 @@ public class FollowService {
 
         if (followRepository.existsById(followId)){
             followRepository.deleteById(followId);
+            isFollowing=false;
 
         }else{
             NonAdminUser follower = nonAdminUserRepository.findById(currentUserId)
@@ -94,8 +97,13 @@ public class FollowService {
                     .orElseThrow(UserNotFoundException::new);
 
             followRepository.save(new Follow(follower, followee));
+            isFollowing=true;
 
         }
+        return new FollowStatusDto(
+                isFollowing,
+                followRepository.countByFolloweeId(id),
+                followRepository.countByFollowerId(id));
 
     }
 }

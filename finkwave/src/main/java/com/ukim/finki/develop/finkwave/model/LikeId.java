@@ -2,7 +2,9 @@ package com.ukim.finki.develop.finkwave.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.Hibernate;
 
@@ -12,6 +14,8 @@ import java.util.Objects;
 @Getter
 @Setter
 @Embeddable
+@AllArgsConstructor
+@NoArgsConstructor
 public class LikeId implements Serializable {
     private static final long serialVersionUID = -2521356135522333223L;
     @Column(name = "listener_id", nullable = false)

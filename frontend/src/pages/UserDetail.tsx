@@ -12,6 +12,12 @@ import type {
   BaseNonAdminUser,
 } from "../utils/types";
 
+interface FollowStatus {
+  isFollowing: boolean;
+  followerCount: number;
+  followingCount: number;
+}
+
 interface Artist extends BaseNonAdminUser {
   userType: "ARTIST";
   contributions: ArtistContribution[];
@@ -42,14 +48,51 @@ const UserDetail = () => {
 
     setIsFollowing(true);
     try {
-      const response = await axiosInstance.post<UserProfile>(
+      const response = await axiosInstance.post<FollowStatus>(
         `/users/${userId}/follow`,
       );
-      setUser(response.data);
+      setUser((prev) => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          isFollowedByCurrentUser: response.data.isFollowing,
+          followers: response.data.followerCount,
+          following: response.data.followingCount,
+        };
+      });
     } catch (err: any) {
       setError(handleError(err));
     } finally {
       setIsFollowing(false);
+    }
+  };
+
+  const handleFollowInModal = async (targetId: number) => {
+    try {
+      const response = await axiosInstance.post<FollowStatus>(
+        `/users/${targetId}/follow`,
+      );
+
+      setModalUsers((prevUsers) =>
+        prevUsers.map((u) =>
+          u.id === targetId
+            ? { ...u, isFollowedByCurrentUser: response.data.isFollowing }
+            : u,
+        ),
+      );
+
+      // if (user && user.id === targetId) {
+      //   setUser((prev) => {
+      //     if (!prev) return null;
+      //     return {
+      //       ...prev,
+      //       isFollowedByCurrentUser: response.data.isFollowing,
+      //       followers: response.data.followerCount,
+      //     };
+      //   });
+      // }
+    } catch (err: any) {
+      setError(handleError(err));
     }
   };
 
@@ -80,36 +123,12 @@ const UserDetail = () => {
     }
   };
 
-  const handleFollowInModal = async (targetId: number) => {
-    try {
-      await axiosInstance.post(`/users/${targetId}/follow`);
-      setModalUsers((prevUsers) =>
-        prevUsers.map((u) => {
-          if (u.id === targetId) {
-            const isNowFollowing = !u.isFollowedByCurrentUser;
-            return {
-              ...u,
-              isFollowedByCurrentUser: isNowFollowing,
-            };
-          }
-          return u;
-        }),
-      );
-
-      // if (user && user.id === targetId) {
-      //   const response = await axiosInstance.get(`/users/${targetId}`);
-      //   setUser(response.data);
-      // }
-    } catch (err: any) {
-      setError(handleError(err));
-    }
-  };
-
   useEffect(() => {
     const fetchUser = async () => {
       setError(null);
       try {
         const response = await axiosInstance.get(`/users/${userId}`);
+        console.log(response.data);
         setUser(response.data);
       } catch (err: any) {
         setError(handleError(err));

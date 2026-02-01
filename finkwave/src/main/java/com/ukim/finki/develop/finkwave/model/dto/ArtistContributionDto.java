@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class ArtistContributionDto {
-    private Long musicalEntityId;
+    private Long id;
     private String title;
     private String genre;
     private String role;

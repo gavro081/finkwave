@@ -14,20 +14,26 @@ import java.util.List;
 
 @Repository
 public interface LikeRepository extends JpaRepository<Like, LikeId> {
-    @Query("SELECT NEW com.ukim.finki.develop.finkwave.model.dto.MusicalEntityDto(l.musicalEntity.id, " +
-            "l.musicalEntity.title," +
-            "l.musicalEntity.genre, " +
-           "CASE WHEN s.id IS NOT NULL THEN 'SONG' " +
-           "WHEN a.id IS NOT NULL THEN 'ALBUM' " +
-           "ELSE 'UNKNOWN' END," +
-            "u.fullName," +
-            "true)" +
-           "FROM Like l " +
-           "LEFT JOIN Song s ON s.musicalEntities.id = l.musicalEntity.id " +
-           "LEFT JOIN Album a ON a.musicalEntities.id = l.musicalEntity.id " +
-            "LEFT JOIN User u ON u.id=l.musicalEntity.releasedBy.id "+
-           "WHERE l.listener.id = :listenerId")
-    List<MusicalEntityDto> findLikedEntitiesWithTypeByListenerId(@Param("listenerId") Long listenerId);
+    @Query("SELECT NEW com.ukim.finki.develop.finkwave.model.dto.MusicalEntityDto(" +
+            "me.id, " +
+            "me.title, " +
+            "me.genre, " +
+            "CASE WHEN s.id IS NOT NULL THEN 'SONG' " +
+            "     WHEN a.id IS NOT NULL THEN 'ALBUM' " +
+            "     ELSE 'UNKNOWN' END, " +
+            "u.fullName, " +
+            "(CASE WHEN currentUserLike.id IS NOT NULL THEN true ELSE false END)" +
+            ") " +
+            "FROM Like l " +
+            "JOIN l.musicalEntity me " +
+            "JOIN me.releasedBy nu " +
+            "JOIN nu.nonAdminUser.user u " +
+            "LEFT JOIN Song s ON s.musicalEntities.id = me.id " +
+            "LEFT JOIN Album a ON a.musicalEntities.id = me.id " +
+            "LEFT JOIN Like currentUserLike ON currentUserLike.musicalEntity.id = me.id " +
+            "AND currentUserLike.listener.id = :currentUserId " +
+            "WHERE l.listener.id = :listenerId")
+    List<MusicalEntityDto> findLikedEntitiesWithTypeByListenerId(@Param("currentUserId")Long currentUserId,@Param("listenerId") Long listenerId);
 
 
     @Query("SELECT CASE WHEN COUNT (l)>0 THEN true ELSE false END " +

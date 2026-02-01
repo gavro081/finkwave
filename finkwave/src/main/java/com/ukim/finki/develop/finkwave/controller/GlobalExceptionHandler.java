@@ -2,9 +2,7 @@ package com.ukim.finki.develop.finkwave.controller;
 
 import java.util.Map;
 
-import com.ukim.finki.develop.finkwave.exceptions.AlbumNotFoundException;
-import com.ukim.finki.develop.finkwave.exceptions.FollowException;
-import com.ukim.finki.develop.finkwave.exceptions.UserNotFoundException;
+import com.ukim.finki.develop.finkwave.exceptions.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -14,8 +12,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.server.ResponseStatusException;
-
-import com.ukim.finki.develop.finkwave.exceptions.AuthException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -38,7 +34,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleUserNotFound(UserNotFoundException ex) {
         return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
+                .status(HttpStatus.NOT_FOUND)
                 .body(Map.of("error", ex.getMessage()));
     }
 
@@ -52,7 +48,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AlbumNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleAlbumNotFound(AlbumNotFoundException ex) {
         return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
+                .status(HttpStatus.NOT_FOUND)
+                .body(Map.of("error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(MusicalEntityNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleMusicalEntityNotFound(MusicalEntityNotFoundException ex) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
                 .body(Map.of("error", ex.getMessage()));
     }
 

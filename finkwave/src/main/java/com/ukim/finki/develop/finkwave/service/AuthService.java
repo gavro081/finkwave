@@ -6,6 +6,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
 
+import com.ukim.finki.develop.finkwave.model.*;
+import com.ukim.finki.develop.finkwave.model.enums.UserType;
+import com.ukim.finki.develop.finkwave.repository.ArtistRepository;
+import com.ukim.finki.develop.finkwave.repository.ListenerRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,10 +22,6 @@ import com.ukim.finki.develop.finkwave.exceptions.InvalidFileException;
 import com.ukim.finki.develop.finkwave.exceptions.UnauthenticatedException;
 import com.ukim.finki.develop.finkwave.exceptions.UserAlreadyExistsException;
 import com.ukim.finki.develop.finkwave.exceptions.UserNotFoundException;
-import com.ukim.finki.develop.finkwave.model.NonAdminUser;
-import com.ukim.finki.develop.finkwave.model.RefreshToken;
-import com.ukim.finki.develop.finkwave.model.Role;
-import com.ukim.finki.develop.finkwave.model.User;
 import com.ukim.finki.develop.finkwave.model.dto.AuthRequestDto;
 import com.ukim.finki.develop.finkwave.model.dto.LoginRequestDto;
 import com.ukim.finki.develop.finkwave.model.dto.UserResponseDto;
@@ -38,10 +38,15 @@ import lombok.RequiredArgsConstructor;
 public class AuthService {
     private final UserRepository userRepository;
     private final NonAdminUserRepository nonAdminUserRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final ArtistRepository artistRepository;
+    private final ListenerRepository listenerRepository;
+
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
+
+    private final PasswordEncoder passwordEncoder;
     private final AuthProperties authProperties;
+
 
     private static final long MAX_FILE_SIZE = 2_000_000;
 
@@ -150,6 +155,18 @@ public class AuthService {
         nonAdminUser.setUser(user);
         user.setNonAdminUser(nonAdminUser);
         nonAdminUserRepository.save(nonAdminUser);
+
+        if (authRequestDto.userType().contains(UserType.ARTIST)){
+            Artist artist = new Artist();
+            artist.setNonAdminUser(nonAdminUser);
+            artistRepository.save(artist);
+        }
+        if (authRequestDto.userType().contains(UserType.LISTENER)){
+            Listener listener = new Listener();
+            listener.setNonAdminUser(nonAdminUser);
+            listenerRepository.save(listener);
+        }
+
         return user;
     }
 

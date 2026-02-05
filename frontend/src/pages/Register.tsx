@@ -3,13 +3,14 @@ import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import axiosInstance, { scheduleTokenRefresh } from "../api/axiosInstance";
 import { useAuth } from "../context/authContext";
-import type { User } from "../utils/types";
+import type { User, UserRegisterType } from "../utils/types";
 
 const Register = () => {
 	const { setUser } = useAuth();
 	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
 	const [fullname, setFullname] = useState("");
+	const [userType, setUserType] = useState<UserRegisterType[]>([]);
 	const [email, setEmail] = useState("");
 	const [profilePhotoFile, setProfilePhotoFile] = useState<File | null>(null);
 	const [previewProfilePhoto, setPreviewProfilePhoto] = useState<string | null>(
@@ -42,11 +43,16 @@ const Register = () => {
 			return;
 		}
 
-		if (username === "" || password === "" || fullname === "" || email === "") {
+		if (
+			username === "" ||
+			password === "" ||
+			fullname === "" ||
+			email === "" ||
+			userType.length === 0
+		) {
 			setError("Please fill in all required fields.");
 			return;
 		}
-
 		if (profilePhotoFile && !profilePhotoFile.type.startsWith("image/")) {
 			alert("Only images allowed");
 			return;
@@ -57,6 +63,7 @@ const Register = () => {
 		formData.append("fullname", fullname);
 		formData.append("email", email);
 		formData.append("password", password);
+		userType.forEach((type) => formData.append("userType", type));
 
 		try {
 			const response = await axiosInstance.post<{
@@ -76,7 +83,10 @@ const Register = () => {
 	return (
 		<div className="flex flex-col items-center justify-center min-h-[90vh] bg-gray-100">
 			<h2 className="text-2xl mb-4">Register</h2>
-			<form className="bg-white p-6 rounded shadow-md w-full max-w-md">
+			<form
+				className="bg-white p-6 rounded shadow-md w-full max-w-md"
+				onSubmit={handleRegister}
+			>
 				{error && <p className="text-red-500 mb-4">{error}</p>}
 				<div className="mb-4">
 					<label className="block text-gray-700 mb-2" htmlFor="username">
@@ -125,6 +135,43 @@ const Register = () => {
 						value={email}
 						onChange={(e) => setEmail(e.target.value)}
 					/>
+				</div>
+				<div className="mb-4">
+					<label className="block text-gray-700 mb-2" htmlFor="userType">
+						User Type
+					</label>
+					<input
+						type="checkbox"
+						id="artist"
+						value="ARTIST"
+						onChange={(e) => {
+							if (e.target.checked) {
+								setUserType((prev) => [...prev, "ARTIST"]);
+							} else {
+								setUserType((prev) => prev.filter((type) => type !== "ARTIST"));
+							}
+						}}
+					/>
+					<label htmlFor="artist" className="ml-2 mr-4">
+						Artist
+					</label>
+					<input
+						type="checkbox"
+						id="listener"
+						value="LISTENER"
+						onChange={(e) => {
+							if (e.target.checked) {
+								setUserType((prev) => [...prev, "LISTENER"]);
+							} else {
+								setUserType((prev) =>
+									prev.filter((type) => type !== "LISTENER"),
+								);
+							}
+						}}
+					/>
+					<label htmlFor="listener" className="ml-2">
+						Listener
+					</label>
 				</div>
 				<div className="mb-4">
 					<label className="block text-gray-700 mb-2">Profile Photo</label>

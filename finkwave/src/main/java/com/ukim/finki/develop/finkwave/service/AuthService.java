@@ -129,7 +129,9 @@ public class AuthService {
                 .fullName(authRequestDto.fullname())
                 .email(authRequestDto.email())
                 .password(passwordEncoder.encode(authRequestDto.password()))
-                .role(Role.NONADMIN);
+                .role(Role.NONADMIN)
+                .artist(authRequestDto.userType().contains(UserType.ARTIST))
+                .listener(authRequestDto.userType().contains(UserType.LISTENER));
 
 
         MultipartFile profilePhoto = authRequestDto.profilePhoto();
@@ -156,12 +158,12 @@ public class AuthService {
         user.setNonAdminUser(nonAdminUser);
         nonAdminUserRepository.save(nonAdminUser);
 
-        if (authRequestDto.userType().contains(UserType.ARTIST)){
+        if (user.isArtist()){
             Artist artist = new Artist();
             artist.setNonAdminUser(nonAdminUser);
             artistRepository.save(artist);
         }
-        if (authRequestDto.userType().contains(UserType.LISTENER)){
+        if (user.isListener()){
             Listener listener = new Listener();
             listener.setNonAdminUser(nonAdminUser);
             listenerRepository.save(listener);

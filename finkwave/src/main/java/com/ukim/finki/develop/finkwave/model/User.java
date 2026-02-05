@@ -45,6 +45,12 @@ public class User {
     @Column(nullable = false, length = Integer.MAX_VALUE)
     private String username;
 
+    @Column(nullable = false)
+    private boolean artist;
+
+    @Column(nullable = false)
+    private boolean listener;
+
     @Column(name = "profile_photo", length = Integer.MAX_VALUE)
     private String profilePhoto;
 

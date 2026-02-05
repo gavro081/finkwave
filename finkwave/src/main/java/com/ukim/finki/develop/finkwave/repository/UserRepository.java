@@ -15,14 +15,14 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("""
         SELECT u from User u
-        WHERE (u.fullName ilike %:searchTerm% or u.username ilike %:searchTerm%)
-            and u.listener = true and u.artist = false 
+        WHERE (u.fullName ILIKE '%' || :searchTerm || '%' or u.username ILIKE '%' || :searchTerm || '%')
+            and u.listener = true and u.artist = false
         """)
     List<User> searchListeners(String searchTerm);
 
     @Query("""
         SELECT u from User u
-        WHERE (u.fullName ilike %:searchTerm% or u.username ilike %:searchTerm%)
+        WHERE (u.fullName ILIKE '%' || :searchTerm || '%' or u.username ILIKE '%' || :searchTerm || '%')
             and u.artist = true
         """)
     List<User> searchArtists(String searchTerm);

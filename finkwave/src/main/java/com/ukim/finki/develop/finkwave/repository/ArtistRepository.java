@@ -12,16 +12,20 @@ import com.ukim.finki.develop.finkwave.model.Artist;
 @Repository
 public interface ArtistRepository extends JpaRepository<Artist, Long> {
 
-    @Query("SELECT DISTINCT a FROM Artist a "+
-        "JOIN FETCH a.nonAdminUser nu "+
-        "JOIN FETCH nu.user "+
-        "WHERE a.id=:artistId")
+    @Query("""
+        SELECT DISTINCT a FROM Artist a
+        JOIN FETCH a.nonAdminUser nu
+        JOIN FETCH nu.user
+        WHERE a.id=:artistId
+        """)
     Optional<Artist>findByIdWithUser(@Param("artistId")Long artistId);
 
-    @Query("SELECT a FROM Artist a " +
-            "JOIN FETCH a.nonAdminUser nau " +
-            "JOIN FETCH nau.user u " +
-            "WHERE u.username = :username")
+    @Query("""
+            SELECT a FROM Artist a
+            JOIN FETCH a.nonAdminUser nau
+            JOIN FETCH nau.user u
+            WHERE u.username = :username
+            """)
     Optional<Artist> findByUsername(@Param("username") String username);
 
 

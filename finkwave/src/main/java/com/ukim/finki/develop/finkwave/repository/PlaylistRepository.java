@@ -13,11 +13,13 @@ import java.util.List;
 public interface PlaylistRepository extends JpaRepository<Playlist, Long> {
 
 
-    @Query("SELECT DISTINCT p FROM Playlist p " +
-            "JOIN FETCH p.createdBy l " +
-            "JOIN FETCH l.nonAdminUser nu " +
-            "JOIN FETCH nu.user u " +
-            "WHERE l.id = :creatorId")
+    @Query("""
+        SELECT DISTINCT p FROM Playlist p
+        JOIN FETCH p.createdBy l
+        JOIN FETCH l.nonAdminUser nu
+        JOIN FETCH nu.user u
+        WHERE l.id = :creatorId
+        """)
     List<Playlist> findByCreatorId(@Param("creatorId") Long creatorId);
 
 

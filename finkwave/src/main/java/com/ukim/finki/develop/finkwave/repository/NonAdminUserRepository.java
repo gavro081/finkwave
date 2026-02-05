@@ -13,17 +13,23 @@ import java.util.Optional;
 @Repository
 public interface NonAdminUserRepository extends JpaRepository<NonAdminUser, Long> {
 
-    @Query("SELECT n FROM NonAdminUser n JOIN FETCH n.user")
+    @Query("""
+        SELECT n FROM NonAdminUser n JOIN FETCH n.user
+    """)
     List<NonAdminUser> findAllWithUser();
 
-    @Query("SELECT u FROM NonAdminUser u " +
-            "WHERE u.user.fullName ILIKE CONCAT('%', :name, '%' ) "+
-            "OR  u.user.username ILIKE CONCAT('%', :name, '%' ) ")
+    @Query("""
+        SELECT u FROM NonAdminUser u
+        WHERE u.user.fullName ILIKE '%' || :name || '%'
+        OR  u.user.username ILIKE '%' || :name || '%'
+    """)
     List<NonAdminUser> searchByName(String name);
 
-    @Query("SELECT nau FROM NonAdminUser nau " +
-            "JOIN FETCH nau.user u " +
-            "WHERE u.username = :username")
+    @Query("""
+        SELECT nau FROM NonAdminUser nau
+        JOIN FETCH nau.user u
+        WHERE u.username = :username
+        """)
     Optional<NonAdminUser> findByUsername(@Param("username") String username);
 
 

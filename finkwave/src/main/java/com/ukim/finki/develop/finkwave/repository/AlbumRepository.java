@@ -15,18 +15,16 @@ public interface AlbumRepository extends JpaRepository<Album, Long> {
 
     List<Album>findAllByIdIn(List<Long>ids);
 
-
     @Query("""
-            SELECT NEW com.ukim.finki.develop.finkwave.model.dto.MusicalEntityDto(
+        SELECT NEW com.ukim.finki.develop.finkwave.model.dto.MusicalEntityDto(
             a.id, me.title, me.genre, 'ALBUM', u.fullName, me.cover, FALSE )
-            FROM Album a
-            JOIN a.musicalEntities me
-            JOIN me.releasedBy rb
-            JOIN rb.nonAdminUser nau
-            JOIN nau.user u
-            WHERE me.title ILIKE %:searchTerm%
-            """
-    )
+        FROM Album a
+        JOIN a.musicalEntities me
+        JOIN me.releasedBy rb
+        JOIN rb.nonAdminUser nau
+        JOIN nau.user u
+        WHERE me.title ILIKE '%' || :searchTerm || '%'
+    """)
     List<MusicalEntityDto> searchAlbums(@Param("currentUserId")Long currentUserId, @Param("searchTerm") String searchTerm);
 
 }

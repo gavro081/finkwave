@@ -28,6 +28,10 @@ public class PlaylistService {
         return playlistRepository.findByCreatorId(id);
     }
 
+    public List<Playlist>findSavedByUser(Long id){
+        return savedPlaylistRepository.findSavedPlaylistsMetadata(id);
+    }
+
     public PlaylistDto getPlaylist(Long id){
         Long currentUserId=authService.getCurrentUserID();
         Playlist playlist = playlistRepository.findById(id).orElseThrow(()-> new PlaylistNotFoundException(id));
@@ -44,6 +48,8 @@ public class PlaylistService {
 
         );
     }
+
+
 
 
 

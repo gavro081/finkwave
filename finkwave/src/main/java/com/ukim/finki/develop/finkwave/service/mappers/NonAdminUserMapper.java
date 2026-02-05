@@ -14,37 +14,41 @@ import java.util.List;
 @Component
 public class NonAdminUserMapper {
 
-    public NonAdminUserDto toArtistDTO(Artist artist, List<ArtistContributionDto> entitiesDTO, Long followers, Long following) {
+    public NonAdminUserDto toArtistDTO(Artist artist, List<ArtistContributionDto> entitiesDTO, FollowStatusDto followStatusDto) {
         ArtistDto dto=new ArtistDto();
-        populateBaseClassFields(dto,artist.getNonAdminUser(),"ARTIST",followers,following);
+        populateBaseClassFields(dto,artist.getNonAdminUser(),"ARTIST",followStatusDto);
         dto.setContributions(entitiesDTO);
         return dto;
     }
 
-    public NonAdminUserDto toListenerDTO(Listener listener, List<MusicalEntityDto> musicalEntityDtos, Long followers, Long following, List<PlaylistDto>playlists) {
+    public NonAdminUserDto toListenerDTO(Listener listener,
+                                         List<MusicalEntityDto> musicalEntityDtos,
+                                         FollowStatusDto followStatusDto,
+                                         List<PlaylistDto>createdPlaylists,
+                                         List<PlaylistDto>savedPlaylists) {
         ListenerDto dto=new ListenerDto();
-        populateBaseClassFields(dto,listener.getNonAdminUser(),"LISTENER",followers,following);
+        populateBaseClassFields(dto,listener.getNonAdminUser(),"LISTENER",followStatusDto);
         dto.setLikedEntities(musicalEntityDtos);
-        dto.setCreatedPlaylists(playlists);
+        dto.setCreatedPlaylists(createdPlaylists);
+        dto.setSavedPlaylists(savedPlaylists);
         return dto;
     }
 
-    public NonAdminUserDto toDto(NonAdminUser user,String type, Long followers,Long following){
+    public NonAdminUserDto toDto(NonAdminUser user,String type, FollowStatusDto followStatusDto){
        NonAdminUserDto dto=new NonAdminUserDto();
-       populateBaseClassFields(dto,user,type,followers,following);
+       populateBaseClassFields(dto,user,type,followStatusDto);
        return dto;
     }
 
 
 
-    private void populateBaseClassFields(NonAdminUserDto dto,NonAdminUser user,String type,Long followers,Long following){
-
-        dto.setId(user.getId());
+    private void populateBaseClassFields(NonAdminUserDto dto,NonAdminUser user,String type,FollowStatusDto followStatusDto){
         dto.setUsername(user.getUser().getUsername());
         dto.setFullName(user.getUser().getFullName());
         dto.setProfilePhoto(user.getUser().getProfilePhoto());
         dto.setUserType(type);
-        dto.setFollowers(followers);
-        dto.setFollowing(following);
+        dto.setFollowers(followStatusDto.followerCount());
+        dto.setFollowing(followStatusDto.followingCount());
+        dto.setIsFollowedByCurrentUser(followStatusDto.isFollowing());
     }
 }

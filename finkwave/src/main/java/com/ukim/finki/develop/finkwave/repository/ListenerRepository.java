@@ -16,4 +16,11 @@ public interface ListenerRepository extends JpaRepository<Listener, Long> {
            "JOIN FETCH nu.user " +
            "WHERE l.id = :listenerId")
     Optional<Listener> findByIdWithUser(@Param("listenerId") Long listenerId);
+
+    @Query("SELECT l FROM Listener l " +
+            "JOIN FETCH l.nonAdminUser nu " +
+            "JOIN FETCH nu.user u " +
+            "WHERE u.username=:username")
+
+    Optional<Listener>findByUsername(@Param("username")String username);
 }

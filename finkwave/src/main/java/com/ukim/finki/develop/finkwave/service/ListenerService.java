@@ -27,6 +27,10 @@ public class ListenerService {
     public List<Playlist>getPlaylistsCreatedByUser(Long listenerId){
         return playlistService.findByCreatorId(listenerId);
     }
+
+    public List<Playlist>getPlaylistsSavedByUser(Long listenerId){
+        return playlistService.findSavedByUser(listenerId);
+    }
 }
 
 

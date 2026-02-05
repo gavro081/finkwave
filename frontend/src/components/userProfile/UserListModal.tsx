@@ -5,7 +5,7 @@ interface ModalProps {
   title: string;
   users: BaseNonAdminUser[];
   onClose: () => void;
-  onFollowToggle: (targetId: number) => Promise<void>;
+  onFollowToggle: (targetUsername: string) => Promise<void>;
 }
 
 const UserListModal = ({
@@ -36,14 +36,14 @@ const UserListModal = ({
           ) : (
             users.map((u) => (
               <div
-                key={u.id}
+                key={u.username}
                 className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg transition-colors"
               >
                 <div
                   className="flex items-center gap-4 cursor-pointer flex-1"
                   onClick={() => {
                     onClose();
-                    navigate(`/users/${u.id}`);
+                    navigate(`/users/${u.username}`);
                   }}
                 >
                   <div className="w-10 h-10 rounded-full bg-blue-100 overflow-hidden shrink-0 flex items-center justify-center">
@@ -63,7 +63,7 @@ const UserListModal = ({
                 </div>
 
                 <button
-                  onClick={() => onFollowToggle(u.id)}
+                  onClick={() => onFollowToggle(u.username)}
                   className={`px-4 py-1 text-sm font-medium rounded-md transition-colors cursor-pointer ${
                     u.isFollowedByCurrentUser
                       ? "bg-gray-200 text-gray-700 hover:bg-gray-300"

@@ -8,7 +8,10 @@ import com.ukim.finki.develop.finkwave.service.mappers.NonAdminUserMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -30,67 +33,75 @@ public class NonAdminUserService {
         return nonAdminUserRepository.findAllWithUser().stream()
                 .map(user -> {
                     String type = determineType(user.getId());
-                    return mapper.toDto(user, type, null, null);
+                    return mapper.toDto(user, type, new FollowStatusDto(false,null,null));
                 })
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public NonAdminUserDto getById(Long id) {
-        Long followers=followRepository.countByFolloweeId(id);
-        Long following=followRepository.countByFollowerId(id);
+    public NonAdminUserDto getNonAdminUserProfile(String username) {
+
         Long currentUserId= authService.getCurrentUserID();
 
-        boolean isFollowedByCurrentUser=false;
-        if (currentUserId != null) {
-            isFollowedByCurrentUser = followRepository.isFollowing(currentUserId, id);
-        }
-        NonAdminUserDto dto;
+
+        Optional<Artist>artistOptional=artistRepository.findByUsername(username);
     
-        if (artistRepository.existsById(id)) {
-             dto=getArtistProfile(id, followers, following);
-             dto.setIsFollowedByCurrentUser(isFollowedByCurrentUser);
-             return dto;
+        if (artistOptional.isPresent()) {
+            Artist artist = artistOptional.get();
+            return getArtistProfile(artist, currentUserId);
         }
+
+        Optional<Listener>listenerOptional=listenerRepository.findByUsername(username);
       
-        if (listenerRepository.existsById(id)) {
-            dto=getListenerProfile(id,currentUserId, followers, following);
-            dto.setIsFollowedByCurrentUser(isFollowedByCurrentUser);
-            return dto;
+        if (listenerOptional.isPresent()) {
+            Listener listener=listenerOptional.get();
+            return getListenerProfile(listener,currentUserId);
         }
-        
-        throw new RuntimeException("User not found with id: " + id);
+
+        throw new UserNotFoundException("User not found: " + username);
     }
 
-    private NonAdminUserDto getArtistProfile(Long artistId, Long followers, Long following) {
-        Artist artist = artistRepository.findByIdWithUser(artistId)
-            .orElseThrow(()->new UserNotFoundException("Artist not found with id: " + artistId));
+    private FollowStatusDto getFollowingInfo(Long id,Long currentUserId){
+        Long followers = followRepository.countByFolloweeId(id);
+        Long following = followRepository.countByFollowerId(id);
+        boolean isFollowing = followRepository.isFollowing(currentUserId, id);
+        return new FollowStatusDto(isFollowing,followers,following);
+    }
 
+    private NonAdminUserDto getArtistProfile(Artist artist,Long currentUserId) {
+        Long artistId=artist.getId();
 
         List<ArtistContributionDto>artistContributionDtos=artistService.getArtistContributions(artistId);
+        FollowStatusDto followStatusDto=getFollowingInfo(artistId,currentUserId);
 
-        return mapper.toArtistDTO(artist, artistContributionDtos,followers,following);
+        return mapper.toArtistDTO(artist, artistContributionDtos,followStatusDto);
     }
 
-    private NonAdminUserDto getListenerProfile(Long listenerId,Long currentUserId, Long followers, Long following) {
-        Listener listener = listenerRepository.findByIdWithUser(listenerId)
-            .orElseThrow(()->new UserNotFoundException("Listener not found with id: " + listenerId));
+    private NonAdminUserDto getListenerProfile(Listener listener, Long currentUserId) {
+        Long profileId = listener.getId();
+
+        FollowStatusDto followStatusDto = getFollowingInfo(profileId, currentUserId);
 
 
-        List<MusicalEntityDto>musicalEntityDtos=listenerService.getLikedEntities(currentUserId,listenerId);
-        Set<Long> savedIds = savedPlaylistRepository.findAllByListener_Id(currentUserId)
-                .stream().map(sp -> sp.getPlaylist().getId()).collect(Collectors.toSet());
-        List<PlaylistDto>playlists=listenerService.getPlaylistsCreatedByUser(listenerId).stream()
-                .map(p->new PlaylistDto(
-                        p.getId(),
-                        p.getName(),
-                        p.getCover(),
-                        p.getCreatedBy().getNonAdminUser().getUser().getFullName(),
-                        null,
-                        savedIds.contains(p.getId())
-                )).toList();
+        List<MusicalEntityDto> likedEntities = listenerService.getLikedEntities(currentUserId, profileId);
 
-        return mapper.toListenerDTO(listener, musicalEntityDtos,followers,following,playlists);
+        Set<Long> visitorSavedPlaylistIds = (currentUserId != null)
+                ? savedPlaylistRepository.findAllByListener_Id(currentUserId).stream()
+                .map(sp -> sp.getPlaylist().getId())
+                .collect(Collectors.toSet())
+                : Collections.emptySet();
+
+
+        List<PlaylistDto> createdPlaylists = listenerService.getPlaylistsCreatedByUser(profileId).stream()
+                .map(p -> mapToPlaylistDto(p, visitorSavedPlaylistIds))
+                .toList();
+
+
+        List<PlaylistDto> savedPlaylists = savedPlaylistRepository.findSavedPlaylistsMetadata(profileId).stream()
+                .map(p -> mapToPlaylistDto(p, visitorSavedPlaylistIds))
+                .toList();
+
+        return mapper.toListenerDTO(listener, likedEntities, followStatusDto, createdPlaylists, savedPlaylists);
     }
 
 
@@ -103,16 +114,25 @@ public class NonAdminUserService {
 
         return nonAdminUserRepository.searchByName(name).stream()
                 .map(user -> {
-                    String type = determineType(user.getId());
-                    Long followers = followRepository.countByFolloweeId(user.getId());
-                    Long following = followRepository.countByFollowerId(user.getId());
-                    return mapper.toDto(user, type, followers, following);
+                    Long userId= user.getId();
+                    String type = determineType(userId);
+                    FollowStatusDto followStatusDto=getFollowingInfo(userId,null);
+                    return mapper.toDto(user, type,followStatusDto);
                 })
                 .collect(Collectors.toList());
     }
 
 
-
+    private PlaylistDto mapToPlaylistDto(Playlist p, Set<Long> savedBy) {
+        return new PlaylistDto(
+                p.getId(),
+                p.getName(),
+                p.getCover(),
+                p.getCreatedBy().getNonAdminUser().getUser().getFullName(),
+                null,
+                savedBy.contains(p.getId())
+        );
+    }
     private String determineType(Long id) {
         if (artistRepository.existsById(id)) {
             return "Artist";

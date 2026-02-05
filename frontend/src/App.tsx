@@ -50,7 +50,7 @@ const router = createBrowserRouter([
         element: <AllUsers />,
       },
       {
-        path: "/users/:userId",
+        path: "/users/:username",
         element: <UserDetail />,
       },
       {

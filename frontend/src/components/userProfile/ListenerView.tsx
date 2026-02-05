@@ -3,14 +3,21 @@ import { Heart, ListMusic, Music, Album, Bookmark } from "lucide-react";
 import type { Playlist, MusicalEntity } from "../../utils/types";
 import axiosInstance from "../../api/axiosInstance";
 import { useState } from "react";
+
 interface ListenerViewProps {
   likedEntities: MusicalEntity[] | [];
-  playlists: Playlist[] | [];
+  createdPlaylists: Playlist[] | [];
+  savedPlaylists: Playlist[] | [];
 }
 
-const ListenerView = ({ likedEntities, playlists }: ListenerViewProps) => {
+const ListenerView = ({
+  likedEntities,
+  createdPlaylists,
+  savedPlaylists,
+}: ListenerViewProps) => {
   const navigate = useNavigate();
   const [items, setItems] = useState(likedEntities);
+  const [savedItems, setSavedItems] = useState(savedPlaylists);
   const [toast, setToast] = useState<{ message: string; show: boolean }>({
     message: "",
     show: false,
@@ -26,10 +33,31 @@ const ListenerView = ({ likedEntities, playlists }: ListenerViewProps) => {
   const likedSongs = items.filter((e) => e.type === "SONG");
   const likedAlbums = items.filter((e) => e.type === "ALBUM");
 
-  const handleSavePlaylist = (e: React.MouseEvent, playlistId: number) => {
+  const handleSavePlaylist = async (
+    e: React.MouseEvent,
+    playlistId: number,
+    playlistName: string,
+  ) => {
     e.stopPropagation();
 
-    console.log("Save playlist:", playlistId);
+    try {
+      const response = await axiosInstance.post(`/playlist/${playlistId}/save`);
+      const data = response.data;
+
+      setSavedItems((prevItems) =>
+        data.isSaved
+          ? [...prevItems, prevItems.find((p) => p.id === playlistId)!]
+          : prevItems.filter((p) => p.id !== playlistId),
+      );
+
+      showToast(
+        data.isSaved
+          ? `Saved "${playlistName}"`
+          : `Removed "${playlistName}" from saved playlists`,
+      );
+    } catch (err: any) {
+      showToast(err.response?.data?.error || "Failed to save playlist");
+    }
   };
 
   const handleLike = async (id: number, title: string) => {
@@ -62,18 +90,21 @@ const ListenerView = ({ likedEntities, playlists }: ListenerViewProps) => {
           </div>
         </div>
       )}
-      {playlists && playlists.length > 0 && (
+
+      {createdPlaylists && createdPlaylists.length > 0 && (
         <section>
           <div className="flex items-center gap-3 mb-6">
             <ListMusic className="w-6 h-6 text-gray-700" />
             <h3 className="text-2xl font-bold text-gray-800">
               Created Playlists
             </h3>
-            <span className="text-sm text-gray-500">({playlists.length})</span>
+            <span className="text-sm text-gray-500">
+              ({createdPlaylists.length})
+            </span>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {playlists.map((playlist) => (
+            {createdPlaylists.map((playlist) => (
               <div
                 key={playlist.id}
                 className="group cursor-pointer"
@@ -92,9 +123,10 @@ const ListenerView = ({ likedEntities, playlists }: ListenerViewProps) => {
                     </div>
                   )}
 
-                  {/* Save button overlay */}
                   <button
-                    onClick={(e) => handleSavePlaylist(e, playlist.id)}
+                    onClick={(e) =>
+                      handleSavePlaylist(e, playlist.id, playlist.name)
+                    }
                     className="absolute top-2 right-2 p-2 bg-white/90 hover:bg-white rounded-full shadow-md transition-all duration-200 opacity-0 group-hover:opacity-100"
                     title={playlist.isSavedByCurrentUser ? "Unsave" : "Save"}
                   >
@@ -105,6 +137,58 @@ const ListenerView = ({ likedEntities, playlists }: ListenerViewProps) => {
                           : "text-gray-600"
                       }`}
                     />
+                  </button>
+                </div>
+                <p className="text-sm font-semibold text-gray-900 truncate group-hover:text-blue-600 transition-colors">
+                  {playlist.name}
+                </p>
+                <p className="text-xs text-gray-500 truncate">
+                  {playlist.creatorName}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {savedItems && savedItems.length > 0 && (
+        <section>
+          <div className="flex items-center gap-3 mb-6">
+            <Bookmark className="w-6 h-6 text-blue-600 fill-blue-600" />
+            <h3 className="text-2xl font-bold text-gray-800">
+              Saved Playlists
+            </h3>
+            <span className="text-sm text-gray-500">({savedItems.length})</span>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {savedItems.map((playlist) => (
+              <div
+                key={playlist.id}
+                className="group cursor-pointer"
+                onClick={() => navigate(`/collection/playlist/${playlist.id}`)}
+              >
+                <div className="relative aspect-square rounded-lg overflow-hidden bg-gray-100 mb-3 shadow-md group-hover:shadow-lg transition-all">
+                  {playlist.cover ? (
+                    <img
+                      src={playlist.cover}
+                      alt={playlist.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
+                      <ListMusic className="w-16 h-16 text-white opacity-30" />
+                    </div>
+                  )}
+
+                  <button
+                    onClick={(e) =>
+                      handleSavePlaylist(e, playlist.id, playlist.name)
+                    }
+                    className="absolute top-2 right-2 p-2 bg-white/90 hover:bg-white rounded-full shadow-md transition-all duration-200 opacity-0 group-hover:opacity-100"
+                    title="Unsave"
+                  >
+                    <Bookmark className="w-5 h-5 fill-blue-600 text-blue-600" />
                   </button>
                 </div>
                 <p className="text-sm font-semibold text-gray-900 truncate group-hover:text-blue-600 transition-colors">
@@ -233,7 +317,8 @@ const ListenerView = ({ likedEntities, playlists }: ListenerViewProps) => {
 
       {likedEntities &&
         likedEntities.length === 0 &&
-        (!playlists || playlists.length === 0) && (
+        (!createdPlaylists || createdPlaylists.length === 0) &&
+        (!savedItems || savedItems.length === 0) && (
           <div className="flex flex-col items-center justify-center py-16 text-gray-400">
             <Music className="w-20 h-20 mb-4 opacity-20" />
             <p className="text-lg font-medium">Nothing here yet</p>

@@ -18,4 +18,11 @@ public interface ArtistRepository extends JpaRepository<Artist, Long> {
         "WHERE a.id=:artistId")
     Optional<Artist>findByIdWithUser(@Param("artistId")Long artistId);
 
+    @Query("SELECT a FROM Artist a " +
+            "JOIN FETCH a.nonAdminUser nau " +
+            "JOIN FETCH nau.user u " +
+            "WHERE u.username = :username")
+    Optional<Artist> findByUsername(@Param("username") String username);
+
+
 }

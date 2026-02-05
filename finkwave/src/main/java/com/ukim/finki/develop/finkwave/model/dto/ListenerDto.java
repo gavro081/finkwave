@@ -10,4 +10,5 @@ import java.util.List;
 public class ListenerDto extends NonAdminUserDto {
     private List<MusicalEntityDto> likedEntities;
     private List<PlaylistDto> createdPlaylists;
+    private List<PlaylistDto>savedPlaylists;
 }

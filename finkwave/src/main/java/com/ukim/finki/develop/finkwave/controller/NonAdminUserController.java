@@ -25,9 +25,9 @@ public class NonAdminUserController {
         return ResponseEntity.ok(nonAdminUserService.getAllUsers());
     }
 
-    @GetMapping("/{id}")
-    public HttpEntity<NonAdminUserDto>getById(@PathVariable Long id){
-        return ResponseEntity.ok(nonAdminUserService.getById(id));
+    @GetMapping("/{username}")
+    public HttpEntity<NonAdminUserDto>getById(@PathVariable String username){
+        return ResponseEntity.ok(nonAdminUserService.getNonAdminUserProfile(username));
     }
 
     @GetMapping("/search")
@@ -35,20 +35,20 @@ public class NonAdminUserController {
         return ResponseEntity.ok(nonAdminUserService.searchUsers(name));
     }
 
-    @GetMapping("/{id}/followers")
-    public HttpEntity<List<NonAdminUserDto>>getFollowersForUser(@PathVariable Long id){
-        return ResponseEntity.ok(followService.getFollowersForUser(id));
+    @GetMapping("/{username}/followers")
+    public HttpEntity<List<NonAdminUserDto>>getFollowersForUser(@PathVariable String username){
+        return ResponseEntity.ok(followService.getFollowersForUser(username));
     }
 
-    @GetMapping("/{id}/following")
-    public HttpEntity<List<NonAdminUserDto>>getFollowingForUser(@PathVariable Long id){
-        return ResponseEntity.ok(followService.getFollowingForUser(id));
+    @GetMapping("/{username}/following")
+    public HttpEntity<List<NonAdminUserDto>>getFollowingForUser(@PathVariable String username){
+        return ResponseEntity.ok(followService.getFollowingForUser(username));
     }
 
-    @PostMapping("/{id}/follow")
-    public HttpEntity<FollowStatusDto>followUser(@PathVariable Long id){
+    @PostMapping("/{username}/follow")
+    public HttpEntity<FollowStatusDto>followUser(@PathVariable String username){
 
-        return ResponseEntity.ok(followService.toggleFollow(id));
+        return ResponseEntity.ok(followService.toggleFollow(username));
     }
 
 

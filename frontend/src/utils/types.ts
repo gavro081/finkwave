@@ -43,7 +43,7 @@ export interface Playlist {
 }
 
 export interface BaseNonAdminUser {
-  id: number;
+  username: string;
   fullName: string;
   userType: string;
   profilePhoto: string;

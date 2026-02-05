@@ -2,11 +2,13 @@ package com.ukim.finki.develop.finkwave.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.ukim.finki.develop.finkwave.model.NonAdminUser;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface NonAdminUserRepository extends JpaRepository<NonAdminUser, Long> {
@@ -18,6 +20,11 @@ public interface NonAdminUserRepository extends JpaRepository<NonAdminUser, Long
             "WHERE u.user.fullName ILIKE CONCAT('%', :name, '%' ) "+
             "OR  u.user.username ILIKE CONCAT('%', :name, '%' ) ")
     List<NonAdminUser> searchByName(String name);
+
+    @Query("SELECT nau FROM NonAdminUser nau " +
+            "JOIN FETCH nau.user u " +
+            "WHERE u.username = :username")
+    Optional<NonAdminUser> findByUsername(@Param("username") String username);
 
 
 

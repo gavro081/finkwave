@@ -26,6 +26,7 @@ interface Listener extends BaseNonAdminUser {
   userType: "LISTENER";
   likedEntities: MusicalEntity[];
   createdPlaylists: Playlist[];
+  savedPlaylists: Playlist[];
 }
 
 type UserProfile = Artist | Listener;
@@ -33,7 +34,7 @@ type UserProfile = Artist | Listener;
 const UserDetail = () => {
   // user refers to the selected user NOT to the user from context
   const baseURL = import.meta.env.VITE_API_BASE_URL;
-  const { userId } = useParams();
+  const { username } = useParams();
   const navigate = useNavigate();
   const [user, setUser] = useState<UserProfile | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -49,7 +50,7 @@ const UserDetail = () => {
     setIsFollowing(true);
     try {
       const response = await axiosInstance.post<FollowStatus>(
-        `/users/${userId}/follow`,
+        `/users/${username}/follow`,
       );
       setUser((prev) => {
         if (!prev) return null;
@@ -67,15 +68,15 @@ const UserDetail = () => {
     }
   };
 
-  const handleFollowInModal = async (targetId: number) => {
+  const handleFollowInModal = async (targetUsername: string) => {
     try {
       const response = await axiosInstance.post<FollowStatus>(
-        `/users/${targetId}/follow`,
+        `/users/${username}/follow`,
       );
 
       setModalUsers((prevUsers) =>
         prevUsers.map((u) =>
-          u.id === targetId
+          u.username === targetUsername
             ? { ...u, isFollowedByCurrentUser: response.data.isFollowing }
             : u,
         ),
@@ -99,7 +100,7 @@ const UserDetail = () => {
   const displayFollowers = async () => {
     setIsLoadingModal(true);
     try {
-      const response = await axiosInstance.get(`/users/${userId}/followers`);
+      const response = await axiosInstance.get(`/users/${username}/followers`);
       setModalUsers(response.data);
       setModalTitle("Followers");
       setShowModal(true);
@@ -112,7 +113,7 @@ const UserDetail = () => {
   const displayFollowing = async () => {
     setIsLoadingModal(true);
     try {
-      const response = await axiosInstance.get(`/users/${userId}/following`);
+      const response = await axiosInstance.get(`/users/${username}/following`);
       setModalUsers(response.data);
       setModalTitle("Following");
       setShowModal(true);
@@ -127,7 +128,7 @@ const UserDetail = () => {
     const fetchUser = async () => {
       setError(null);
       try {
-        const response = await axiosInstance.get(`/users/${userId}`);
+        const response = await axiosInstance.get(`/users/${username}`);
         console.log(response.data);
         setUser(response.data);
       } catch (err: any) {
@@ -135,7 +136,7 @@ const UserDetail = () => {
       }
     };
     fetchUser();
-  }, [userId]);
+  }, [username]);
 
   if (error) {
     return (
@@ -232,7 +233,8 @@ const UserDetail = () => {
         ) : (
           <ListenerView
             likedEntities={user.likedEntities}
-            playlists={user.createdPlaylists}
+            createdPlaylists={user.createdPlaylists}
+            savedPlaylists={user.savedPlaylists}
           />
         )}
 

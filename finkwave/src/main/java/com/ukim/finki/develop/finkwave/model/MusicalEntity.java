@@ -36,6 +36,8 @@ public class MusicalEntity {
     @Column(name = "release_date", nullable = false)
     private LocalDate releaseDate;
 
+    private String cover;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "released_by")

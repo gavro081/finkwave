@@ -21,6 +21,7 @@ export interface MusicalEntity {
 	genre: string;
 	type: string;
 	releasedBy: string;
+	cover?: string | null;
 	isLikedByCurrentUser?: boolean;
 }
 

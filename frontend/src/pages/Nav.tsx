@@ -1,17 +1,26 @@
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import axiosInstance, { baseURL } from "../api/axiosInstance";
 import Logo from "../assets/logo-finkwave.png";
 import { useAuth } from "../context/authContext";
 
-const Nav = () => {
+interface NavProps {
+	isSidebarOpen?: boolean;
+	onToggleSidebar?: () => void;
+}
+
+const Nav = ({ isSidebarOpen = false, onToggleSidebar }: NavProps) => {
 	const { user, setUser, isAuthLoading } = useAuth();
+	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+	const dropdownRef = useRef<HTMLDivElement>(null);
 
 	const handleLogout = async (e: React.MouseEvent<HTMLButtonElement>) => {
 		e.preventDefault();
 		try {
 			await axiosInstance.post("/auth/logout");
 			setUser(undefined);
+			setIsDropdownOpen(false);
 			toast.success("Logout successful!");
 		} catch (error) {
 			console.error("Logout failed:", error);
@@ -19,46 +28,96 @@ const Nav = () => {
 		}
 	};
 
+	useEffect(() => {
+		const handleClickOutside = (event: MouseEvent) => {
+			if (
+				dropdownRef.current &&
+				!dropdownRef.current.contains(event.target as Node)
+			) {
+				setIsDropdownOpen(false);
+			}
+		};
+
+		document.addEventListener("mousedown", handleClickOutside);
+		return () => {
+			document.removeEventListener("mousedown", handleClickOutside);
+		};
+	}, []);
+
 	return (
-		<div className="bg-gray-800 p-4 flex justify-between items-center">
-			<Link to="/" className="text-white text-lg font-semibold">
-				<img src={Logo} alt="Finkwave Logo" className="h-12 w-auto" />
-			</Link>
+		<div
+			className={`bg-gray-800 p-4 flex justify-between items-center fixed top-0 right-0 z-50 transition-all duration-300 ${
+				isSidebarOpen ? "left-64" : "left-0"
+			}`}
+		>
+			<div className="flex items-center gap-4">
+				{onToggleSidebar && (
+					<button
+						onClick={onToggleSidebar}
+						className="text-white hover:text-[#1db954] transition-colors p-2"
+						aria-label="Toggle sidebar"
+					>
+						<svg
+							className="w-6 h-6"
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={2}
+								d="M4 6h16M4 12h16M4 18h16"
+							/>
+						</svg>
+					</button>
+				)}
+				<Link to="/" className="text-white text-lg font-semibold">
+					<img src={Logo} alt="Finkwave Logo" className="h-12 w-auto" />
+				</Link>
+			</div>
 
 			<div className="flex items-center space-x-4">
 				{!isAuthLoading && (
 					<div className="flex items-center space-x-3">
 						{user ? (
-							<div className="flex items-center space-x-3">
-								<div className="flex items-center space-x-2 bg-slate-700 rounded-lg px-3 py-2">
+							<div className="relative" ref={dropdownRef}>
+								<button
+									onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+									className="focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-full"
+								>
 									{user.profilePhoto ? (
 										<img
 											src={`${baseURL}/${user.profilePhoto}`}
 											alt={`${user.username}'s profile`}
-											className="w-8 h-8 rounded-full object-cover"
+											className="w-10 h-10 rounded-full object-cover cursor-pointer hover:ring-2 hover:ring-blue-400 transition-all"
 										/>
 									) : (
-										<div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-											<span className="text-white text-sm font-semibold">
+										<div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center cursor-pointer hover:ring-2 hover:ring-blue-400 transition-all">
+											<span className="text-white text-lg font-semibold">
 												{user.username.charAt(0).toUpperCase()}
 											</span>
 										</div>
 									)}
-
-									<div className="text-white">
-										<p className="text-sm font-medium">{user.username}</p>
-										<p className="text-xs text-gray-300 capitalize">
-											{user.role}
-										</p>
-									</div>
-								</div>
-								<button
-									onClick={handleLogout}
-									className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm 
-                                    font-medium transition-colors duration-200 flex items-center space-x-1 cursor-pointer"
-								>
-									Logout
 								</button>
+
+								{isDropdownOpen && (
+									<div className="absolute right-0 mt-2 w-48 bg-gray-700 rounded-lg shadow-lg py-1 z-50">
+										<Link
+											to="#"
+											className="block px-4 py-2 text-sm text-white hover:bg-gray-600 transition-colors"
+											onClick={() => setIsDropdownOpen(false)}
+										>
+											Account
+										</Link>
+										<button
+											onClick={handleLogout}
+											className="w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-600 transition-colors"
+										>
+											Log out
+										</button>
+									</div>
+								)}
 							</div>
 						) : (
 							<div className="flex items-center space-x-4">

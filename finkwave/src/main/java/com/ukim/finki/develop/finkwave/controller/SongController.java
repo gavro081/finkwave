@@ -9,6 +9,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -17,13 +18,18 @@ import java.util.List;
 @RequestMapping("/songs")
 @AllArgsConstructor
 public class SongController {
-    private final SongRepository songRepository;
     private final AuthService authService;
     private final SongService songService;
 
-    @GetMapping
+    @GetMapping("/top")
     private HttpEntity<List<MusicalEntityDto>> getSongs(){
         Long userId = authService.getCurrentUserID();
         return ResponseEntity.ok(songService.getTopSongs(userId));
+    }
+
+    @GetMapping("/search")
+    private HttpEntity<List<MusicalEntityDto>> searchSongs(
+            @RequestParam(name = "q") String searchTerm){
+        return ResponseEntity.ok(songService.searchSongs(null, searchTerm));
     }
 }

@@ -38,7 +38,10 @@ public class AlbumService {
 
         dto.setSongs(songsFromAlbum);
         return dto;
+    }
 
+    public List<MusicalEntityDto> searchAlbums(String searchTerm){
+        return albumRepository.searchAlbums(authService.getCurrentUserID(), searchTerm);
     }
 
 }

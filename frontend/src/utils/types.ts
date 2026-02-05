@@ -54,3 +54,5 @@ export interface BaseNonAdminUser {
 }
 
 export type UserRegisterType = "ARTIST" | "LISTENER";
+
+export type SearchCategory = "songs" | "albums" | "artists" | "users";

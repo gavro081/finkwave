@@ -14,7 +14,7 @@ import java.util.List;
 @RestController
 @CrossOrigin("*")
 @RequiredArgsConstructor
-@RequestMapping("/users")
+@RequestMapping("/users/na/")
 public class NonAdminUserController {
 
     private final NonAdminUserService nonAdminUserService;
@@ -26,12 +26,12 @@ public class NonAdminUserController {
     }
 
     @GetMapping("/{username}")
-    public HttpEntity<NonAdminUserDto>getById(@PathVariable String username){
+    public HttpEntity<NonAdminUserDto>getNonAdminUserById(@PathVariable String username){
         return ResponseEntity.ok(nonAdminUserService.getNonAdminUserProfile(username));
     }
 
     @GetMapping("/search")
-    public HttpEntity<List<NonAdminUserDto>>searchUsers(@RequestParam String name){
+    public HttpEntity<List<NonAdminUserDto>>searchNonAdminUsers(@RequestParam String name){
         return ResponseEntity.ok(nonAdminUserService.searchUsers(name));
     }
 

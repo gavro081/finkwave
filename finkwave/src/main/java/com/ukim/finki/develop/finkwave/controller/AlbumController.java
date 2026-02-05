@@ -5,21 +5,24 @@ import com.ukim.finki.develop.finkwave.service.AlbumService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @AllArgsConstructor
 @RequestMapping("/albums")
 public class AlbumController {
-
     private final AlbumService albumService;
 
     @GetMapping("/{id}")
     public HttpEntity<MusicalEntityDto> getAlbum(@PathVariable Long id){
         return ResponseEntity.ok(albumService.getAlbum(id));
+    }
+
+    @GetMapping("/search")
+    public HttpEntity<List<MusicalEntityDto>> searchAlbums(@RequestParam(name = "q") String searchTerm){
+        return ResponseEntity.ok(albumService.searchAlbums(searchTerm));
     }
 
 }

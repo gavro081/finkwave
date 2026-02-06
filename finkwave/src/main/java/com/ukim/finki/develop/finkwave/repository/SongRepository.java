@@ -48,31 +48,35 @@ public interface SongRepository extends JpaRepository<Song, Long> {
 
     @Query("""
         SELECT NEW com.ukim.finki.develop.finkwave.model.dto.MusicalEntityDto(
-        s.id, me.title, me.genre, 'SONG', u.fullName, me.cover,
-            (EXISTS (SELECT 1 FROM Like l WHERE l.musicalEntity.id = s.id AND l.listener.id = :currentUserId))
+            s.id,
+            s.musicalEntities.title,
+            s.musicalEntities.genre,
+            'SONG',
+            s.musicalEntities.releasedBy.nonAdminUser.user.fullName,
+            s.musicalEntities.cover,
+            (EXISTS (SELECT 1 FROM Like l WHERE l.musicalEntity.id = s.id AND l.listener.id = :currentUserId)),
+            s.album.musicalEntities.title
         )
         FROM Song s
-        JOIN s.musicalEntities me
-        JOIN me.releasedBy a
-        JOIN a.nonAdminUser nau
-        JOIN nau.user u
-        JOIN Listen l on l.song.id = s.id
-        GROUP BY s.id, me.title, me.genre, u.fullName, me.cover
+        GROUP BY s.id, s.musicalEntities.title, s.musicalEntities.genre,
+            s.musicalEntities.releasedBy.nonAdminUser.user.fullName, s.musicalEntities.cover, s.album.musicalEntities.title
         ORDER BY count(*) desc
     """)
     // todo: add paging
     List<MusicalEntityDto> findTopByListens(@Param("currentUserId")Long currentUserId);
 
-    // todo: fix is liked by user, currently returns hard coded false
     @Query("""
         SELECT NEW com.ukim.finki.develop.finkwave.model.dto.MusicalEntityDto(
-            s.id, me.title, me.genre, 'SONG', u.fullName, me.cover, FALSE )
+            s.id,
+            s.musicalEntities.title,
+            s.musicalEntities.genre,
+            'SONG',
+            s.musicalEntities.releasedBy.nonAdminUser.user.fullName,
+            s.musicalEntities.cover,
+            (EXISTS (SELECT 1 FROM Like l WHERE l.musicalEntity.id = s.id AND l.listener.id = :currentUserId))
+        )
         FROM Song s
-        JOIN s.musicalEntities me
-        JOIN me.releasedBy a
-        JOIN a.nonAdminUser nau
-        JOIN nau.user u
-        WHERE me.title ILIKE '%' || :searchTerm || '%'
+        WHERE s.musicalEntities.title ILIKE '%' || :searchTerm || '%'
     """)
     List<MusicalEntityDto> searchSongs(@Param("currentUserId")Long currentUserId, @Param("searchTerm") String searchTerm);
 

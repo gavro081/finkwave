@@ -349,7 +349,7 @@ const LandingPage = () => {
 														{song.title}
 													</h3>
 													<p className="text-sm text-gray-400 mb-3 overflow-hidden text-ellipsis whitespace-nowrap">
-														{"<album>"}
+														{song.album}
 													</p>
 													<p className="text-sm text-gray-400 mb-3 overflow-hidden text-ellipsis whitespace-nowrap">
 														{song.releasedBy}

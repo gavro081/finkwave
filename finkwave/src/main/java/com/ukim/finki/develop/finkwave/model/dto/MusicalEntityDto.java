@@ -16,6 +16,7 @@ public class MusicalEntityDto {
     private String releasedBy;
     private String cover;
     private Boolean isLikedByCurrentUser;
+    private String album;
 
     public MusicalEntityDto(Long id, String title, String genre, String type, String releasedBy, Boolean isLikedByCurrentUser) {
         this.id = id;
@@ -23,6 +24,16 @@ public class MusicalEntityDto {
         this.genre = genre;
         this.type = type;
         this.releasedBy = releasedBy;
+        this.isLikedByCurrentUser = isLikedByCurrentUser;
+    }
+
+    public MusicalEntityDto(Long id, String title, String genre, String type, String releasedBy, String cover, Boolean isLikedByCurrentUser) {
+        this.id = id;
+        this.title = title;
+        this.genre = genre;
+        this.type = type;
+        this.releasedBy = releasedBy;
+        this.cover = cover;
         this.isLikedByCurrentUser = isLikedByCurrentUser;
     }
 }

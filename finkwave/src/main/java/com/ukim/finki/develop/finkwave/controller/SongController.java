@@ -31,7 +31,7 @@ public class SongController {
     @GetMapping("/search")
     public HttpEntity<List<MusicalEntityDto>> searchSongs(
             @RequestParam(name = "q") String searchTerm){
-        return ResponseEntity.ok(songService.searchSongs(null, searchTerm));
+        return ResponseEntity.ok(songService.searchSongs(searchTerm));
     }
 
     @GetMapping("/recent")

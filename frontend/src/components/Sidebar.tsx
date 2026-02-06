@@ -1,26 +1,31 @@
-interface SidebarProps {
-	isOpen: boolean;
-	onClose: () => void;
-}
+import { useEffect, useState } from "react";
+import axiosInstance from "../api/axiosInstance";
+import type { BasicPlaylist, BasicSong, SidebarProps } from "../utils/types";
 
 const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
-	// mock data for recently listened songs
-	const recentlyListened = [
-		{ id: 1, title: "Song One", artist: "Artist A", cover: "/favicon.png" },
-		{ id: 2, title: "Song Two", artist: "Artist B", cover: "/favicon.png" },
-		{ id: 3, title: "Song Three", artist: "Artist C", cover: "/favicon.png" },
-		{ id: 4, title: "Song Four", artist: "Artist D", cover: "/favicon.png" },
-		{ id: 5, title: "Song Five", artist: "Artist E", cover: "/favicon.png" },
-	];
+	const [recentlyListened, setRecentlyListened] = useState<BasicSong[]>([]);
+	const [playlists, setPlaylists] = useState<BasicPlaylist[]>([]);
 
-	// mock data for my playlists
-	const playlists = [
-		{ id: 1, name: "My Favorites", songCount: 25 },
-		{ id: 2, name: "Workout Mix", songCount: 18 },
-		{ id: 3, name: "Chill Vibes", songCount: 32 },
-		{ id: 4, name: "Party Hits", songCount: 45 },
-	];
-
+	useEffect(() => {
+		const fetchData = async () => {
+			try {
+				const data = await axiosInstance.get<BasicSong[]>("/songs/recent");
+				setRecentlyListened(data.data);
+			} catch (error) {
+				console.error("Error fetching recently listened songs:", error);
+				// todo: show toast
+			}
+			try {
+				const data =
+					await axiosInstance.get<BasicPlaylist[]>("/playlists/user");
+				setPlaylists(data.data);
+			} catch (error) {
+				console.error("Error fetching playlists:", error);
+				// todo: show toast
+			}
+		};
+		fetchData();
+	}, []);
 	return (
 		<div
 			className={`fixed left-0 top-0 h-full bg-[#121212] border-r border-white/10 transition-transform duration-300 ease-in-out z-40 ${
@@ -64,7 +69,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 								className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-colors"
 							>
 								<img
-									src={song.cover}
+									src={song.cover || "/favicon.png"}
 									alt={song.title}
 									className="w-10 h-10 rounded object-cover"
 								/>

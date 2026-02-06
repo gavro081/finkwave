@@ -1,5 +1,6 @@
 package com.ukim.finki.develop.finkwave.service;
 
+import com.ukim.finki.develop.finkwave.model.dto.BasicSongDto;
 import com.ukim.finki.develop.finkwave.model.dto.MusicalEntityDto;
 import com.ukim.finki.develop.finkwave.repository.SongRepository;
 import lombok.AllArgsConstructor;
@@ -11,6 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 public class SongService {
     private final SongRepository songRepository;
+    private final AuthService authService;
 
     public List<MusicalEntityDto> getTopSongs(Long userId){
         return songRepository.findTopByListens(userId);
@@ -18,5 +20,10 @@ public class SongService {
 
     public List<MusicalEntityDto> searchSongs(Long userId, String searchTerm){
         return songRepository.searchSongs(userId, searchTerm);
+    }
+
+    public List<BasicSongDto> getRecentlyListened(){
+        Long userId = authService.getCurrentUserID();
+        return songRepository.getRecentlyListened(userId);
     }
 }

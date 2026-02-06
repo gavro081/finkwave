@@ -56,3 +56,21 @@ export interface BaseNonAdminUser {
 export type UserRegisterType = "ARTIST" | "LISTENER";
 
 export type SearchCategory = "songs" | "albums" | "artists" | "users";
+
+export interface SidebarProps {
+	isOpen: boolean;
+	onClose: () => void;
+}
+
+export interface BasicSong {
+	id: number;
+	title: string;
+	artist: string;
+	cover?: string;
+}
+
+export interface BasicPlaylist {
+	id: number;
+	name: string;
+	songCount: number;
+}

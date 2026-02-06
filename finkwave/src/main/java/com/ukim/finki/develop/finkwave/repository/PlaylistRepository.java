@@ -1,5 +1,6 @@
 package com.ukim.finki.develop.finkwave.repository;
 
+import com.ukim.finki.develop.finkwave.model.dto.BasicPlaylistDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -22,8 +23,13 @@ public interface PlaylistRepository extends JpaRepository<Playlist, Long> {
         """)
     List<Playlist> findByCreatorId(@Param("creatorId") Long creatorId);
 
-
-
-
-
+    @SuppressWarnings("JpaQlInspection") // count returns long, intellij expects int
+    @Query("""
+    SELECT NEW com.ukim.finki.develop.finkwave.model.dto.BasicPlaylistDto(
+    p.id, p.name, p.cover, (SELECT COUNT(*) FROM PlaylistSong ps where ps.playlist.id = p.id)
+    )
+    FROM Playlist p
+    WHERE p.createdBy.id = :userId
+    """)
+    List<BasicPlaylistDto> getPlaylistsByIdIs(@Param("userId") Long userId);
 }

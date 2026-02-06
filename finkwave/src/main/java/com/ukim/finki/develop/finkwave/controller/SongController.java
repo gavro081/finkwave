@@ -1,5 +1,6 @@
 package com.ukim.finki.develop.finkwave.controller;
 
+import com.ukim.finki.develop.finkwave.model.dto.BasicSongDto;
 import com.ukim.finki.develop.finkwave.model.dto.MusicalEntityDto;
 import com.ukim.finki.develop.finkwave.repository.SongRepository;
 import com.ukim.finki.develop.finkwave.service.AuthService;
@@ -22,14 +23,19 @@ public class SongController {
     private final SongService songService;
 
     @GetMapping("/top")
-    private HttpEntity<List<MusicalEntityDto>> getSongs(){
+    public HttpEntity<List<MusicalEntityDto>> getSongs(){
         Long userId = authService.getCurrentUserID();
         return ResponseEntity.ok(songService.getTopSongs(userId));
     }
 
     @GetMapping("/search")
-    private HttpEntity<List<MusicalEntityDto>> searchSongs(
+    public HttpEntity<List<MusicalEntityDto>> searchSongs(
             @RequestParam(name = "q") String searchTerm){
         return ResponseEntity.ok(songService.searchSongs(null, searchTerm));
+    }
+
+    @GetMapping("/recent")
+    public HttpEntity<List<BasicSongDto>> getRecentlyListenedSongs(){
+        return ResponseEntity.ok(songService.getRecentlyListened());
     }
 }

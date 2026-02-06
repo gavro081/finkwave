@@ -2,6 +2,7 @@ package com.ukim.finki.develop.finkwave.service;
 
 import com.ukim.finki.develop.finkwave.exceptions.PlaylistNotFoundException;
 import com.ukim.finki.develop.finkwave.model.Playlist;
+import com.ukim.finki.develop.finkwave.model.dto.BasicPlaylistDto;
 import com.ukim.finki.develop.finkwave.model.dto.MusicalEntityDto;
 import com.ukim.finki.develop.finkwave.model.dto.PlaylistDto;
 import com.ukim.finki.develop.finkwave.repository.PlaylistRepository;
@@ -49,6 +50,10 @@ public class PlaylistService {
         );
     }
 
+    public List<BasicPlaylistDto> getBasicPlaylists(){
+        Long userId = authService.getCurrentUserID();
+        return playlistRepository.getPlaylistsByIdIs(userId);
+    }
 
 
 

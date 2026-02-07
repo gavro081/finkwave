@@ -1,6 +1,7 @@
 package com.ukim.finki.develop.finkwave.repository;
 
 import com.ukim.finki.develop.finkwave.model.dto.ArtistContributionDto;
+import com.ukim.finki.develop.finkwave.model.dto.ArtistContributionSummaryDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -27,4 +28,14 @@ public interface ArtistContributionRepository extends JpaRepository<ArtistContri
         WHERE ac.artist.id=:artistId
         """)
     List<ArtistContributionDto>findContributionsByArtistId(@Param("currentUserId")Long currentUserId,@Param("artistId")Long artistId);
+
+
+    @Query("""
+    SELECT NEW com.ukim.finki.develop.finkwave.model.dto.ArtistContributionSummaryDto(
+    ac.artist.nonAdminUser.user.fullName, ac.role
+    )
+    FROM ArtistContribution ac
+    WHERE ac.id.musicalEntityId = :songId
+    """)
+    List<ArtistContributionSummaryDto> findContributionsBySongId(@Param("songId")Long songId);
 }

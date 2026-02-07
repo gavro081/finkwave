@@ -16,6 +16,7 @@ import Login from "./pages/Login";
 import MusicalCollection from "./pages/MusicalCollection";
 import Nav from "./pages/Nav";
 import Register from "./pages/Register";
+import SongDetail from "./pages/SongDetail";
 import UserDetail from "./pages/UserDetail";
 
 const MainLayout = () => {
@@ -96,6 +97,10 @@ const router = createBrowserRouter([
 			{
 				path: "/register",
 				element: <Register />,
+			},
+			{
+				path: "/songs/:id",
+				element: <SongDetail />,
 			},
 			{
 				path: "/collection/:type/:id",

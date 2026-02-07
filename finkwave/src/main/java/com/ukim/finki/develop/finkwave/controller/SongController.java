@@ -2,16 +2,15 @@ package com.ukim.finki.develop.finkwave.controller;
 
 import com.ukim.finki.develop.finkwave.model.dto.BasicSongDto;
 import com.ukim.finki.develop.finkwave.model.dto.MusicalEntityDto;
+import com.ukim.finki.develop.finkwave.model.dto.SongDetailsDto;
 import com.ukim.finki.develop.finkwave.repository.SongRepository;
 import com.ukim.finki.develop.finkwave.service.AuthService;
 import com.ukim.finki.develop.finkwave.service.SongService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -35,5 +34,10 @@ public class SongController {
     @GetMapping("/recent")
     public HttpEntity<List<BasicSongDto>> getRecentlyListenedSongs(){
         return ResponseEntity.ok(songService.getRecentlyListened());
+    }
+
+    @GetMapping("/{songId}/details")
+    public HttpEntity<SongDetailsDto> getSongById(@PathVariable Long songId){
+        return ResponseEntity.ok(songService.getSongDetails(songId));
     }
 }

@@ -2,9 +2,11 @@ package com.ukim.finki.develop.finkwave.repository;
 
 import com.ukim.finki.develop.finkwave.model.dto.BasicSongDto;
 import com.ukim.finki.develop.finkwave.model.dto.MusicalEntityDto;
+import com.ukim.finki.develop.finkwave.model.dto.SongDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Repository;
 
 import com.ukim.finki.develop.finkwave.model.Song;
@@ -95,4 +97,31 @@ public interface SongRepository extends JpaRepository<Song, Long> {
         LIMIT 5
     """, nativeQuery = true)
     List<BasicSongDto> getRecentlyListened(@Param("userId")Long userId);
+
+    @Query(value = """
+        SELECT NEW com.ukim.finki.develop.finkwave.model.dto.SongDto(
+            s.id,
+            me.title,
+            me.genre,
+            'SONG',
+            u.fullName,
+            me.cover,
+            (EXISTS (
+                SELECT 1 FROM Like l
+                WHERE l.musicalEntity.id = s.id
+                  AND l.listener.id = :userId
+            )),
+            albumMe.title,
+            s.link
+        )
+        FROM Song s
+        JOIN s.musicalEntities me
+        JOIN me.releasedBy a
+        JOIN a.nonAdminUser nau
+        JOIN nau.user u
+        LEFT JOIN s.album album
+        LEFT JOIN album.musicalEntities albumMe
+        WHERE s.id = :songId
+    """)
+    SongDto getSongById(@Param("songId") Long songId, @Param("userId") Long userId);
 }

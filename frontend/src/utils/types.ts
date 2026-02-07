@@ -63,6 +63,29 @@ export interface SidebarProps {
 	onClose: () => void;
 }
 
+export interface SongContribution {
+	artistName: string;
+	role: string;
+}
+
+export interface SongReview {
+	id: {
+		listenerId: number;
+		musicalEntityId: number;
+	};
+	author: string;
+	grade: number;
+	comment: string;
+}
+
+export interface SongDetail extends MusicalEntity {
+	type: "SONG";
+	album?: string | null;
+	link?: string | null;
+	contributions: SongContribution[];
+	reviews: SongReview[];
+}
+
 export interface BasicSong {
 	id: number;
 	title: string;

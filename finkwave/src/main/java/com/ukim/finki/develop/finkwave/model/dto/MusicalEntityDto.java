@@ -3,11 +3,13 @@ package com.ukim.finki.develop.finkwave.model.dto;
 import jakarta.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @AllArgsConstructor
 @Getter
 @Setter
+@NoArgsConstructor
 public class MusicalEntityDto {
     private Long id;
     private String title;

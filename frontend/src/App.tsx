@@ -3,6 +3,7 @@ import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Sidebar from "./components/Sidebar";
+import { useAuth } from "./context/authContext";
 import AllUsers from "./pages/AllUsers";
 import LandingPage from "./pages/LandingPage";
 import Login from "./pages/Login";
@@ -11,8 +12,9 @@ import Nav from "./pages/Nav";
 import Register from "./pages/Register";
 import UserDetail from "./pages/UserDetail";
 
-const Layout = () => {
-	const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+const MainLayout = () => {
+	const { user } = useAuth();
+	const [isSidebarOpen, setIsSidebarOpen] = useState(!!user);
 
 	return (
 		<div className="flex flex-col min-h-screen bg-[#121212]">
@@ -42,6 +44,20 @@ const Layout = () => {
 			</main>
 		</div>
 	);
+};
+
+const Layout = () => {
+	const { isAuthLoading } = useAuth();
+
+	if (isAuthLoading) {
+		return (
+			<div className="flex h-screen items-center justify-center bg-[#121212]">
+				<div className="w-12 h-12 border-4 border-white/10 border-t-[#1db954] rounded-full animate-spin"></div>
+			</div>
+		);
+	}
+
+	return <MainLayout />;
 };
 
 const router = createBrowserRouter([

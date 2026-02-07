@@ -19,13 +19,11 @@ import java.util.List;
 @RequestMapping("/songs")
 @AllArgsConstructor
 public class SongController {
-    private final AuthService authService;
     private final SongService songService;
 
     @GetMapping("/top")
     public HttpEntity<List<MusicalEntityDto>> getSongs(){
-        Long userId = authService.getCurrentUserID();
-        return ResponseEntity.ok(songService.getTopSongs(userId));
+        return ResponseEntity.ok(songService.getTopSongs());
     }
 
     @GetMapping("/search")

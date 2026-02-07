@@ -14,7 +14,11 @@ public class SongService {
     private final SongRepository songRepository;
     private final AuthService authService;
 
-    public List<MusicalEntityDto> getTopSongs(Long userId){
+    public List<MusicalEntityDto> getTopSongs(){
+        Long userId = null;
+        try {
+            userId = authService.getCurrentUserID();
+        } catch (Exception ignored) {}
         return songRepository.findTopByListens(userId);
     }
 

@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import axiosInstance from "../api/axiosInstance";
+import { useAuth } from "../context/authContext";
 import type { BasicPlaylist, BasicSong, SidebarProps } from "../utils/types";
 
 const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
+	const { user } = useAuth();
 	const [recentlyListened, setRecentlyListened] = useState<BasicSong[]>([]);
 	const [playlists, setPlaylists] = useState<BasicPlaylist[]>([]);
 
@@ -24,8 +26,13 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 				// todo: show toast
 			}
 		};
-		fetchData();
-	}, []);
+		if (user) {
+			fetchData();
+		} else {
+			setRecentlyListened([]);
+			setPlaylists([]);
+		}
+	}, [user]);
 	return (
 		<div
 			className={`fixed left-0 top-0 h-full bg-[#121212] border-r border-white/10 transition-transform duration-300 ease-in-out z-40 ${

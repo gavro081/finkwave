@@ -8,8 +8,10 @@ import {
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import LoadingSpinner from "./components/LoadingSpinner";
+import MiniPlayer from "./components/MiniPlayer";
 import Sidebar from "./components/Sidebar";
 import { useAuth } from "./context/authContext";
+import { usePlayer } from "./context/playerContext";
 import AllUsers from "./pages/AllUsers";
 import LandingPage from "./pages/LandingPage";
 import Login from "./pages/Login";
@@ -21,6 +23,7 @@ import UserDetail from "./pages/UserDetail";
 
 const MainLayout = () => {
 	const { user } = useAuth();
+	const { currentSong } = usePlayer();
 	const location = useLocation();
 	// show sidebar only if user is logged in and is on the landing page
 	const isLandingPage = location.pathname === "/";
@@ -55,10 +58,11 @@ const MainLayout = () => {
 			<main
 				className={`grow transition-all duration-300 pt-20 ${
 					isSidebarOpen ? "ml-64" : "ml-0"
-				}`}
+				} ${currentSong ? "pb-20" : ""}`}
 			>
 				<Outlet />
 			</main>
+			<MiniPlayer />
 		</div>
 	);
 };

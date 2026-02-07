@@ -6,7 +6,6 @@ import com.ukim.finki.develop.finkwave.model.dto.SongDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Repository;
 
 import com.ukim.finki.develop.finkwave.model.Song;
@@ -49,7 +48,7 @@ public interface SongRepository extends JpaRepository<Song, Long> {
     List<MusicalEntityDto>findSongsByPlaylistId(@Param("playlistId")Long playlistId, @Param("currentUserId")Long currentUserId);
 
     @Query("""
-        SELECT NEW com.ukim.finki.develop.finkwave.model.dto.MusicalEntityDto(
+        SELECT NEW com.ukim.finki.develop.finkwave.model.dto.SongDto(
             s.id,
             s.musicalEntities.title,
             s.musicalEntities.genre,
@@ -57,7 +56,8 @@ public interface SongRepository extends JpaRepository<Song, Long> {
             s.musicalEntities.releasedBy.nonAdminUser.user.fullName,
             s.musicalEntities.cover,
             (EXISTS (SELECT 1 FROM Like l WHERE l.musicalEntity.id = s.id AND l.listener.id = :currentUserId)),
-            s.album.musicalEntities.title
+            s.album.musicalEntities.title,
+            s.link
         )
         FROM Song s
         GROUP BY s.id, s.musicalEntities.title, s.musicalEntities.genre,
@@ -65,7 +65,7 @@ public interface SongRepository extends JpaRepository<Song, Long> {
         ORDER BY count(*) desc
     """)
     // todo: add paging
-    List<MusicalEntityDto> findTopByListens(@Param("currentUserId")Long currentUserId);
+    List<SongDto> findTopByListens(@Param("currentUserId")Long currentUserId);
 
     @Query("""
         SELECT NEW com.ukim.finki.develop.finkwave.model.dto.MusicalEntityDto(

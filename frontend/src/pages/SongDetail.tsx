@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import axiosInstance from "../api/axiosInstance";
 import { useAuth } from "../context/authContext";
+import { usePlayer } from "../context/playerContext";
 import type { SongDetail as SongDetailType } from "../utils/types";
 
 const ROLE_LABELS: Record<string, string> = {
@@ -61,6 +62,7 @@ const renderStars = (grade: number) => {
 const SongDetail = () => {
 	const { id } = useParams<{ id: string }>();
 	const { user } = useAuth();
+	const { play, currentSong } = usePlayer();
 	const [song, setSong] = useState<SongDetailType | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
@@ -71,6 +73,7 @@ const SongDetail = () => {
 				setLoading(true);
 				const response = await axiosInstance.get(`/songs/${id}/details`);
 				setSong(response.data);
+				// Don't autoplay - user must click play button
 			} catch (err) {
 				console.error("Error fetching song details:", err);
 				setError("Failed to load song details.");
@@ -206,8 +209,51 @@ const SongDetail = () => {
 						)}
 
 						{/* Action buttons */}
-						{/* todo: add add to playlist button */}
 						<div className="flex items-center gap-3 mt-4">
+							{/* Play button */}
+							{song.link && (
+								<button
+									onClick={() =>
+										play({
+											id: song.id,
+											title: song.title,
+											artist: song.releasedBy,
+											cover: song.cover,
+											embedUrl: toEmbedUrl(song.link!),
+										})
+									}
+									className={`flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold transition-all cursor-pointer ${
+										currentSong?.id === song.id
+											? "bg-white text-[#1db954]"
+											: "bg-[#1db954] text-black hover:bg-[#1ed760] hover:scale-105"
+									}`}
+								>
+									{currentSong?.id === song.id ? (
+										<>
+											<svg
+												className="w-5 h-5"
+												fill="currentColor"
+												viewBox="0 0 24 24"
+											>
+												<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+											</svg>
+											Now Playing
+										</>
+									) : (
+										<>
+											<svg
+												className="w-5 h-5"
+												fill="currentColor"
+												viewBox="0 0 24 24"
+											>
+												<path d="M8 5v14l11-7z" />
+											</svg>
+											Play Song
+										</>
+									)}
+								</button>
+							)}
+
 							{user && (
 								<button
 									onClick={toggleLike}
@@ -247,18 +293,49 @@ const SongDetail = () => {
 					</div>
 				</div>
 
-				{/* YouTube embed */}
+				{/* Play button — plays in persistent mini-player */}
 				{song.link && (
 					<section className="mb-10">
-						<div className="rounded-xl overflow-hidden shadow-lg aspect-video bg-black">
-							<iframe
-								src={toEmbedUrl(song.link)}
-								title={song.title}
-								className="w-full h-full"
-								allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-								allowFullScreen
-							/>
-						</div>
+						{currentSong?.id === song.id ? (
+							<div className="bg-[#1a1a2e]/60 rounded-xl p-4 flex items-center gap-3">
+								<div className="w-10 h-10 rounded-full bg-[#1db954] flex items-center justify-center text-black animate-pulse">
+									<svg
+										className="w-5 h-5"
+										fill="currentColor"
+										viewBox="0 0 24 24"
+									>
+										<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+									</svg>
+								</div>
+								<p className="text-[#1db954] font-medium">
+									Now playing in mini-player below
+								</p>
+							</div>
+						) : (
+							<button
+								onClick={() =>
+									play({
+										id: song.id,
+										title: song.title,
+										artist: song.releasedBy,
+										cover: song.cover,
+										embedUrl: toEmbedUrl(song.link!),
+									})
+								}
+								className="w-full bg-[#1a1a2e]/60 hover:bg-[#1a1a2e]/80 rounded-xl p-4 flex items-center gap-3 transition-colors cursor-pointer group"
+							>
+								<div className="w-10 h-10 rounded-full bg-[#1db954] flex items-center justify-center text-black group-hover:scale-105 transition-transform">
+									<svg
+										className="w-5 h-5"
+										fill="currentColor"
+										viewBox="0 0 24 24"
+									>
+										<path d="M8 5v14l11-7z" />
+									</svg>
+								</div>
+								<p className="text-white font-medium">Play this song</p>
+							</button>
+						)}
 					</section>
 				)}
 

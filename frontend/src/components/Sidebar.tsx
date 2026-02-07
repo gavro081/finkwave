@@ -1,10 +1,33 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axiosInstance from "../api/axiosInstance";
 import { useAuth } from "../context/authContext";
+import { usePlayer } from "../context/playerContext";
 import type { BasicPlaylist, BasicSong, SidebarProps } from "../utils/types";
+
+const toEmbedUrl = (url: string): string => {
+	try {
+		const parsed = new URL(url);
+		if (
+			(parsed.hostname === "www.youtube.com" ||
+				parsed.hostname === "youtube.com") &&
+			parsed.searchParams.has("v")
+		) {
+			return `https://www.youtube.com/embed/${parsed.searchParams.get("v")}`;
+		}
+		if (parsed.hostname === "youtu.be") {
+			return `https://www.youtube.com/embed${parsed.pathname}`;
+		}
+		return url;
+	} catch {
+		return url;
+	}
+};
 
 const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 	const { user } = useAuth();
+	const navigate = useNavigate();
+	const { play, currentSong } = usePlayer();
 	const [recentlyListened, setRecentlyListened] = useState<BasicSong[]>([]);
 	const [playlists, setPlaylists] = useState<BasicPlaylist[]>([]);
 
@@ -73,12 +96,16 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 						{recentlyListened.map((song) => (
 							<div
 								key={song.id}
-								className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-colors"
+								onClick={() => navigate(`/songs/${song.id}`)}
+								className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-colors group relative"
 							>
 								<img
 									src={song.cover || "/favicon.png"}
 									alt={song.title}
 									className="w-10 h-10 rounded object-cover"
+									onError={(e) => {
+										(e.target as HTMLImageElement).src = "/favicon.png";
+									}}
 								/>
 								<div className="flex-1 min-w-0">
 									<p className="text-sm font-medium text-white truncate">
@@ -88,6 +115,46 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 										{song.artist}
 									</p>
 								</div>
+								{song.link && (
+									<button
+										onClick={(e) => {
+											e.stopPropagation();
+											play({
+												id: song.id,
+												title: song.title,
+												artist: song.artist,
+												cover: song.cover,
+												embedUrl: toEmbedUrl(song.link!),
+											});
+										}}
+										className={`p-1.5 rounded-full transition-all opacity-0 group-hover:opacity-100 ${
+											currentSong?.id === song.id
+												? "bg-white text-[#1db954]"
+												: "bg-[#1db954] text-black hover:scale-110"
+										}`}
+										aria-label={
+											currentSong?.id === song.id ? "Now playing" : "Play song"
+										}
+									>
+										{currentSong?.id === song.id ? (
+											<svg
+												className="w-4 h-4"
+												fill="currentColor"
+												viewBox="0 0 24 24"
+											>
+												<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+											</svg>
+										) : (
+											<svg
+												className="w-4 h-4"
+												fill="currentColor"
+												viewBox="0 0 24 24"
+											>
+												<path d="M8 5v14l11-7z" />
+											</svg>
+										)}
+									</button>
+								)}
 							</div>
 						))}
 					</div>

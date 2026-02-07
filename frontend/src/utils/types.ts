@@ -28,6 +28,7 @@ export interface MusicalEntity {
 export interface Song extends MusicalEntity {
 	type: "SONG";
 	album?: string;
+	link?: string;
 }
 
 export interface Album extends MusicalEntity {
@@ -91,6 +92,7 @@ export interface BasicSong {
 	title: string;
 	artist: string;
 	cover?: string;
+	link?: string;
 }
 
 export interface BasicPlaylist {

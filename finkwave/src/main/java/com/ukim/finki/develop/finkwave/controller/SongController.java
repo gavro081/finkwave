@@ -3,6 +3,7 @@ package com.ukim.finki.develop.finkwave.controller;
 import com.ukim.finki.develop.finkwave.model.dto.BasicSongDto;
 import com.ukim.finki.develop.finkwave.model.dto.MusicalEntityDto;
 import com.ukim.finki.develop.finkwave.model.dto.SongDetailsDto;
+import com.ukim.finki.develop.finkwave.model.dto.SongDto;
 import com.ukim.finki.develop.finkwave.repository.SongRepository;
 import com.ukim.finki.develop.finkwave.service.AuthService;
 import com.ukim.finki.develop.finkwave.service.SongService;
@@ -21,7 +22,7 @@ public class SongController {
     private final SongService songService;
 
     @GetMapping("/top")
-    public HttpEntity<List<MusicalEntityDto>> getSongs(){
+    public HttpEntity<List<SongDto>> getSongs(){
         return ResponseEntity.ok(songService.getTopSongs());
     }
 

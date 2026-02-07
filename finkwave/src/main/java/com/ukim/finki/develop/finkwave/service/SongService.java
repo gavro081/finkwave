@@ -17,7 +17,7 @@ public class SongService {
     private final ReviewService reviewService;
     private final SongDetailsMapper songDetailsMapper;
 
-    public List<MusicalEntityDto> getTopSongs(){
+    public List<SongDto> getTopSongs(){
         Long userId = null;
         try {
             userId = authService.getCurrentUserID();

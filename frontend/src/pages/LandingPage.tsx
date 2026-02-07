@@ -1,14 +1,36 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axiosInstance from "../api/axiosInstance";
 import AlbumResult from "../components/search/AlbumResult";
 import SongResult from "../components/search/SongResult";
 import UserResult from "../components/search/UserResult";
+import { usePlayer } from "../context/playerContext";
 import type {
 	Album,
 	BaseNonAdminUser,
 	SearchCategory,
 	Song,
 } from "../utils/types";
+
+// Convert a regular YouTube URL to an embeddable URL
+const toEmbedUrl = (url: string): string => {
+	try {
+		const parsed = new URL(url);
+		if (
+			(parsed.hostname === "www.youtube.com" ||
+				parsed.hostname === "youtube.com") &&
+			parsed.searchParams.has("v")
+		) {
+			return `https://www.youtube.com/embed/${parsed.searchParams.get("v")}`;
+		}
+		if (parsed.hostname === "youtu.be") {
+			return `https://www.youtube.com/embed${parsed.pathname}`;
+		}
+		return url;
+	} catch {
+		return url;
+	}
+};
 
 const CATEGORIES: { value: SearchCategory; label: string }[] = [
 	{ value: "songs", label: "Songs" },
@@ -18,6 +40,8 @@ const CATEGORIES: { value: SearchCategory; label: string }[] = [
 ];
 
 const LandingPage = () => {
+	const navigate = useNavigate();
+	const { play, currentSong } = usePlayer();
 	const [songs, setSongs] = useState<Song[]>([]);
 	const [loading, setLoading] = useState<boolean>(true);
 
@@ -326,6 +350,7 @@ const LandingPage = () => {
 										{songs.map((song) => (
 											<div
 												key={song.id}
+												onClick={() => navigate(`/songs/${song.id}`)}
 												className="bg-[#282828] rounded-xl overflow-hidden cursor-pointer shadow-lg transition-all duration-300 ease-in-out hover:-translate-y-2 hover:shadow-2xl group"
 											>
 												<div className="relative w-full pt-[100%] overflow-hidden bg-[#181818]">
@@ -339,9 +364,52 @@ const LandingPage = () => {
 														}}
 													/>
 													<div className="absolute top-0 left-0 w-full h-full bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-														<div className="w-15 h-15 rounded-full bg-[#1db954] flex items-center justify-center text-2xl text-black shadow-[0_4px_12px_rgba(29,185,84,0.5)]">
-															▶
-														</div>
+														{song.link ? (
+															<button
+																onClick={(e) => {
+																	e.stopPropagation();
+																	play({
+																		id: song.id,
+																		title: song.title,
+																		artist: song.releasedBy,
+																		cover: song.cover,
+																		embedUrl: toEmbedUrl(song.link!),
+																	});
+																}}
+																className={`w-14 h-14 rounded-full flex items-center justify-center text-xl shadow-[0_4px_12px_rgba(29,185,84,0.5)] transition-all cursor-pointer ${
+																	currentSong?.id === song.id
+																		? "bg-white text-[#1db954]"
+																		: "bg-[#1db954] text-black hover:scale-105"
+																}`}
+																aria-label={
+																	currentSong?.id === song.id
+																		? "Now playing"
+																		: "Play song"
+																}
+															>
+																{currentSong?.id === song.id ? (
+																	<svg
+																		className="w-6 h-6"
+																		fill="currentColor"
+																		viewBox="0 0 24 24"
+																	>
+																		<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+																	</svg>
+																) : (
+																	<svg
+																		className="w-6 h-6"
+																		fill="currentColor"
+																		viewBox="0 0 24 24"
+																	>
+																		<path d="M8 5v14l11-7z" />
+																	</svg>
+																)}
+															</button>
+														) : (
+															<div className="w-14 h-14 rounded-full bg-[#1db954] flex items-center justify-center text-xl text-black shadow-[0_4px_12px_rgba(29,185,84,0.5)]">
+																▶
+															</div>
+														)}
 													</div>
 												</div>
 												<div className="p-4">

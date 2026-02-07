@@ -8,12 +8,11 @@ import java.util.List;
 
 @Getter
 @Setter
+@AllArgsConstructor
 public class AlbumDto extends MusicalEntityDto{
     private List<MusicalEntityDto>songs;
 
-    public AlbumDto(Long id, String title, String genre, String type, String releasedBy, String artistUsername, Boolean isLikedByCurrentUser) {
-        super(id, title, genre, type, releasedBy, artistUsername, isLikedByCurrentUser);
+    public AlbumDto(Long id, String title, String genre, String type, String releasedBy, String artistUsername, String cover, Boolean isLikedByCurrentUser) {
+        super(id, title, genre, type, releasedBy, artistUsername, cover, isLikedByCurrentUser);
     }
-
-
 }

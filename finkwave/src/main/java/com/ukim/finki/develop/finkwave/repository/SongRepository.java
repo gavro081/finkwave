@@ -86,6 +86,8 @@ public interface SongRepository extends JpaRepository<Song, Long> {
             s.musicalEntities.releasedBy.nonAdminUser.user.username,
             s.musicalEntities.cover,
             (EXISTS (SELECT 1 FROM Like l WHERE l.musicalEntity.id = s.id AND l.listener.id = :currentUserId)),
+            s.album.musicalEntities.title,
+            s.album.musicalEntities.id,
             s.link
         )
         FROM Song s

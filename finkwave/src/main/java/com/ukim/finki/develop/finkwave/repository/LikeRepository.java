@@ -23,6 +23,7 @@ public interface LikeRepository extends JpaRepository<Like, LikeId> {
                  ELSE 'UNKNOWN' END),
             u.fullName,
             u.username,
+            me.cover,
             (CASE WHEN currentUserLike.id IS NOT NULL THEN true ELSE false END))
         FROM Like l
         JOIN l.musicalEntity me

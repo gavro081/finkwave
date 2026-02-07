@@ -34,6 +34,7 @@ public class AlbumService {
                 "ALBUM",
                 album.getMusicalEntities().getReleasedBy().getNonAdminUser().getUser().getFullName(),
                 album.getMusicalEntities().getReleasedBy().getNonAdminUser().getUser().getUsername(),
+                album.getMusicalEntities().getCover(),
                 likeRepository.isLikedByUser(currentUserId));
         List<MusicalEntityDto>songsFromAlbum=songRepository.findSongsByAlbum(id,currentUserId);
 

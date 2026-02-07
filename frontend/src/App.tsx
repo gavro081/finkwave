@@ -1,7 +1,13 @@
-import { useState } from "react";
-import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
+import { useEffect, useState } from "react";
+import {
+	createBrowserRouter,
+	Outlet,
+	RouterProvider,
+	useLocation,
+} from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import LoadingSpinner from "./components/LoadingSpinner";
 import Sidebar from "./components/Sidebar";
 import { useAuth } from "./context/authContext";
 import AllUsers from "./pages/AllUsers";
@@ -14,7 +20,17 @@ import UserDetail from "./pages/UserDetail";
 
 const MainLayout = () => {
 	const { user } = useAuth();
-	const [isSidebarOpen, setIsSidebarOpen] = useState(!!user);
+	const location = useLocation();
+	// show sidebar only if user is logged in and is on the landing page
+	const isLandingPage = location.pathname === "/";
+	const [isSidebarOpen, setIsSidebarOpen] = useState(!!user && isLandingPage);
+
+	// Open sidebar when user logs in and navigates to landing page
+	useEffect(() => {
+		if (user && isLandingPage) {
+			setIsSidebarOpen(true);
+		}
+	}, [user, isLandingPage]);
 
 	return (
 		<div className="flex flex-col min-h-screen bg-[#121212]">
@@ -50,11 +66,7 @@ const Layout = () => {
 	const { isAuthLoading } = useAuth();
 
 	if (isAuthLoading) {
-		return (
-			<div className="flex h-screen items-center justify-center bg-[#121212]">
-				<div className="w-12 h-12 border-4 border-white/10 border-t-[#1db954] rounded-full animate-spin"></div>
-			</div>
-		);
+		return <LoadingSpinner />;
 	}
 
 	return <MainLayout />;

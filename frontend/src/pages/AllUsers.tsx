@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../api/axiosInstance";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 interface User {
 	username: string;
@@ -38,7 +39,9 @@ const AllUsers = () => {
 		}
 	};
 
-	if (users.length == 0) return <div className="p-6">Loading...</div>;
+	if (users.length == 0) {
+		return <LoadingSpinner />;
+	}
 	if (error) {
 		return (
 			<div className="p-6 bg-red-50 border border-red-200 text-red-700 rounded-lg">

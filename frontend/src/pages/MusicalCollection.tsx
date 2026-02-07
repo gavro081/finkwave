@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axiosInstance from "../api/axiosInstance";
+import LoadingSpinner from "../components/LoadingSpinner";
 import type { Song, Album, Playlist } from "../utils/types";
 import { handleError } from "../utils/error";
 interface CollectionView {
@@ -70,7 +71,7 @@ const MusicalCollection = () => {
   }, [id, type]);
 
   if (isLoading) {
-    return <div className="p-6">Loading...</div>;
+    return <LoadingSpinner />;
   }
 
   if (error) {

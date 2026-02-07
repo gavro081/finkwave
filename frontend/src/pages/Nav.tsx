@@ -51,7 +51,7 @@ const Nav = ({ isSidebarOpen = false, onToggleSidebar }: NavProps) => {
 			}`}
 		>
 			<div className="flex items-center gap-4">
-				{onToggleSidebar && (
+				{onToggleSidebar && user && (
 					<button
 						onClick={onToggleSidebar}
 						className="text-white hover:text-[#1db954] transition-colors p-2"

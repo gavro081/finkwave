@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axiosInstance from "../api/axiosInstance";
+import LoadingSpinner from "../components/LoadingSpinner";
 import ArtistView from "../components/userProfile/ArtistView";
 import ListenerView from "../components/userProfile/ListenerView";
 import UserListModal from "../components/userProfile/UserListModal";
@@ -173,7 +174,9 @@ const UserDetail = () => {
 		);
 	}
 
-	if (!user) return <div className="p-6">Loading...</div>;
+	if (!user) {
+		return <LoadingSpinner />;
+	}
 
 	return (
 		<div className="container mx-auto p-6">

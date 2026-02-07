@@ -27,7 +27,7 @@ public class SongController {
     }
 
     @GetMapping("/search")
-    public HttpEntity<List<MusicalEntityDto>> searchSongs(
+    public HttpEntity<List<SongDto>> searchSongs(
             @RequestParam(name = "q") String searchTerm){
         return ResponseEntity.ok(songService.searchSongs(searchTerm));
     }

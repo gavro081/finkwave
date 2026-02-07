@@ -68,19 +68,20 @@ public interface SongRepository extends JpaRepository<Song, Long> {
     List<SongDto> findTopByListens(@Param("currentUserId")Long currentUserId);
 
     @Query("""
-        SELECT NEW com.ukim.finki.develop.finkwave.model.dto.MusicalEntityDto(
+        SELECT NEW com.ukim.finki.develop.finkwave.model.dto.SongDto(
             s.id,
             s.musicalEntities.title,
             s.musicalEntities.genre,
             'SONG',
             s.musicalEntities.releasedBy.nonAdminUser.user.fullName,
             s.musicalEntities.cover,
-            (EXISTS (SELECT 1 FROM Like l WHERE l.musicalEntity.id = s.id AND l.listener.id = :currentUserId))
+            (EXISTS (SELECT 1 FROM Like l WHERE l.musicalEntity.id = s.id AND l.listener.id = :currentUserId)),
+            s.link
         )
         FROM Song s
         WHERE s.musicalEntities.title ILIKE '%' || :searchTerm || '%'
     """)
-    List<MusicalEntityDto> searchSongs(@Param("currentUserId")Long currentUserId, @Param("searchTerm") String searchTerm);
+    List<SongDto> searchSongs(@Param("currentUserId")Long currentUserId, @Param("searchTerm") String searchTerm);
 
 
     @Query(value = """
@@ -88,11 +89,13 @@ public interface SongRepository extends JpaRepository<Song, Long> {
             l.song_id,
             me.title,
             u.full_name,
+            s.link,
             me.cover
         FROM LISTENS l
         JOIN MUSICAL_ENTITIES me on me.id = l.song_id
-        JOIN USERS u on u.user_id = l.listener_id
-        WHERE u.user_id = :userId
+        JOIN USERS u on u.user_id = me.released_by
+        JOIN SONGS s on s.id = me.id
+        WHERE l.listener_id = :userId
         ORDER BY l.song_id, l.timestamp DESC
         LIMIT 5
     """, nativeQuery = true)

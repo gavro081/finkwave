@@ -3,6 +3,7 @@ package com.ukim.finki.develop.finkwave.controller;
 import com.ukim.finki.develop.finkwave.model.MusicalEntity;
 import com.ukim.finki.develop.finkwave.model.User;
 import com.ukim.finki.develop.finkwave.model.dto.MusicalEntityDto;
+import com.ukim.finki.develop.finkwave.model.dto.SongDto;
 import com.ukim.finki.develop.finkwave.repository.SongRepository;
 import com.ukim.finki.develop.finkwave.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -21,7 +22,7 @@ public class TestController {
     private final UserRepository userRepository;
 
     @GetMapping("/search/{searchTerm}")
-    public HttpEntity<List<MusicalEntityDto>> searchSongsTest(@PathVariable String searchTerm){
+    public HttpEntity<List<SongDto>> searchSongsTest(@PathVariable String searchTerm){
         return ResponseEntity.ok(songRepository.searchSongs(null, searchTerm));
     }
 

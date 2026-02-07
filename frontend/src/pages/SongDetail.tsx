@@ -451,9 +451,6 @@ const SongDetail = () => {
 												{renderStars(review.grade)}
 											</div>
 										</div>
-										<span className="text-sm text-gray-500 bg-white/5 px-2.5 py-0.5 rounded-full">
-											{review.grade}/5
-										</span>
 									</div>
 									<p className="text-gray-300 text-sm leading-relaxed mt-3 pl-12">
 										{review.comment}

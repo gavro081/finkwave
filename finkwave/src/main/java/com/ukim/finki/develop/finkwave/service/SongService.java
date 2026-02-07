@@ -25,7 +25,7 @@ public class SongService {
         return songRepository.findTopByListens(userId);
     }
 
-    public List<MusicalEntityDto> searchSongs(String searchTerm){
+    public List<SongDto> searchSongs(String searchTerm){
         Long userId = authService.getCurrentUserID();
         return songRepository.searchSongs(userId, searchTerm);
     }

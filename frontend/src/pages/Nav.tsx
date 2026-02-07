@@ -104,7 +104,7 @@ const Nav = ({ isSidebarOpen = false, onToggleSidebar }: NavProps) => {
 								{isDropdownOpen && (
 									<div className="absolute right-0 mt-2 w-48 bg-gray-700 rounded-lg shadow-lg py-1 z-50">
 										<Link
-											to="#"
+											to="/me"
 											className="block px-4 py-2 text-sm text-white hover:bg-gray-600 transition-colors"
 											onClick={() => setIsDropdownOpen(false)}
 										>

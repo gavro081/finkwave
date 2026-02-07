@@ -89,6 +89,10 @@ const router = createBrowserRouter([
 				path: "/collection/:type/:id",
 				element: <MusicalCollection />,
 			},
+			{
+				path: "/me",
+				element: <UserDetail />,
+			},
 		],
 	},
 ]);

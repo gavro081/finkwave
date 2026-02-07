@@ -4,6 +4,7 @@ import axiosInstance from "../api/axiosInstance";
 import ArtistView from "../components/userProfile/ArtistView";
 import ListenerView from "../components/userProfile/ListenerView";
 import UserListModal from "../components/userProfile/UserListModal";
+import { useAuth } from "../context/authContext";
 import { handleError } from "../utils/error";
 import type {
 	ArtistContribution,
@@ -34,7 +35,9 @@ type UserProfile = Artist | Listener;
 const UserDetail = () => {
 	// user refers to the selected user NOT to the user from context
 	const baseURL = import.meta.env.VITE_API_BASE_URL;
-	const { username } = useParams();
+	const { username: usernameParam } = useParams();
+	// sintaksava dole znaci zemi go user od auth context i preimenuvaj go vo currentUser, za da ne se izmesa so user-ot dole
+	const { user: currentUser } = useAuth();
 	const navigate = useNavigate();
 	const [user, setUser] = useState<UserProfile | null>(null);
 	const [error, setError] = useState<string | null>(null);
@@ -43,6 +46,25 @@ const UserDetail = () => {
 	const [modalUsers, setModalUsers] = useState<any[]>([]);
 	const [isLoadingModal, setIsLoadingModal] = useState(false);
 	const [isFollowing, setIsFollowing] = useState(false);
+
+	// determine which username to use: URL param or current user's username
+	const username = usernameParam || currentUser?.username;
+
+	// if we're on /me route and no user is logged in, show error
+	if (!usernameParam && !currentUser) {
+		return (
+			<div className="p-6 bg-red-50 border border-red-200 text-red-700 rounded-lg">
+				<h2 className="font-bold">Authentication Required</h2>
+				<p>You must be logged in to view your profile.</p>
+				<button
+					onClick={() => navigate("/login")}
+					className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors duration-200 cursor-pointer"
+				>
+					Go to Login
+				</button>
+			</div>
+		);
+	}
 
 	const handleFollow = async () => {
 		if (!user) return;

@@ -17,7 +17,7 @@ public interface AlbumRepository extends JpaRepository<Album, Long> {
 
     @Query("""
         SELECT NEW com.ukim.finki.develop.finkwave.model.dto.MusicalEntityDto(
-            a.id, me.title, me.genre, 'ALBUM', u.fullName, me.cover, FALSE )
+            a.id, me.title, me.genre, 'ALBUM', u.fullName, u.username, me.cover, FALSE )
         FROM Album a
         JOIN a.musicalEntities me
         JOIN me.releasedBy rb

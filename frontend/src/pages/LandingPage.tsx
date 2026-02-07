@@ -416,10 +416,36 @@ const LandingPage = () => {
 													<h3 className="text-lg font-semibold mb-2 text-white overflow-hidden text-ellipsis whitespace-nowrap">
 														{song.title}
 													</h3>
-													<p className="text-sm text-gray-400 mb-3 overflow-hidden text-ellipsis whitespace-nowrap">
-														{song.album}
-													</p>
-													<p className="text-sm text-gray-400 mb-3 overflow-hidden text-ellipsis whitespace-nowrap">
+													{song.album && (
+														<p
+															onClick={(e) => {
+																e.stopPropagation();
+																if (song.albumId) {
+																	navigate(`/collection/album/${song.albumId}`);
+																}
+															}}
+															className={`text-sm text-gray-400 mb-3 overflow-hidden text-ellipsis whitespace-nowrap ${
+																song.albumId
+																	? "hover:underline cursor-pointer hover:text-white"
+																	: ""
+															}`}
+														>
+															{song.album}
+														</p>
+													)}
+													<p
+														onClick={(e) => {
+															e.stopPropagation();
+															if (song.artistUsername) {
+																navigate(`/users/${song.artistUsername}`);
+															}
+														}}
+														className={`text-sm text-gray-400 mb-3 overflow-hidden text-ellipsis whitespace-nowrap ${
+															song.artistUsername
+																? "hover:underline cursor-pointer hover:text-white"
+																: ""
+														}`}
+													>
 														{song.releasedBy}
 													</p>
 													<div className="flex items-center justify-between mt-4 pt-3 border-t border-white/10">

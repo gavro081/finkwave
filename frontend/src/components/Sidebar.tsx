@@ -96,7 +96,6 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 						{recentlyListened.map((song) => (
 							<div
 								key={song.id}
-								onClick={() => navigate(`/songs/${song.id}`)}
 								className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-colors group relative"
 							>
 								<img
@@ -108,12 +107,49 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 									}}
 								/>
 								<div className="flex-1 min-w-0">
-									<p className="text-sm font-medium text-white truncate">
+									<p
+										onClick={() => navigate(`/songs/${song.id}`)}
+										className="text-sm font-medium text-white truncate hover:underline cursor-pointer"
+									>
 										{song.title}
 									</p>
-									<p className="text-xs text-gray-400 truncate">
-										{song.artist}
-									</p>
+									<div className="flex items-center gap-1 text-xs text-gray-400">
+										<span
+											onClick={(e) => {
+												e.stopPropagation();
+												if (song.artistUsername) {
+													navigate(`/users/${song.artistUsername}`);
+												}
+											}}
+											className={`truncate ${
+												song.artistUsername
+													? "hover:underline cursor-pointer hover:text-white"
+													: ""
+											}`}
+										>
+											{song.artist}
+										</span>
+										{song.album && (
+											<>
+												<span>•</span>
+												<span
+													onClick={(e) => {
+														e.stopPropagation();
+														if (song.albumId) {
+															navigate(`/collection/album/${song.albumId}`);
+														}
+													}}
+													className={`truncate ${
+														song.albumId
+															? "hover:underline cursor-pointer hover:text-white"
+															: ""
+													}`}
+												>
+													{song.album}
+												</span>
+											</>
+										)}
+									</div>
 								</div>
 								{song.link && (
 									<button

@@ -1,6 +1,5 @@
 package com.ukim.finki.develop.finkwave.model.dto;
 
-import jakarta.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,25 +15,29 @@ public class MusicalEntityDto {
     private String genre;
     private String type;
     private String releasedBy;
+    private String artistUsername;
     private String cover;
     private Boolean isLikedByCurrentUser;
     private String album;
+    private Long albumId;
 
-    public MusicalEntityDto(Long id, String title, String genre, String type, String releasedBy, Boolean isLikedByCurrentUser) {
+    public MusicalEntityDto(Long id, String title, String genre, String type, String releasedBy, String artistUsername, Boolean isLikedByCurrentUser) {
         this.id = id;
         this.title = title;
         this.genre = genre;
         this.type = type;
         this.releasedBy = releasedBy;
+        this.artistUsername = artistUsername;
         this.isLikedByCurrentUser = isLikedByCurrentUser;
     }
 
-    public MusicalEntityDto(Long id, String title, String genre, String type, String releasedBy, String cover, Boolean isLikedByCurrentUser) {
+    public MusicalEntityDto(Long id, String title, String genre, String type, String releasedBy, String releasedByUsername, String cover, Boolean isLikedByCurrentUser) {
         this.id = id;
         this.title = title;
         this.genre = genre;
         this.type = type;
         this.releasedBy = releasedBy;
+        this.artistUsername = artistUsername;
         this.cover = cover;
         this.isLikedByCurrentUser = isLikedByCurrentUser;
     }

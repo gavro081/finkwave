@@ -21,6 +21,7 @@ export interface MusicalEntity {
 	genre: string;
 	type: string;
 	releasedBy: string;
+	artistUsername?: string;
 	cover?: string | null;
 	isLikedByCurrentUser?: boolean;
 }
@@ -28,6 +29,7 @@ export interface MusicalEntity {
 export interface Song extends MusicalEntity {
 	type: "SONG";
 	album?: string;
+	albumId?: number;
 	link?: string;
 }
 
@@ -91,8 +93,11 @@ export interface BasicSong {
 	id: number;
 	title: string;
 	artist: string;
+	artistUsername?: string;
 	cover?: string;
 	link?: string;
+	album?: string;
+	albumId?: number;
 }
 
 export interface BasicPlaylist {

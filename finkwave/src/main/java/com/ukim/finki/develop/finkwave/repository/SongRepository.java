@@ -18,7 +18,7 @@ public interface SongRepository extends JpaRepository<Song, Long> {
 
     @Query("""
         SELECT NEW com.ukim.finki.develop.finkwave.model.dto.MusicalEntityDto(
-            s.id, me.title, me.genre, 'SONG', u.fullName, me.cover,
+            s.id, me.title, me.genre, 'SONG', u.fullName, u.username, me.cover,
             (CASE WHEN :currentUserId IS NOT NULL AND l.id IS NOT NULL THEN true ELSE false END)
         )
         FROM Song s
@@ -34,7 +34,7 @@ public interface SongRepository extends JpaRepository<Song, Long> {
 
     @Query("""
         SELECT NEW com.ukim.finki.develop.finkwave.model.dto.MusicalEntityDto(
-            s.id, me.title, me.genre, 'SONG', u.fullName, me.cover,
+            s.id, me.title, me.genre, 'SONG', u.fullName, u.username, me.cover,
             (CASE WHEN :currentUserId IS NOT NULL AND l.id IS NOT NULL THEN true ELSE false END))
         FROM Song s
         JOIN s.musicalEntities me
@@ -54,14 +54,23 @@ public interface SongRepository extends JpaRepository<Song, Long> {
             s.musicalEntities.genre,
             'SONG',
             s.musicalEntities.releasedBy.nonAdminUser.user.fullName,
+            s.musicalEntities.releasedBy.nonAdminUser.user.username,
             s.musicalEntities.cover,
             (EXISTS (SELECT 1 FROM Like l WHERE l.musicalEntity.id = s.id AND l.listener.id = :currentUserId)),
             s.album.musicalEntities.title,
+            s.album.musicalEntities.id,
             s.link
         )
         FROM Song s
-        GROUP BY s.id, s.musicalEntities.title, s.musicalEntities.genre,
-            s.musicalEntities.releasedBy.nonAdminUser.user.fullName, s.musicalEntities.cover, s.album.musicalEntities.title
+        GROUP BY
+            s.id,
+            s.musicalEntities.title,
+            s.musicalEntities.genre,
+            s.musicalEntities.releasedBy.nonAdminUser.user.fullName,
+            s.musicalEntities.releasedBy.nonAdminUser.user.username,
+            s.musicalEntities.cover,
+            s.album.musicalEntities.title,
+            s.album.musicalEntities.id
         ORDER BY count(*) desc
     """)
     // todo: add paging
@@ -74,6 +83,7 @@ public interface SongRepository extends JpaRepository<Song, Long> {
             s.musicalEntities.genre,
             'SONG',
             s.musicalEntities.releasedBy.nonAdminUser.user.fullName,
+            s.musicalEntities.releasedBy.nonAdminUser.user.username,
             s.musicalEntities.cover,
             (EXISTS (SELECT 1 FROM Like l WHERE l.musicalEntity.id = s.id AND l.listener.id = :currentUserId)),
             s.link
@@ -89,6 +99,7 @@ public interface SongRepository extends JpaRepository<Song, Long> {
             l.song_id,
             me.title,
             u.full_name,
+            u.username,
             s.link,
             me.cover
         FROM LISTENS l
@@ -108,6 +119,7 @@ public interface SongRepository extends JpaRepository<Song, Long> {
             me.genre,
             'SONG',
             u.fullName,
+            u.username,
             me.cover,
             (EXISTS (
                 SELECT 1 FROM Like l
@@ -115,6 +127,7 @@ public interface SongRepository extends JpaRepository<Song, Long> {
                   AND l.listener.id = :userId
             )),
             albumMe.title,
+            albumMe.id,
             s.link
         )
         FROM Song s

@@ -22,6 +22,7 @@ public interface LikeRepository extends JpaRepository<Like, LikeId> {
                  WHEN a.id IS NOT NULL THEN 'ALBUM'
                  ELSE 'UNKNOWN' END),
             u.fullName,
+            u.username,
             (CASE WHEN currentUserLike.id IS NOT NULL THEN true ELSE false END))
         FROM Like l
         JOIN l.musicalEntity me
@@ -39,7 +40,7 @@ public interface LikeRepository extends JpaRepository<Like, LikeId> {
     @Query("""
         SELECT CASE WHEN COUNT (l)>0 THEN true ELSE false END
         FROM MusicalEntity me
-        JOIN Like  l on l.musicalEntity.id=me.id
+        JOIN Like l on l.musicalEntity.id=me.id
         WHERE l.listener.id=:userId
         """)
     boolean isLikedByUser(@Param("userId") Long userId);

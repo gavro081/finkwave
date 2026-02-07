@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import type { Album } from "../../utils/types";
 
 interface AlbumResultProps {
@@ -5,8 +6,13 @@ interface AlbumResultProps {
 }
 
 const AlbumResult = ({ album }: AlbumResultProps) => {
+	const navigate = useNavigate();
+
 	return (
-		<div className="flex items-center gap-4 p-3 rounded-lg hover:bg-white/5 cursor-pointer transition-colors group">
+		<div
+			onClick={() => navigate(`/collection/album/${album.id}`)}
+			className="flex items-center gap-4 p-3 rounded-lg hover:bg-white/5 cursor-pointer transition-colors group"
+		>
 			<img
 				src={album.cover || "/favicon.png"}
 				alt={album.title}

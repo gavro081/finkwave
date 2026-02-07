@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { baseURL } from "../../api/axiosInstance";
 import type { BaseNonAdminUser } from "../../utils/types";
 
@@ -7,8 +8,13 @@ interface UserResultProps {
 }
 
 const UserResult = ({ user, label }: UserResultProps) => {
+	const navigate = useNavigate();
+
 	return (
-		<div className="flex items-center gap-4 p-3 rounded-lg hover:bg-white/5 cursor-pointer transition-colors group">
+		<div
+			onClick={() => navigate(`/users/${user.username}`)}
+			className="flex items-center gap-4 p-3 rounded-lg hover:bg-white/5 cursor-pointer transition-colors group"
+		>
 			{user.profilePhoto ? (
 				<img
 					src={`${baseURL}/${user.profilePhoto}`}

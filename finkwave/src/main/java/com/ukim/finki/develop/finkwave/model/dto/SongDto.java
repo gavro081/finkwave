@@ -12,19 +12,19 @@ public class SongDto extends MusicalEntityDto{
 
     // todo: clean up constructors
 
-    public SongDto(Long id, String title, String genre, String type, String releasedBy, String cover, Boolean isLikedByCurrentUser, String album, String link) {
-        super(id, title, genre, type, releasedBy, cover, isLikedByCurrentUser, album);
+
+    public SongDto(Long id, String title, String genre, String type, String releasedBy, String artistUsername, String cover, Boolean isLikedByCurrentUser, String album, Long albumId, String link) {
+        super(id, title, genre, type, releasedBy, artistUsername, cover, isLikedByCurrentUser, album, albumId);
         this.link = link;
     }
 
-    public SongDto(Long id, String title, String genre, String type, String releasedBy, Boolean isLikedByCurrentUser, String link) {
-        super(id, title, genre, type, releasedBy, isLikedByCurrentUser);
+    public SongDto(Long id, String title, String genre, String type, String releasedBy, String artistUsername, Boolean isLikedByCurrentUser, String link) {
+        super(id, title, genre, type, releasedBy, artistUsername, isLikedByCurrentUser);
         this.link = link;
     }
 
-    public SongDto(Long id, String title, String genre, String type, String releasedBy, String cover, Boolean isLikedByCurrentUser, String link) {
-        super(id, title, genre, type, releasedBy, cover, isLikedByCurrentUser);
+    public SongDto(Long id, String title, String genre, String type, String releasedBy, String artistUsername, String cover, Boolean isLikedByCurrentUser, String link) {
+        super(id, title, genre, type, releasedBy, artistUsername, cover, isLikedByCurrentUser);
         this.link = link;
     }
-
 }

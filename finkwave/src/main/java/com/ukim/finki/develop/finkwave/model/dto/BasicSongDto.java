@@ -6,6 +6,7 @@ public record BasicSongDto (
     Long id,
     String title,
     String artist,
+    String artistUsername,
     String link,
     @Nullable String cover
 ){}

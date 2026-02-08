@@ -62,6 +62,7 @@ public interface SongRepository extends JpaRepository<Song, Long> {
             s.link
         )
         FROM Song s
+        JOIN Listen l on l.id.songId = s.id
         GROUP BY
             s.id,
             s.musicalEntities.title,

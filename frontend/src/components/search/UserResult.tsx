@@ -34,9 +34,6 @@ const UserResult = ({ user, label }: UserResultProps) => {
 					{label} • @{user.username}
 				</p>
 			</div>
-			<div className="text-right text-xs text-gray-500">
-				<p>{user.followers} followers</p>
-			</div>
 		</div>
 	);
 };

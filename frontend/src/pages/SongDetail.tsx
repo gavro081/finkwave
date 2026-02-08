@@ -136,6 +136,7 @@ const SongDetail = () => {
 			const response = await axiosInstance.get(`/songs/${id}/details`);
 			setSong(response.data);
 		} catch (err) {
+			// todo :add toast
 			console.error("Error deleting review:", err);
 		}
 	};

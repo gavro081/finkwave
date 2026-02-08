@@ -17,6 +17,7 @@ public interface ReviewRepository extends JpaRepository<Review, ReviewId> {
         SELECT NEW com.ukim.finki.develop.finkwave.model.dto.ReviewDto(
         r.id,
         r.listener.nonAdminUser.user.fullName,
+        r.listener.nonAdminUser.user.username,
         r.grade,
         r.comment
         )
@@ -24,4 +25,6 @@ public interface ReviewRepository extends JpaRepository<Review, ReviewId> {
         WHERE r.id.musicalEntityId = :songId
     """)
     List<ReviewDto> getReviewsForSongId(@Param("songId") Long songId);
+
+    Review getReviewById_ListenerIdAndId_MusicalEntityId(Long listenerId, Long musicalEntityId);
 }

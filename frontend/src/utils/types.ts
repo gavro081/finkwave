@@ -77,6 +77,7 @@ export interface SongReview {
 		musicalEntityId: number;
 	};
 	author: string;
+	authorUsername: string;
 	grade: number;
 	comment: string;
 }

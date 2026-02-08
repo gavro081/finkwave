@@ -66,7 +66,11 @@ const SongDetail = () => {
 	const [song, setSong] = useState<SongDetailType | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
-
+	const [showReviewModal, setShowReviewModal] = useState(false);
+	const [reviewRating, setReviewRating] = useState(0);
+	const [reviewComment, setReviewComment] = useState("");
+	const [hoverRating, setHoverRating] = useState(0);
+	console.log(user);
 	useEffect(() => {
 		const fetchSong = async () => {
 			try {
@@ -83,6 +87,40 @@ const SongDetail = () => {
 		};
 		if (id) fetchSong();
 	}, [id]);
+
+	const handleSubmitReview = async () => {
+		if (reviewRating === 0) {
+			// todo: replace with toast
+			alert("Please select a rating");
+			return;
+		}
+		try {
+			await axiosInstance.post(`reviews/${song?.id}`, {
+				grade: reviewRating,
+				comment: reviewComment,
+			});
+			const response = await axiosInstance.get(`/songs/${id}/details`);
+			setSong(response.data);
+		} catch (err) {
+			// todo: replace with toast
+			console.error("Error submitting review:", err);
+		} finally {
+			setShowReviewModal(false);
+			setReviewRating(0);
+			setReviewComment("");
+			setHoverRating(0);
+		}
+	};
+
+	const deleteReview = async () => {
+		try {
+			await axiosInstance.delete(`reviews/${song?.id}`);
+			const response = await axiosInstance.get(`/songs/${id}/details`);
+			setSong(response.data);
+		} catch (err) {
+			console.error("Error deleting review:", err);
+		}
+	};
 
 	const toggleLike = async () => {
 		if (!song) return;
@@ -293,52 +331,6 @@ const SongDetail = () => {
 					</div>
 				</div>
 
-				{/* Play button — plays in persistent mini-player */}
-				{song.link && (
-					<section className="mb-10">
-						{currentSong?.id === song.id ? (
-							<div className="bg-[#1a1a2e]/60 rounded-xl p-4 flex items-center gap-3">
-								<div className="w-10 h-10 rounded-full bg-[#1db954] flex items-center justify-center text-black animate-pulse">
-									<svg
-										className="w-5 h-5"
-										fill="currentColor"
-										viewBox="0 0 24 24"
-									>
-										<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
-									</svg>
-								</div>
-								<p className="text-[#1db954] font-medium">
-									Now playing in mini-player below
-								</p>
-							</div>
-						) : (
-							<button
-								onClick={() =>
-									play({
-										id: song.id,
-										title: song.title,
-										artist: song.releasedBy,
-										cover: song.cover,
-										embedUrl: toEmbedUrl(song.link!),
-									})
-								}
-								className="w-full bg-[#1a1a2e]/60 hover:bg-[#1a1a2e]/80 rounded-xl p-4 flex items-center gap-3 transition-colors cursor-pointer group"
-							>
-								<div className="w-10 h-10 rounded-full bg-[#1db954] flex items-center justify-center text-black group-hover:scale-105 transition-transform">
-									<svg
-										className="w-5 h-5"
-										fill="currentColor"
-										viewBox="0 0 24 24"
-									>
-										<path d="M8 5v14l11-7z" />
-									</svg>
-								</div>
-								<p className="text-white font-medium">Play this song</p>
-							</button>
-						)}
-					</section>
-				)}
-
 				{/* Credits / Contributions */}
 				{song.contributions.length > 0 && (
 					<section className="mb-10">
@@ -401,9 +393,7 @@ const SongDetail = () => {
 							)}
 						</h2>
 						<button
-							onClick={() => {
-								/* TODO: add review modal */
-							}}
+							onClick={() => setShowReviewModal(true)}
 							className="flex items-center gap-2 bg-[#1db954] hover:bg-[#1ed760] text-black text-sm font-semibold px-4 py-2 rounded-full transition-colors"
 						>
 							<svg
@@ -451,6 +441,27 @@ const SongDetail = () => {
 												{renderStars(review.grade)}
 											</div>
 										</div>
+										{user?.username === review.authorUsername && (
+											<button
+												onClick={deleteReview}
+												className="text-gray-500 hover:text-red-400 transition-colors p-2 rounded-lg hover:bg-red-400/10"
+												title="Delete review"
+											>
+												<svg
+													className="w-5 h-5"
+													fill="none"
+													stroke="currentColor"
+													viewBox="0 0 24 24"
+												>
+													<path
+														strokeLinecap="round"
+														strokeLinejoin="round"
+														strokeWidth={2}
+														d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+													/>
+												</svg>
+											</button>
+										)}
 									</div>
 									<p className="text-gray-300 text-sm leading-relaxed mt-3 pl-12">
 										{review.comment}
@@ -461,6 +472,106 @@ const SongDetail = () => {
 					)}
 				</section>
 			</div>
+
+			{/* Review Modal */}
+			{showReviewModal && (
+				<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+					<div className="bg-[#1a1a2e] rounded-2xl p-6 max-w-md w-full shadow-2xl">
+						<div className="flex items-center justify-between mb-6">
+							<h3 className="text-2xl font-bold">Add Review</h3>
+							<button
+								onClick={() => {
+									setShowReviewModal(false);
+									setReviewRating(0);
+									setReviewComment("");
+									setHoverRating(0);
+								}}
+								className="text-gray-400 hover:text-white transition-colors"
+							>
+								<svg
+									className="w-6 h-6"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M6 18L18 6M6 6l12 12"
+									/>
+								</svg>
+							</button>
+						</div>
+
+						{/* Star Rating */}
+						<div className="mb-6">
+							<label className="block text-sm font-medium mb-3">
+								Rating <span className="text-red-400">*</span>
+							</label>
+							<div className="flex gap-2">
+								{[1, 2, 3, 4, 5].map((star) => (
+									<button
+										key={star}
+										onClick={() => setReviewRating(star)}
+										onMouseEnter={() => setHoverRating(star)}
+										onMouseLeave={() => setHoverRating(0)}
+										className="transition-transform hover:scale-110"
+									>
+										<svg
+											className={`w-10 h-10 ${
+												star <= (hoverRating || reviewRating)
+													? "text-yellow-400"
+													: "text-gray-600"
+											}`}
+											fill="currentColor"
+											viewBox="0 0 20 20"
+										>
+											<path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+										</svg>
+									</button>
+								))}
+							</div>
+						</div>
+
+						{/* Comment */}
+						<div className="mb-6">
+							<label className="block text-sm font-medium mb-2">
+								Comment <span className="text-gray-500">(optional)</span>
+							</label>
+							<textarea
+								value={reviewComment}
+								onChange={(e) => setReviewComment(e.target.value)}
+								placeholder="Share your thoughts about this song..."
+								rows={4}
+								className="w-full bg-[#0f0f1e] border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#1db954] transition-colors resize-none"
+							/>
+						</div>
+
+						{/* Actions */}
+						<div className="flex gap-3 justify-end">
+							<button
+								onClick={() => {
+									setShowReviewModal(false);
+									setReviewRating(0);
+									setReviewComment("");
+									setHoverRating(0);
+								}}
+								className="px-5 py-2.5 rounded-full text-sm font-semibold bg-white/10 hover:bg-white/20 transition-colors"
+							>
+								Cancel
+							</button>
+							<button
+								onClick={handleSubmitReview}
+								disabled={reviewRating === 0}
+								className="px-5 py-2.5 rounded-full text-sm font-semibold bg-[#1db954] hover:bg-[#1ed760] text-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+							>
+								Submit
+							</button>
+						</div>
+					</div>
+				</div>
+			)}
 		</div>
 	);
 };

@@ -9,6 +9,7 @@ import lombok.Getter;
 public class ReviewDto {
     private ReviewId id;
     private String author;
+    private String authorUsername;
     private Integer grade;
     private String comment;
 }

@@ -98,20 +98,31 @@ public interface SongRepository extends JpaRepository<Song, Long> {
 
 
     @Query(value = """
-        SELECT DISTINCT on (l.song_id)
-            l.song_id,
-            me.title,
-            u.full_name,
-            u.username,
-            s.link,
-            me.cover
-        FROM LISTENS l
-        JOIN MUSICAL_ENTITIES me on me.id = l.song_id
-        JOIN USERS u on u.user_id = me.released_by
-        JOIN SONGS s on s.id = me.id
-        WHERE l.listener_id = :userId
-        ORDER BY l.song_id, l.timestamp DESC
-        LIMIT 5
+        SELECT
+            t.song_id,
+            t.title,
+            t.full_name,
+            t.username,
+            t.link,
+            t.cover
+        FROM (
+                 SELECT DISTINCT ON (l.song_id)
+                     l.song_id,
+                     me.title,
+                     u.full_name,
+                     u.username,
+                     me.cover,
+                     s.link,
+                     l.timestamp
+                 FROM listens l
+                     JOIN musical_entities me ON me.id = l.song_id
+                     JOIN songs s on s.id = l.song_id
+                     JOIN users u ON u.user_id = me.released_by
+                     WHERE l.listener_id = 2
+                 ORDER BY l.song_id, l.timestamp DESC
+             ) t
+        ORDER BY t.timestamp DESC
+        LIMIT 5;
     """, nativeQuery = true)
     List<BasicSongDto> getRecentlyListened(@Param("userId")Long userId);
 

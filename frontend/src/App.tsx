@@ -16,7 +16,9 @@ import AllUsers from "./pages/AllUsers";
 import LandingPage from "./pages/LandingPage";
 import Login from "./pages/Login";
 import MusicalCollection from "./pages/MusicalCollection";
+import MySongs from "./pages/MySongs";
 import Nav from "./pages/Nav";
+import PublishSong from "./pages/PublishSong";
 import Register from "./pages/Register";
 import SongDetail from "./pages/SongDetail";
 import UserDetail from "./pages/UserDetail";
@@ -27,11 +29,13 @@ const MainLayout = () => {
 	const location = useLocation();
 	// show sidebar only if user is logged in and is on the landing page
 	const isLandingPage = location.pathname === "/";
-	const [isSidebarOpen, setIsSidebarOpen] = useState(!!user && isLandingPage);
+	const [isSidebarOpen, setIsSidebarOpen] = useState(
+		!!user && isLandingPage && !user?.isArtist && !user?.isAdmin,
+	);
 
 	// Open sidebar when user logs in and navigates to landing page
 	useEffect(() => {
-		if (user && isLandingPage) {
+		if (user && isLandingPage && !user.isArtist && !user.isAdmin) {
 			setIsSidebarOpen(true);
 		}
 	}, [user, isLandingPage]);
@@ -101,6 +105,14 @@ const router = createBrowserRouter([
 			{
 				path: "/register",
 				element: <Register />,
+			},
+			{
+				path: "/my-songs",
+				element: <MySongs />,
+			},
+			{
+				path: "/publish",
+				element: <PublishSong />,
 			},
 			{
 				path: "/songs/:id",

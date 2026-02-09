@@ -53,4 +53,9 @@ public class SongService {
         List<ReviewDto> reviewsForSongId = reviewService.getReviewsForSongId(songId);
         return songDetailsMapper.toSongDetailsDto(songDto, contributionsBySongId, reviewsForSongId);
     }
+
+    public List<MusicalEntitesByArtistDto> getArtistCatalog(){
+        Long userId = authService.getCurrentUserID();
+        return songRepository.getMusicalEntitiesReleasedByArtist(userId);
+    }
 }

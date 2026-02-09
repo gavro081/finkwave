@@ -3,7 +3,8 @@ export interface User {
 	fullName: string;
 	email?: string;
 	profilePhoto?: string | null;
-	role?: "ADMIN" | "NONADMIN";
+	isAdmin: boolean;
+	isArtist: boolean;
 }
 
 export interface ArtistContribution {
@@ -105,4 +106,31 @@ export interface BasicPlaylist {
 	id: number;
 	name: string;
 	songCount: number;
+}
+
+export interface CatalogItem {
+	id: number;
+	title: string;
+	genre: string;
+	cover: string | null;
+	type: "SONG" | "ALBUM";
+	releaseDate: string;
+}
+
+export interface Contributor {
+	username: string;
+	fullName: string;
+	role: string;
+}
+
+export interface ArtistSearchResult {
+	username: string;
+	fullName: string;
+	profilePhoto?: string;
+}
+
+export interface SongEntry {
+	title: string;
+	link: string;
+	contributors: Contributor[];
 }

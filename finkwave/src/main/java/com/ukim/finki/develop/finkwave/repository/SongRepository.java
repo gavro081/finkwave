@@ -1,16 +1,17 @@
 package com.ukim.finki.develop.finkwave.repository;
 
-import com.ukim.finki.develop.finkwave.model.dto.BasicSongDto;
-import com.ukim.finki.develop.finkwave.model.dto.MusicalEntityDto;
-import com.ukim.finki.develop.finkwave.model.dto.SongDto;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.ukim.finki.develop.finkwave.model.Song;
-
-import java.util.List;
+import com.ukim.finki.develop.finkwave.model.dto.BasicSongDto;
+import com.ukim.finki.develop.finkwave.model.dto.MusicalEntitesByArtistDto;
+import com.ukim.finki.develop.finkwave.model.dto.MusicalEntityDto;
+import com.ukim.finki.develop.finkwave.model.dto.SongDto;
 
 @Repository
 public interface SongRepository extends JpaRepository<Song, Long> {
@@ -118,7 +119,7 @@ public interface SongRepository extends JpaRepository<Song, Long> {
                      JOIN musical_entities me ON me.id = l.song_id
                      JOIN songs s on s.id = l.song_id
                      JOIN users u ON u.user_id = me.released_by
-                     WHERE l.listener_id = 2
+                     WHERE l.listener_id = :userId
                  ORDER BY l.song_id, l.timestamp DESC
              ) t
         ORDER BY t.timestamp DESC
@@ -154,4 +155,19 @@ public interface SongRepository extends JpaRepository<Song, Long> {
         WHERE s.id = :songId
     """)
     SongDto getSongById(@Param("songId") Long songId, @Param("userId") Long userId);
+
+    @Query("""
+        SELECT new com.ukim.finki.develop.finkwave.model.dto.MusicalEntitesByArtistDto(
+          me.id,
+          me.title,
+          me.genre,
+          (CASE WHEN EXISTS (SELECT 1 from Song s where me.id = s.id and s.album is null) THEN 'SONG' ELSE 'ALBUM' END),
+          me.cover,
+          me.releaseDate
+        )
+        FROM MusicalEntity me
+        WHERE me.releasedBy.id = :artistId
+        ORDER BY me.releaseDate DESC
+    """)
+    List<MusicalEntitesByArtistDto> getMusicalEntitiesReleasedByArtist(@Param("artistId")Long artistId);
 }

@@ -208,7 +208,8 @@ public class AuthService {
                 .fullname(user.getFullName())
                 .username(user.getUsername())
                 .profilePhoto(user.getProfilePhoto())
-                .role(user.getRole())
+                .isAdmin(user.getRole().equals(Role.ADMIN))
+                .isArtist(user.isArtist())
                 .build();
     }
 }

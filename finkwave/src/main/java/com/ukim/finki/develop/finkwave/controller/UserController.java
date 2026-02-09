@@ -1,6 +1,7 @@
 package com.ukim.finki.develop.finkwave.controller;
 
 import com.ukim.finki.develop.finkwave.model.User;
+import com.ukim.finki.develop.finkwave.model.dto.UserSearchResultDto;
 import com.ukim.finki.develop.finkwave.model.enums.UserType;
 import com.ukim.finki.develop.finkwave.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -23,9 +24,11 @@ public class UserController {
     }
 
     @GetMapping("/search")
-    public HttpEntity<List<User>> searchArtists(
+    public HttpEntity<List<UserSearchResultDto>> searchArtists(
             @RequestParam(name = "type") UserType userType,
-            @RequestParam(name = "q") String searchTerm){
-        return ResponseEntity.ok(usersService.search(userType, searchTerm));
+            @RequestParam(name = "q") String searchTerm,
+            @RequestParam(name = "limit", defaultValue = "10") Integer limit)
+            {
+        return ResponseEntity.ok(usersService.search(userType, searchTerm, limit));
     }
 }

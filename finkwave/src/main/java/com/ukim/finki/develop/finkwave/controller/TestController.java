@@ -1,13 +1,10 @@
 package com.ukim.finki.develop.finkwave.controller;
 
-import com.ukim.finki.develop.finkwave.model.MusicalEntity;
-import com.ukim.finki.develop.finkwave.model.User;
-import com.ukim.finki.develop.finkwave.model.dto.MusicalEntityDto;
 import com.ukim.finki.develop.finkwave.model.dto.SongDto;
+import com.ukim.finki.develop.finkwave.model.dto.UserSearchResultDto;
 import com.ukim.finki.develop.finkwave.repository.SongRepository;
 import com.ukim.finki.develop.finkwave.repository.UserRepository;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,11 +24,11 @@ public class TestController {
     }
 
     @GetMapping("/search/u/{searchTerm}")
-    public HttpEntity<List<User>> searchUsersTest(@PathVariable String searchTerm){
-        return ResponseEntity.ok(userRepository.searchListeners(searchTerm));
+    public HttpEntity<List<UserSearchResultDto>> searchUsersTest(@PathVariable String searchTerm){
+        return ResponseEntity.ok(userRepository.searchListeners(searchTerm, 10));
     }
     @GetMapping("/search/a/{searchTerm}")
-    public HttpEntity<List<User>> searchArtistsTest(@PathVariable String searchTerm){
-        return ResponseEntity.ok(userRepository.searchArtists(searchTerm));
+    public HttpEntity<List<UserSearchResultDto>> searchArtistsTest(@PathVariable String searchTerm){
+        return ResponseEntity.ok(userRepository.searchArtists(searchTerm, 10));
     }
 }

@@ -116,3 +116,21 @@ export interface CatalogItem {
 	type: "SONG" | "ALBUM";
 	releaseDate: string;
 }
+
+export interface Contributor {
+	username: string;
+	fullName: string;
+	role: string;
+}
+
+export interface ArtistSearchResult {
+	username: string;
+	fullName: string;
+	profilePhoto?: string;
+}
+
+export interface SongEntry {
+	title: string;
+	link: string;
+	contributors: Contributor[];
+}

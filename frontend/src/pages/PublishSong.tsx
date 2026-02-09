@@ -1,69 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import axiosInstance from "../api/axiosInstance";
 import { useAuth } from "../context/authContext";
-
-interface Contributor {
-	username: string;
-	fullName: string;
-	role: string;
-}
-
-interface ArtistSearchResult {
-	username: string;
-	fullName: string;
-	profilePhoto?: string;
-}
-
-interface SongEntry {
-	title: string;
-	link: string;
-	contributors: Contributor[];
-}
-
-const ROLE_OPTIONS = [
-	{ value: "FEATURED", label: "Featured" },
-	{ value: "PRODUCER", label: "Producer" },
-	{ value: "SONGWRITER", label: "Songwriter" },
-	{ value: "COMPOSER", label: "Composer" },
-	{ value: "MIXER", label: "Mixer" },
-	{ value: "ENGINEER", label: "Engineer" },
-];
-
-const GENRE_OPTIONS = [
-	"Pop",
-	"Rock",
-	"Hip-Hop",
-	"R&B",
-	"Electronic",
-	"Jazz",
-	"Classical",
-	"Country",
-	"Folk",
-	"Latin",
-	"Metal",
-	"Punk",
-	"Indie",
-	"Alternative",
-	"Blues",
-	"Soul",
-	"Reggae",
-	"Funk",
-	"Disco",
-	"House",
-	"Techno",
-	"Ambient",
-	"Other",
-];
-
-// Mock artist search results
-const MOCK_ARTISTS: ArtistSearchResult[] = [
-	{ username: "john_doe", fullName: "John Doe" },
-	{ username: "jane_smith", fullName: "Jane Smith" },
-	{ username: "mike_producer", fullName: "Mike the Producer" },
-	{ username: "sarah_vocals", fullName: "Sarah Vocals" },
-	{ username: "alex_beats", fullName: "Alex Beats" },
-];
+import { GENRE_OPTIONS, ROLE_OPTIONS } from "../utils/consts";
+import type {
+	ArtistSearchResult,
+	Contributor,
+	SongEntry,
+} from "../utils/types";
 
 const MAX_CONTRIBUTORS = 5;
 const MAX_ALBUM_SONGS = 20;
@@ -144,14 +89,12 @@ const PublishSong = () => {
 
 		setIsSearching(true);
 		try {
-			// TODO: replace with api call
-			// const response = await axiosInstance.get(`/users/search?type=ARTIST&q=${encodeURIComponent(query)}`);
-			// setSearchResults(response.data);
+			const response = await axiosInstance.get(
+				`/users/search?type=ARTIST&q=${encodeURIComponent(query)}&limit=5`,
+			);
 
-			// Mock search - filter by name
-			await new Promise((resolve) => setTimeout(resolve, 200));
-			const filtered = MOCK_ARTISTS.filter(
-				(artist) =>
+			const filtered = response.data.filter(
+				(artist: ArtistSearchResult) =>
 					artist.fullName.toLowerCase().includes(query.toLowerCase()) ||
 					artist.username.toLowerCase().includes(query.toLowerCase()),
 			);
@@ -275,9 +218,11 @@ const PublishSong = () => {
 			}
 
 			// TODO: replace with api call
-			await new Promise((resolve) => setTimeout(resolve, 200));
-			const filtered = MOCK_ARTISTS.filter(
-				(artist) =>
+			const response = await axiosInstance.get(
+				`/users/search?type=ARTIST&q=${encodeURIComponent(query)}&limit=5`,
+			);
+			const filtered = response.data.filter(
+				(artist: ArtistSearchResult) =>
 					artist.fullName.toLowerCase().includes(query.toLowerCase()) ||
 					artist.username.toLowerCase().includes(query.toLowerCase()),
 			);

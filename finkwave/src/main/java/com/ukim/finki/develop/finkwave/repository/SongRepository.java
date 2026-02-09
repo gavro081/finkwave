@@ -118,7 +118,7 @@ public interface SongRepository extends JpaRepository<Song, Long> {
                      JOIN musical_entities me ON me.id = l.song_id
                      JOIN songs s on s.id = l.song_id
                      JOIN users u ON u.user_id = me.released_by
-                     WHERE l.listener_id = 2
+                     WHERE l.listener_id = :userId
                  ORDER BY l.song_id, l.timestamp DESC
              ) t
         ORDER BY t.timestamp DESC

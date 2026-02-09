@@ -3,7 +3,8 @@ export interface User {
 	fullName: string;
 	email?: string;
 	profilePhoto?: string | null;
-	role?: "ADMIN" | "NONADMIN";
+	isAdmin: boolean;
+	isArtist: boolean;
 }
 
 export interface ArtistContribution {

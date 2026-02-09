@@ -1,9 +1,6 @@
 package com.ukim.finki.develop.finkwave.controller;
 
-import com.ukim.finki.develop.finkwave.model.dto.BasicSongDto;
-import com.ukim.finki.develop.finkwave.model.dto.MusicalEntityDto;
-import com.ukim.finki.develop.finkwave.model.dto.SongDetailsDto;
-import com.ukim.finki.develop.finkwave.model.dto.SongDto;
+import com.ukim.finki.develop.finkwave.model.dto.*;
 import com.ukim.finki.develop.finkwave.repository.SongRepository;
 import com.ukim.finki.develop.finkwave.service.AuthService;
 import com.ukim.finki.develop.finkwave.service.SongService;
@@ -40,5 +37,11 @@ public class SongController {
     @GetMapping("/{songId}/details")
     public HttpEntity<SongDetailsDto> getSongById(@PathVariable Long songId){
         return ResponseEntity.ok(songService.getSongDetails(songId));
+    }
+
+    @GetMapping("/catalog")
+    public HttpEntity<List<MusicalEntitesByArtistDto>> getArtistCatalog(){
+        List<MusicalEntitesByArtistDto> artistCatalog = songService.getArtistCatalog();
+        return ResponseEntity.ok(artistCatalog);
     }
 }

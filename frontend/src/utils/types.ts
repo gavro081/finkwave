@@ -107,3 +107,12 @@ export interface BasicPlaylist {
 	name: string;
 	songCount: number;
 }
+
+export interface CatalogItem {
+	id: number;
+	title: string;
+	genre: string;
+	cover: string | null;
+	type: "SONG" | "ALBUM";
+	releaseDate: string;
+}

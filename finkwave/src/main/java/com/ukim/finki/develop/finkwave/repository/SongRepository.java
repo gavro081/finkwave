@@ -2,6 +2,7 @@ package com.ukim.finki.develop.finkwave.repository;
 
 import java.util.List;
 
+import com.ukim.finki.develop.finkwave.model.dto.MusicalEntitesByArtistDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -154,4 +155,19 @@ public interface SongRepository extends JpaRepository<Song, Long> {
         WHERE s.id = :songId
     """)
     SongDto getSongById(@Param("songId") Long songId, @Param("userId") Long userId);
+
+    @Query("""
+        SELECT new com.ukim.finki.develop.finkwave.model.dto.MusicalEntitesByArtistDto(
+          me.id,
+          me.title,
+          me.genre,
+          (CASE WHEN EXISTS (SELECT 1 from Song s where me.id = s.id and s.album is null) THEN 'SONG' ELSE 'ALBUM' END),
+          me.cover,
+          me.releaseDate
+        )
+        FROM MusicalEntity me
+        WHERE me.releasedBy.id = :artistId
+        ORDER BY me.releaseDate DESC
+    """)
+    List<MusicalEntitesByArtistDto> getMusicalEntitiesReleasedByArtist(@Param("artistId")Long artistId);
 }

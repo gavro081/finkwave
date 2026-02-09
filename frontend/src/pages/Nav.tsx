@@ -21,7 +21,8 @@ const Nav = ({ isSidebarOpen = false, onToggleSidebar }: NavProps) => {
 			await axiosInstance.post("/auth/logout");
 			setUser(undefined);
 			setIsDropdownOpen(false);
-			toast.success("Logout successful!");
+			window.location.href = "/";
+			// toast.success("Logout successful!");
 		} catch (error) {
 			console.error("Logout failed:", error);
 			toast.error("Logout failed!");
@@ -80,6 +81,14 @@ const Nav = ({ isSidebarOpen = false, onToggleSidebar }: NavProps) => {
 			<div className="flex items-center space-x-4">
 				{!isAuthLoading && (
 					<div className="flex items-center space-x-3">
+						{user?.isArtist && (
+							<Link
+								to="/my-songs"
+								className="text-white hover:text-[#1db954] px-4 py-2 text-sm font-medium transition-colors"
+							>
+								My Songs
+							</Link>
+						)}
 						{user ? (
 							<div className="relative" ref={dropdownRef}>
 								<button

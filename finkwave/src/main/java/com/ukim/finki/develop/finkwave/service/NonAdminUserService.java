@@ -40,9 +40,7 @@ public class NonAdminUserService {
 
     @Transactional(readOnly = true)
     public NonAdminUserDto getNonAdminUserProfile(String username) {
-
-        Long currentUserId= authService.getCurrentUserID();
-
+        Long currentUserId = authService.getCurrentUserIDOptional().orElse(null);
 
         Optional<Artist>artistOptional=artistRepository.findByUsername(username);
     
@@ -62,16 +60,17 @@ public class NonAdminUserService {
     }
 
     private FollowStatusDto getFollowingInfo(Long id,Long currentUserId){
+
         Long followers = followRepository.countByFolloweeId(id);
         Long following = followRepository.countByFollowerId(id);
-        boolean isFollowing = followRepository.isFollowing(currentUserId, id);
+        boolean isFollowing = currentUserId != null && followRepository.isFollowing(currentUserId, id);
         return new FollowStatusDto(isFollowing,followers,following);
     }
 
     private NonAdminUserDto getArtistProfile(Artist artist,Long currentUserId) {
         Long artistId=artist.getId();
 
-        List<ArtistContributionDto>artistContributionDtos=artistService.getArtistContributions(artistId);
+        List<ArtistContributionDto>artistContributionDtos=artistService.getArtistContributions(artistId, currentUserId);
         FollowStatusDto followStatusDto=getFollowingInfo(artistId,currentUserId);
 
         return mapper.toArtistDTO(artist, artistContributionDtos,followStatusDto);

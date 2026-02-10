@@ -54,7 +54,7 @@ public class FollowService {
 
         Long id=nonAdminUser.getId();
         List<Follow> followers = followRepository.findFollowersWithProfile(id);
-        Long currentUserId=authService.getCurrentUserID();
+        Long currentUserId=authService.getCurrentUserIDOptional().orElse(null);
 
 
         return followers.stream()

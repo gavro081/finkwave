@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import com.ukim.finki.develop.finkwave.model.*;
@@ -122,6 +124,14 @@ public class AuthService {
                 .orElseThrow(UserNotFoundException::new);
     }
 
+    public Optional<Long> getCurrentUserIDOptional(){
+        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return Optional.empty();
+        }
+        String username=authentication.getName();
+        return userRepository.findByUsername(username).map(User::getId);
+    }
 
     private User createNonAdminUser(AuthRequestDto authRequestDto) throws IOException {
         User.UserBuilder userBuilder = User.builder()

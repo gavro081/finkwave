@@ -31,4 +31,5 @@ public class UserController {
             {
         return ResponseEntity.ok(usersService.search(userType, searchTerm, limit));
     }
+
 }

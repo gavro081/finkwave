@@ -26,7 +26,7 @@ public class SongService {
     }
 
     public List<SongDto> searchSongs(String searchTerm){
-        Long userId = authService.getCurrentUserID();
+        Long userId = authService.getCurrentUserIDOptional().orElse(null);
         return songRepository.searchSongs(userId, searchTerm);
     }
 
@@ -35,13 +35,13 @@ public class SongService {
         return songRepository.getRecentlyListened(userId);
     }
 
-    public MusicalEntityDto getSongById(Long songId){
-        Long userId = null;
-        try {
-            userId = authService.getCurrentUserID();
-        } catch (Exception ignored) {}
-        return songRepository.getSongById(songId, userId);
-    }
+//    public MusicalEntityDto getSongById(Long songId){
+//        Long userId = null;
+//        try {
+//            userId = authService.getCurrentUserID();
+//        } catch (Exception ignored) {}
+//        return songRepository.getSongById(songId, userId);
+//    }
 
     public SongDetailsDto getSongDetails(Long songId){
         Long userId = null;

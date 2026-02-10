@@ -8,19 +8,15 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
 public class ArtistService {
-
     private final ArtistContributionRepository artistContributionRepository;
-    private final AuthService authService;
 
 
     @Transactional(readOnly=true)
-    public List<ArtistContributionDto> getArtistContributions(Long artistId){
-        Long currentUserId=authService.getCurrentUserID();
+    public List<ArtistContributionDto> getArtistContributions(Long artistId, Long currentUserId){
         return artistContributionRepository.findContributionsByArtistId(currentUserId,artistId);
     }
 

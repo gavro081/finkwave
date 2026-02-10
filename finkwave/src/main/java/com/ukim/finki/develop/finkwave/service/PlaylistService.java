@@ -34,7 +34,7 @@ public class PlaylistService {
     }
 
     public PlaylistDto getPlaylist(Long id){
-        Long currentUserId=authService.getCurrentUserID();
+        Long currentUserId=authService.getCurrentUserIDOptional().orElse(null);
         Playlist playlist = playlistRepository.findById(id).orElseThrow(()-> new PlaylistNotFoundException(id));
         List<MusicalEntityDto>songsInPlaylist=songRepository.findSongsByPlaylistId(id,currentUserId);
         Set<Long> savedIds = savedPlaylistRepository.findAllByListener_Id(currentUserId)

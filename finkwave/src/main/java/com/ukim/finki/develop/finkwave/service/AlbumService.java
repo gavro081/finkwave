@@ -25,7 +25,7 @@ public class AlbumService {
         if (!albumRepository.existsById(id)){
             throw new AlbumNotFoundException(id);
         }
-        Long currentUserId=authService.getCurrentUserID();
+        Long currentUserId=authService.getCurrentUserIDOptional().orElse(null);
 
         Album album=albumRepository.findById(id).orElseThrow(()->new AlbumNotFoundException(id));
         AlbumDto dto=new AlbumDto(album.getId(),
@@ -43,7 +43,7 @@ public class AlbumService {
     }
 
     public List<MusicalEntityDto> searchAlbums(String searchTerm){
-        return albumRepository.searchAlbums(authService.getCurrentUserID(), searchTerm);
+        return albumRepository.searchAlbums(authService.getCurrentUserIDOptional().orElse(null), searchTerm);
     }
 
 }

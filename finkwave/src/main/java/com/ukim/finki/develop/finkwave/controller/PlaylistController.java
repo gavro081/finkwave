@@ -4,7 +4,6 @@ import com.ukim.finki.develop.finkwave.model.dto.BasicPlaylistDto;
 import com.ukim.finki.develop.finkwave.model.dto.PlaylistDto;
 import com.ukim.finki.develop.finkwave.service.PlaylistService;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -3,8 +3,8 @@ package com.ukim.finki.develop.finkwave.service;
 import com.ukim.finki.develop.finkwave.exceptions.PlaylistNotFoundException;
 import com.ukim.finki.develop.finkwave.model.Playlist;
 import com.ukim.finki.develop.finkwave.model.dto.BasicPlaylistDto;
-import com.ukim.finki.develop.finkwave.model.dto.MusicalEntityDto;
 import com.ukim.finki.develop.finkwave.model.dto.PlaylistDto;
+import com.ukim.finki.develop.finkwave.model.dto.SongWithLinkDto;
 import com.ukim.finki.develop.finkwave.repository.PlaylistRepository;
 import com.ukim.finki.develop.finkwave.repository.SavedPlaylistRepository;
 import com.ukim.finki.develop.finkwave.repository.SongRepository;
@@ -36,7 +36,7 @@ public class PlaylistService {
     public PlaylistDto getPlaylist(Long id){
         Long currentUserId=authService.getCurrentUserIDOptional().orElse(null);
         Playlist playlist = playlistRepository.findById(id).orElseThrow(()-> new PlaylistNotFoundException(id));
-        List<MusicalEntityDto>songsInPlaylist=songRepository.findSongsByPlaylistId(id,currentUserId);
+        List<SongWithLinkDto>songsInPlaylist=songRepository.findSongsByPlaylistId(id,currentUserId);
         Set<Long> savedIds = savedPlaylistRepository.findAllByListener_Id(currentUserId)
                 .stream().map(sp -> sp.getPlaylist().getId()).collect(Collectors.toSet());
         return new PlaylistDto(

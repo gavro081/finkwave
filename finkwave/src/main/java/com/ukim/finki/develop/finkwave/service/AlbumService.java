@@ -5,6 +5,7 @@ import com.ukim.finki.develop.finkwave.model.Album;
 import com.ukim.finki.develop.finkwave.model.MusicalEntity;
 import com.ukim.finki.develop.finkwave.model.dto.AlbumDto;
 import com.ukim.finki.develop.finkwave.model.dto.MusicalEntityDto;
+import com.ukim.finki.develop.finkwave.model.dto.SongWithLinkDto;
 import com.ukim.finki.develop.finkwave.repository.AlbumRepository;
 import com.ukim.finki.develop.finkwave.repository.LikeRepository;
 import com.ukim.finki.develop.finkwave.repository.SongRepository;
@@ -36,7 +37,7 @@ public class AlbumService {
                 album.getMusicalEntities().getReleasedBy().getNonAdminUser().getUser().getUsername(),
                 album.getMusicalEntities().getCover(),
                 likeRepository.isLikedByUser(currentUserId));
-        List<MusicalEntityDto>songsFromAlbum=songRepository.findSongsByAlbum(id,currentUserId);
+        List<SongWithLinkDto>songsFromAlbum=songRepository.findSongsByAlbum(id,currentUserId);
 
         dto.setSongs(songsFromAlbum);
         return dto;

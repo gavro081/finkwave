@@ -14,6 +14,8 @@ export interface ArtistContribution {
 	role: string;
 	entityType: string;
 	isLikedByCurrentUser: boolean;
+	cover?: string | null;
+	link?: string | null;
 }
 
 export interface MusicalEntity {

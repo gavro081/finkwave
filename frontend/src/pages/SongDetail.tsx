@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 import axiosInstance from "../api/axiosInstance";
 import { useAuth } from "../context/authContext";
 import { usePlayer } from "../context/playerContext";
 import type { SongDetail as SongDetailType } from "../utils/types";
+import { toEmbedUrl } from "../utils/utils";
 
 const ROLE_LABELS: Record<string, string> = {
 	MAIN_VOCAL: "Main Vocal",
@@ -17,29 +19,6 @@ const ROLE_LABELS: Record<string, string> = {
 
 const formatRole = (role: string): string => {
 	return ROLE_LABELS[role] || role.replace(/_/g, " ");
-};
-
-// convert a regular youtube URL to an embeddable URL
-const toEmbedUrl = (url: string): string => {
-	try {
-		const parsed = new URL(url);
-		// youtube.com/watch?v=ID
-		if (
-			(parsed.hostname === "www.youtube.com" ||
-				parsed.hostname === "youtube.com") &&
-			parsed.searchParams.has("v")
-		) {
-			return `https://www.youtube.com/embed/${parsed.searchParams.get("v")}`;
-		}
-		// youtu.be/ID
-		if (parsed.hostname === "youtu.be") {
-			return `https://www.youtube.com/embed${parsed.pathname}`;
-		}
-		// already an embed URL or other provider – return as-is
-		return url;
-	} catch {
-		return url;
-	}
 };
 
 const renderStars = (grade: number) => {
@@ -136,7 +115,7 @@ const SongDetail = () => {
 			const response = await axiosInstance.get(`/songs/${id}/details`);
 			setSong(response.data);
 		} catch (err) {
-			// todo :add toast
+			toast.error("Failed to delete review");
 			console.error("Error deleting review:", err);
 		}
 	};
@@ -151,6 +130,7 @@ const SongDetail = () => {
 					: prev,
 			);
 		} catch (err) {
+			toast.error("Failed to toggle like");
 			console.error("Error toggling like:", err);
 		}
 	};

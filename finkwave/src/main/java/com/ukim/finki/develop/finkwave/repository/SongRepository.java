@@ -2,25 +2,23 @@ package com.ukim.finki.develop.finkwave.repository;
 
 import java.util.List;
 
+import com.ukim.finki.develop.finkwave.model.dto.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.ukim.finki.develop.finkwave.model.Song;
-import com.ukim.finki.develop.finkwave.model.dto.BasicSongDto;
-import com.ukim.finki.develop.finkwave.model.dto.MusicalEntitesByArtistDto;
-import com.ukim.finki.develop.finkwave.model.dto.MusicalEntityDto;
-import com.ukim.finki.develop.finkwave.model.dto.SongDto;
 
 @Repository
 public interface SongRepository extends JpaRepository<Song, Long> {
 
 
     @Query("""
-        SELECT NEW com.ukim.finki.develop.finkwave.model.dto.MusicalEntityDto(
+        SELECT NEW com.ukim.finki.develop.finkwave.model.dto.SongWithLinkDto(
             s.id, me.title, me.genre, 'SONG', u.fullName, u.username, me.cover,
-            (CASE WHEN :currentUserId IS NOT NULL AND l.id IS NOT NULL THEN true ELSE false END)
+            (CASE WHEN :currentUserId IS NOT NULL AND l.id IS NOT NULL THEN true ELSE false END),
+            s.link
         )
         FROM Song s
         JOIN s.musicalEntities me
@@ -30,13 +28,15 @@ public interface SongRepository extends JpaRepository<Song, Long> {
         LEFT JOIN Like l ON l.musicalEntity.id = s.id AND l.listener.id = :currentUserId
         WHERE s.album.id = :albumId
     """)
-    List<MusicalEntityDto>findSongsByAlbum(@Param("albumId") Long albumId, @Param("currentUserId")Long currentUserId);
+    List<SongWithLinkDto>findSongsByAlbum(@Param("albumId") Long albumId, @Param("currentUserId")Long currentUserId);
 
 
     @Query("""
-        SELECT NEW com.ukim.finki.develop.finkwave.model.dto.MusicalEntityDto(
+        SELECT NEW com.ukim.finki.develop.finkwave.model.dto.SongWithLinkDto(
             s.id, me.title, me.genre, 'SONG', u.fullName, u.username, me.cover,
-            (CASE WHEN :currentUserId IS NOT NULL AND l.id IS NOT NULL THEN true ELSE false END))
+            (CASE WHEN :currentUserId IS NOT NULL AND l.id IS NOT NULL THEN true ELSE false END),
+            s.link
+            )
         FROM Song s
         JOIN s.musicalEntities me
         JOIN me.releasedBy a
@@ -46,7 +46,7 @@ public interface SongRepository extends JpaRepository<Song, Long> {
         LEFT JOIN Like l ON l.musicalEntity.id=s.id AND l.listener.id=:currentUserId
         WHERE ps.playlist.id=:playlistId
     """)
-    List<MusicalEntityDto>findSongsByPlaylistId(@Param("playlistId")Long playlistId, @Param("currentUserId")Long currentUserId);
+    List<SongWithLinkDto>findSongsByPlaylistId(@Param("playlistId")Long playlistId, @Param("currentUserId")Long currentUserId);
 
     @Query("""
         SELECT NEW com.ukim.finki.develop.finkwave.model.dto.SongDto(

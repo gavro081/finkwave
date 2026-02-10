@@ -10,7 +10,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 public class AlbumDto extends MusicalEntityDto{
-    private List<MusicalEntityDto>songs;
+    private List<SongWithLinkDto>songs;
 
     public AlbumDto(Long id, String title, String genre, String type, String releasedBy, String artistUsername, String cover, Boolean isLikedByCurrentUser) {
         super(id, title, genre, type, releasedBy, artistUsername, cover, isLikedByCurrentUser);

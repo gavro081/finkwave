@@ -1,15 +1,16 @@
 package com.ukim.finki.develop.finkwave.repository;
 
-import com.ukim.finki.develop.finkwave.model.dto.ArtistContributionDto;
-import com.ukim.finki.develop.finkwave.model.dto.ArtistContributionSummaryDto;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
 import com.ukim.finki.develop.finkwave.model.ArtistContribution;
 import com.ukim.finki.develop.finkwave.model.ArtistContributionId;
-
-import java.util.List;
+import com.ukim.finki.develop.finkwave.model.dto.ArtistContributionDto;
+import com.ukim.finki.develop.finkwave.model.dto.ArtistContributionSummaryDto;
 
 @Repository
 public interface ArtistContributionRepository extends JpaRepository<ArtistContribution, ArtistContributionId> {
@@ -20,7 +21,9 @@ public interface ArtistContributionRepository extends JpaRepository<ArtistContri
             (CASE WHEN s.id IS NOT NULL THEN 'SONG'
                   WHEN a.id IS NOT NULL THEN 'ALBUM'
                   ELSE 'Unknown' END),
-            (CASE WHEN l.id IS NOT NULL THEN true ELSE false END))
+            (CASE WHEN l.id IS NOT NULL THEN true ELSE false END),
+            ac.musicalEntity.cover,
+            s.link)
         FROM ArtistContribution ac
         LEFT JOIN Song s  ON s.musicalEntities.id=ac.musicalEntity.id
         LEFT JOIN Album a ON a.musicalEntities.id=ac.musicalEntity.id

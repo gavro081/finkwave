@@ -4,25 +4,7 @@ import axiosInstance from "../api/axiosInstance";
 import { useAuth } from "../context/authContext";
 import { usePlayer } from "../context/playerContext";
 import type { BasicPlaylist, BasicSong, SidebarProps } from "../utils/types";
-
-const toEmbedUrl = (url: string): string => {
-	try {
-		const parsed = new URL(url);
-		if (
-			(parsed.hostname === "www.youtube.com" ||
-				parsed.hostname === "youtube.com") &&
-			parsed.searchParams.has("v")
-		) {
-			return `https://www.youtube.com/embed/${parsed.searchParams.get("v")}`;
-		}
-		if (parsed.hostname === "youtu.be") {
-			return `https://www.youtube.com/embed${parsed.pathname}`;
-		}
-		return url;
-	} catch {
-		return url;
-	}
-};
+import { toEmbedUrl } from "../utils/utils";
 
 const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 	const { user } = useAuth();

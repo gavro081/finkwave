@@ -14,4 +14,6 @@ public class ArtistContributionDto {
     private String role;
     private String entityType;
     private Boolean isLikedByCurrentUser;
+    private String cover;
+    private String link;
 }

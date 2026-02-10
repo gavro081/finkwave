@@ -11,26 +11,7 @@ import type {
 	SearchCategory,
 	Song,
 } from "../utils/types";
-
-// Convert a regular YouTube URL to an embeddable URL
-const toEmbedUrl = (url: string): string => {
-	try {
-		const parsed = new URL(url);
-		if (
-			(parsed.hostname === "www.youtube.com" ||
-				parsed.hostname === "youtube.com") &&
-			parsed.searchParams.has("v")
-		) {
-			return `https://www.youtube.com/embed/${parsed.searchParams.get("v")}`;
-		}
-		if (parsed.hostname === "youtu.be") {
-			return `https://www.youtube.com/embed${parsed.pathname}`;
-		}
-		return url;
-	} catch {
-		return url;
-	}
-};
+import { toEmbedUrl } from "../utils/utils";
 
 const CATEGORIES: { value: SearchCategory; label: string }[] = [
 	{ value: "songs", label: "Songs" },

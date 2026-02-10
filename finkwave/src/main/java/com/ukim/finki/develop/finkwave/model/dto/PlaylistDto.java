@@ -14,7 +14,7 @@ public class PlaylistDto {
     private String name;
     private String cover;
     private String creatorName;
-    private List<MusicalEntityDto>songsInPlaylist;
+    private List<SongWithLinkDto>songsInPlaylist;
     private Boolean isSavedByCurrentUser;
 
 }

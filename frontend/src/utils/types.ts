@@ -120,12 +120,13 @@ export interface CatalogItem {
 }
 
 export interface Contributor {
-	username: string;
+	id: number;
 	fullName: string;
 	role: string;
 }
 
 export interface ArtistSearchResult {
+	id: number;
 	username: string;
 	fullName: string;
 	profilePhoto?: string;

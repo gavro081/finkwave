@@ -22,7 +22,7 @@ const PublishSong = () => {
 	const [title, setTitle] = useState("");
 	const [genre, setGenre] = useState("");
 	const [link, setLink] = useState("");
-	const [_coverFile, setCoverFile] = useState<File | null>(null); // TODO: Use in API call
+	const [coverFile, setCoverFile] = useState<File | null>(null);
 	const [coverPreview, setCoverPreview] = useState<string | null>(null);
 	const [contributors, setContributors] = useState<Contributor[]>([]);
 	const [isSubmitting, setIsSubmitting] = useState(false);
@@ -92,7 +92,6 @@ const PublishSong = () => {
 			const response = await axiosInstance.get(
 				`/users/search?type=ARTIST&q=${encodeURIComponent(query)}&limit=5`,
 			);
-
 			const filtered = response.data.filter(
 				(artist: ArtistSearchResult) =>
 					artist.fullName.toLowerCase().includes(query.toLowerCase()) ||
@@ -128,7 +127,7 @@ const PublishSong = () => {
 			return;
 		}
 
-		if (contributors.some((c) => c.username === artist.username)) {
+		if (contributors.some((c) => c.id === artist.id)) {
 			toast.error("This contributor is already added");
 			return;
 		}
@@ -136,7 +135,7 @@ const PublishSong = () => {
 		setContributors([
 			...contributors,
 			{
-				username: artist.username,
+				id: artist.id,
 				fullName: artist.fullName,
 				role: selectedContributorRole,
 			},
@@ -147,8 +146,8 @@ const PublishSong = () => {
 	};
 
 	// Remove contributor
-	const handleRemoveContributor = (username: string) => {
-		setContributors(contributors.filter((c) => c.username !== username));
+	const handleRemoveContributor = (id: number) => {
+		setContributors(contributors.filter((c) => c.id !== id));
 	};
 
 	// Handle cover file
@@ -241,14 +240,14 @@ const PublishSong = () => {
 			return;
 		}
 
-		if (song.contributors.some((c) => c.username === artist.username)) {
+		if (song.contributors.some((c) => c.id === artist.id)) {
 			toast.error("This contributor is already added");
 			return;
 		}
 
 		const role = albumSongSelectedRole[songIndex] || ROLE_OPTIONS[0].value;
 		const newContributor: Contributor = {
-			username: artist.username,
+			id: artist.id,
 			fullName: artist.fullName,
 			role,
 		};
@@ -262,23 +261,18 @@ const PublishSong = () => {
 		setAlbumSongShowDropdown((prev) => ({ ...prev, [songIndex]: false }));
 	};
 
-	const handleRemoveAlbumSongContributor = (
-		songIndex: number,
-		username: string,
-	) => {
+	const handleRemoveAlbumSongContributor = (songIndex: number, id: number) => {
 		const song = albumSongs[songIndex];
 		handleAlbumSongChange(
 			songIndex,
 			"contributors",
-			song.contributors.filter((c) => c.username !== username),
+			song.contributors.filter((c) => c.id !== id),
 		);
 	};
 
-	// Form submission
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 
-		// Validation
 		if (!title.trim()) {
 			toast.error("Please enter a title");
 			return;
@@ -294,7 +288,6 @@ const PublishSong = () => {
 				return;
 			}
 		} else {
-			// Album validation
 			for (let i = 0; i < albumSongs.length; i++) {
 				if (!albumSongs[i].title.trim()) {
 					toast.error(`Please enter a title for song ${i + 1}`);
@@ -310,15 +303,55 @@ const PublishSong = () => {
 		setIsSubmitting(true);
 
 		try {
-			// TODO: replace with API call
-			// const formData = new FormData();
-			// formData.append('title', title);
-			// formData.append('genre', genre);
-			// if (coverFile) formData.append('cover', coverFile);
-			// ...
+			const formData = new FormData();
+			formData.append("title", title);
+			formData.append("genre", genre);
+			if (coverFile) formData.append("cover", coverFile);
 
-			// Simulate API call
-			await new Promise((resolve) => setTimeout(resolve, 1000));
+			// Helper to append contributors in indexed format for Spring @ModelAttribute
+			const appendContributors = (
+				formData: FormData,
+				contributors: Contributor[],
+				prefix: string,
+			) => {
+				contributors.forEach((c, i) => {
+					formData.append(`${prefix}[${i}].id`, c.id.toString());
+					formData.append(`${prefix}[${i}].artistName`, c.fullName);
+					formData.append(`${prefix}[${i}].role`, c.role);
+				});
+			};
+
+			if (releaseType === "album") {
+				// Append album songs in indexed format
+				albumSongs.forEach((song, songIndex) => {
+					formData.append(`albumSongs[${songIndex}].title`, song.title);
+					formData.append(`albumSongs[${songIndex}].link`, song.link);
+					// Append nested contributors for each song
+					song.contributors.forEach((c, contribIndex) => {
+						formData.append(
+							`albumSongs[${songIndex}].contributors[${contribIndex}].id`,
+							c.id.toString(),
+						);
+						formData.append(
+							`albumSongs[${songIndex}].contributors[${contribIndex}].artistName`,
+							c.fullName,
+						);
+						formData.append(
+							`albumSongs[${songIndex}].contributors[${contribIndex}].role`,
+							c.role,
+						);
+					});
+				});
+				await axiosInstance.post("/musical-entity/publish/album", formData, {
+					headers: { "Content-Type": "multipart/form-data" },
+				});
+			} else {
+				formData.append("link", link);
+				appendContributors(formData, contributors, "contributors");
+				await axiosInstance.post("/musical-entity/publish/song", formData, {
+					headers: { "Content-Type": "multipart/form-data" },
+				});
+			}
 
 			toast.success(
 				releaseType === "single"
@@ -611,7 +644,7 @@ const PublishSong = () => {
 								<div className="flex flex-wrap gap-2 mb-4">
 									{contributors.map((contributor) => (
 										<div
-											key={contributor.username}
+											key={contributor.id}
 											className="flex items-center gap-2 bg-[#282828] rounded-full py-1.5 px-3"
 										>
 											<span className="text-sm">{contributor.fullName}</span>
@@ -625,9 +658,7 @@ const PublishSong = () => {
 											</span>
 											<button
 												type="button"
-												onClick={() =>
-													handleRemoveContributor(contributor.username)
-												}
+												onClick={() => handleRemoveContributor(contributor.id)}
 												className="text-gray-400 hover:text-red-400 transition-colors"
 											>
 												<svg
@@ -686,7 +717,7 @@ const PublishSong = () => {
 												) : searchResults.length > 0 ? (
 													searchResults.map((artist) => (
 														<button
-															key={artist.username}
+															key={artist.id}
 															type="button"
 															onClick={() => handleAddContributor(artist)}
 															className="w-full text-left px-4 py-2.5 hover:bg-white/10 transition-colors flex items-center gap-3"
@@ -807,7 +838,7 @@ const PublishSong = () => {
 											<div className="flex flex-wrap gap-2 mb-3">
 												{song.contributors.map((contributor) => (
 													<div
-														key={contributor.username}
+														key={contributor.id}
 														className="flex items-center gap-2 bg-[#1a1a2e] rounded-full py-1 px-2.5 text-sm"
 													>
 														<span>{contributor.fullName}</span>
@@ -825,7 +856,7 @@ const PublishSong = () => {
 															onClick={() =>
 																handleRemoveAlbumSongContributor(
 																	index,
-																	contributor.username,
+																	contributor.id,
 																)
 															}
 															className="text-gray-400 hover:text-red-400 transition-colors"
@@ -901,7 +932,7 @@ const PublishSong = () => {
 																	albumSongSearchResults[index].map(
 																		(artist) => (
 																			<button
-																				key={artist.username}
+																				key={artist.id}
 																				type="button"
 																				onClick={() =>
 																					handleAddAlbumSongContributor(

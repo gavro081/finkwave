@@ -16,7 +16,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 
     @Query(value = """
-        SELECT u.full_name, u.username, u.profile_photo from users u
+        SELECT u.user_id, u.full_name, u.username, u.profile_photo from users u
         WHERE (u.full_name ILIKE '%' || :searchTerm || '%' or u.username ILIKE '%' || :searchTerm || '%')
             and u.listener = true and u.artist = false
         LIMIT :limit
@@ -24,7 +24,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<UserSearchResultDto> searchListeners(@Param("searchTerm") String searchTerm, @Param("limit") Integer limit);
 
     @Query(value = """
-        SELECT u.full_name, u.username, u.profile_photo from users u
+        SELECT u.user_id, u.full_name, u.username, u.profile_photo from users u
         WHERE (u.full_name ILIKE '%' || :searchTerm || '%' or u.username ILIKE '%' || :searchTerm || '%') and u.artist = true
         LIMIT :limit
         """, nativeQuery = true)

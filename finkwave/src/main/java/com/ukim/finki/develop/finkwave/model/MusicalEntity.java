@@ -2,29 +2,25 @@ package com.ukim.finki.develop.finkwave.model;
 
 import java.time.LocalDate;
 
+import jakarta.persistence.*;
+import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.Setter;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "musical_entities", schema = "project")
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class MusicalEntity {
     @Id
     @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "title", nullable = false, length = Integer.MAX_VALUE)

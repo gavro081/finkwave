@@ -14,6 +14,7 @@ import org.hibernate.annotations.OnDeleteAction;
 public class Song {
     @Id
     @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @MapsId

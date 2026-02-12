@@ -133,7 +133,8 @@ public class AuthService {
         return userRepository.findByUsername(username).map(User::getId);
     }
 
-    private User createNonAdminUser(AuthRequestDto authRequestDto) throws IOException {
+    @Transactional
+    public User createNonAdminUser(AuthRequestDto authRequestDto) throws IOException {
         User.UserBuilder userBuilder = User.builder()
                 .username(authRequestDto.username())
                 .fullName(authRequestDto.fullname())

@@ -1,3 +1,4 @@
+import { baseURL } from "../api/axiosInstance";
 import { usePlayer } from "../context/playerContext";
 
 const MiniPlayer = () => {
@@ -19,7 +20,11 @@ const MiniPlayer = () => {
 				<div className="flex items-center justify-between px-6 py-4 bg-[#1a1a2e]/80 backdrop-blur-sm">
 					<div className="flex items-center gap-4">
 						<img
-							src={currentSong.cover || "/favicon.png"}
+							src={
+								currentSong.cover
+									? `${baseURL}/${currentSong.cover}`
+									: "/favicon.png"
+							}
 							alt={currentSong.title}
 							className="w-12 h-12 rounded-lg object-cover shadow-lg"
 							onError={(e) => {
@@ -109,7 +114,11 @@ const MiniPlayer = () => {
 					{/* Song info */}
 					<div className="flex items-center gap-3 min-w-0 flex-1">
 						<img
-							src={currentSong.cover || "/favicon.png"}
+							src={
+								currentSong.cover
+									? `${baseURL}/${currentSong.cover}`
+									: "/favicon.png"
+							}
 							alt={currentSong.title}
 							className="w-10 h-10 rounded object-cover shrink-0"
 							onError={(e) => {

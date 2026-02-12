@@ -2,7 +2,7 @@ import { Disc3, Music } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import axiosInstance from "../../api/axiosInstance";
+import axiosInstance, { baseURL } from "../../api/axiosInstance";
 import type { ArtistContribution } from "../../utils/types";
 import SongItem from "../SongItem";
 
@@ -64,7 +64,9 @@ const ArtistView = ({ contributions }: ArtistViewProps) => {
 							>
 								<div className="relative aspect-square rounded-lg mb-3 overflow-hidden shadow-md group-hover:shadow-xl transition-all duration-300 bg-[#181818]">
 									<img
-										src={album.cover || "/favicon.png"}
+										src={
+											album.cover ? `${baseURL}/${album.cover}` : "/favicon.png"
+										}
 										alt={album.title}
 										className="w-full h-full object-cover"
 										onError={(e) => {

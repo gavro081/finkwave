@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { baseURL } from "../api/axiosInstance";
 import { usePlayer } from "../context/playerContext";
 import { toEmbedUrl } from "../utils/utils";
 
@@ -93,7 +94,7 @@ const SongItem = ({
 
 			{/* Cover */}
 			<img
-				src={song.cover || "/favicon.png"}
+				src={song.cover ? `${baseURL}/${song.cover}` : "/favicon.png"}
 				alt={song.title}
 				className="w-12 h-12 rounded object-cover shrink-0"
 				onError={(e) => {

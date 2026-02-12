@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axiosInstance from "../api/axiosInstance";
+import axiosInstance, { baseURL } from "../api/axiosInstance";
 import AlbumResult from "../components/search/AlbumResult";
 import SongResult from "../components/search/SongResult";
 import UserResult from "../components/search/UserResult";
@@ -336,7 +336,11 @@ const LandingPage = () => {
 											>
 												<div className="relative w-full pt-[100%] overflow-hidden bg-[#181818]">
 													<img
-														src={song.cover || "/favicon.png"}
+														src={
+															song.cover
+																? `${baseURL}/${song.cover}`
+																: "/favicon.png"
+														}
 														alt={song.title}
 														className="absolute top-0 left-0 w-full h-full object-cover"
 														onError={(e) => {

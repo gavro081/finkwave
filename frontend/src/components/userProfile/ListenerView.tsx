@@ -2,7 +2,7 @@ import { Album, Bookmark, Heart, ListMusic, Music } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import axiosInstance from "../../api/axiosInstance";
+import axiosInstance, { baseURL } from "../../api/axiosInstance";
 import type { MusicalEntity, Playlist } from "../../utils/types";
 import SongItem from "../SongItem";
 
@@ -93,7 +93,11 @@ const ListenerView = ({
 							>
 								<div className="relative aspect-square rounded-lg overflow-hidden bg-[#181818] mb-3 shadow-md group-hover:shadow-xl transition-all">
 									<img
-										src={playlist.cover || "/favicon.png"}
+										src={
+											playlist.cover
+												? `${baseURL}/${playlist.cover}`
+												: "/favicon.png"
+										}
 										alt={playlist.name}
 										className="w-full h-full object-cover"
 										onError={(e) => {
@@ -146,7 +150,11 @@ const ListenerView = ({
 							>
 								<div className="relative aspect-square rounded-lg overflow-hidden bg-[#181818] mb-3 shadow-md group-hover:shadow-xl transition-all">
 									<img
-										src={playlist.cover || "/favicon.png"}
+										src={
+											playlist.cover
+												? `${baseURL}/${playlist.cover}`
+												: "/favicon.png"
+										}
 										alt={playlist.name}
 										className="w-full h-full object-cover"
 										onError={(e) => {
@@ -193,7 +201,9 @@ const ListenerView = ({
 								song={{
 									id: song.id,
 									title: song.title,
-									cover: song.cover,
+									cover: song.cover
+										? `${baseURL}/${song.cover}`
+										: "/favicon.png",
 									genre: song.genre,
 									link: (song as any).link,
 									releasedBy: song.releasedBy,
@@ -226,7 +236,9 @@ const ListenerView = ({
 							>
 								<div className="relative aspect-square rounded-lg overflow-hidden bg-[#181818] mb-3 shadow-md group-hover:shadow-xl transition-all">
 									<img
-										src={album.cover || "/favicon.png"}
+										src={
+											album.cover ? `${baseURL}/${album.cover}` : "/favicon.png"
+										}
 										alt={album.title}
 										className="w-full h-full object-cover"
 										onError={(e) => {

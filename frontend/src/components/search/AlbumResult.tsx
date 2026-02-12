@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { baseURL } from "../../api/axiosInstance";
 import type { Album } from "../../utils/types";
 
 interface AlbumResultProps {
@@ -14,7 +15,7 @@ const AlbumResult = ({ album }: AlbumResultProps) => {
 			className="flex items-center gap-4 p-3 rounded-lg hover:bg-white/5 cursor-pointer transition-colors group"
 		>
 			<img
-				src={album.cover || "/favicon.png"}
+				src={album.cover ? `${baseURL}/${album.cover}` : "/favicon.png"}
 				alt={album.title}
 				className="w-12 h-12 rounded object-cover"
 				onError={(e) => {
@@ -24,7 +25,7 @@ const AlbumResult = ({ album }: AlbumResultProps) => {
 			<div className="flex-1 min-w-0">
 				<p className="text-white font-medium truncate">{album.title}</p>
 				<p className="text-sm text-gray-400 truncate">
-					Album • {album.releasedBy} • {album.songs?.length ?? 0} songs
+					Album • {album.releasedBy}
 				</p>
 			</div>
 			<span className="text-xs text-gray-500 uppercase tracking-wider">

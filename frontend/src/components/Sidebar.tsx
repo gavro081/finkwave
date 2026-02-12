@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axiosInstance from "../api/axiosInstance";
+import axiosInstance, { baseURL } from "../api/axiosInstance";
 import { useAuth } from "../context/authContext";
 import { usePlayer } from "../context/playerContext";
 import type { BasicPlaylist, BasicSong, SidebarProps } from "../utils/types";
@@ -81,7 +81,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
 								className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-colors group relative"
 							>
 								<img
-									src={song.cover || "/favicon.png"}
+									src={song.cover ? `${baseURL}/${song.cover}` : "/favicon.png"}
 									alt={song.title}
 									className="w-10 h-10 rounded object-cover"
 									onError={(e) => {

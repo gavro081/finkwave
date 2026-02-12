@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import axiosInstance from "../api/axiosInstance";
+import axiosInstance, { baseURL } from "../api/axiosInstance";
 import SongItem from "../components/SongItem";
 import { handleError } from "../utils/error";
 import type { Album, Playlist, Song } from "../utils/types";
@@ -160,7 +160,11 @@ const MusicalCollection = () => {
 					<div className="w-full md:w-72 shrink-0">
 						<div className="relative w-full pt-[100%] rounded-xl overflow-hidden shadow-2xl bg-[#181818]">
 							<img
-								src={collection.cover || "/favicon.png"}
+								src={
+									collection.cover
+										? `${baseURL}/${collection.cover}`
+										: "/favicon.png"
+								}
 								alt={collection.title}
 								className="absolute inset-0 w-full h-full object-cover"
 								onError={(e) => {

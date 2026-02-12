@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import axiosInstance from "../api/axiosInstance";
+import axiosInstance, { baseURL } from "../api/axiosInstance";
 import { useAuth } from "../context/authContext";
 import { usePlayer } from "../context/playerContext";
 import type { SongDetail as SongDetailType } from "../utils/types";
@@ -215,7 +215,7 @@ const SongDetail = () => {
 					<div className="w-full md:w-72 shrink-0">
 						<div className="relative w-full pt-[100%] rounded-xl overflow-hidden shadow-2xl bg-[#181818]">
 							<img
-								src={song.cover || "/favicon.png"}
+								src={song.cover ? `${baseURL}/${song.cover}` : "/favicon.png"}
 								alt={song.title}
 								className="absolute inset-0 w-full h-full object-cover"
 								onError={(e) => {

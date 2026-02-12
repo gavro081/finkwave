@@ -161,7 +161,11 @@ public interface SongRepository extends JpaRepository<Song, Long> {
           me.id,
           me.title,
           me.genre,
-          (CASE WHEN EXISTS (SELECT 1 from Song s where me.id = s.id and s.album is null) THEN 'SONG' ELSE 'ALBUM' END),
+          (CASE
+            WHEN EXISTS (SELECT 1 FROM Song s WHERE me.id = s.id AND s.album IS NULL) THEN 'SONG'
+            WHEN EXISTS (SELECT 1 FROM Album a WHERE a.id = me.id) THEN 'ALBUM'
+            ELSE NULL
+           END),
           me.cover,
           me.releaseDate
         )

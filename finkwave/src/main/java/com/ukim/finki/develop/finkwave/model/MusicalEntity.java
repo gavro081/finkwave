@@ -20,7 +20,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class MusicalEntity {
     @Id
     @Column(name = "id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "musical_entity_id_gen")
+    @SequenceGenerator(name = "musical_entity_id_gen", sequenceName = "musical_entities_id_seq", allocationSize = 1)
     private Long id;
 
     @Column(name = "title", nullable = false, length = Integer.MAX_VALUE)

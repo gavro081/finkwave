@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axiosInstance from "../api/axiosInstance";
+import axiosInstance, { baseURL } from "../api/axiosInstance";
 import { useAuth } from "../context/authContext";
 import type { CatalogItem } from "../utils/types";
 
@@ -154,7 +154,9 @@ const MySongs = () => {
 											{index + 1}
 										</span>
 										<img
-											src={song.cover || "/favicon.png"}
+											src={
+												song.cover ? `${baseURL}/${song.cover}` : "/favicon.png"
+											}
 											alt={song.title}
 											className="w-12 h-12 rounded object-cover"
 											onError={(e) => {
@@ -214,7 +216,11 @@ const MySongs = () => {
 									>
 										<div className="relative w-full pt-[100%] rounded-lg overflow-hidden mb-4 bg-[#282828]">
 											<img
-												src={album.cover || "/favicon.png"}
+												src={
+													album.cover
+														? `${baseURL}/${album.cover}`
+														: "/favicon.png"
+												}
 												alt={album.title}
 												className="absolute inset-0 w-full h-full object-cover"
 												onError={(e) => {

@@ -20,6 +20,9 @@ const MusicalCollection = () => {
   const [collection, setCollection] = useState<CollectionView | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [openDropdownSongId, setOpenDropdownSongId] = useState<number | null>(
+    null,
+  );
 
   const normalizeCollection = (
     data: Album | Playlist,
@@ -235,6 +238,8 @@ const MusicalCollection = () => {
                   song={song}
                   index={index + 1}
                   onLikeToggle={() => toggleLike(song.id)}
+                  isDropdownOpen={openDropdownSongId === song.id}
+                  onDropdownToggle={setOpenDropdownSongId}
                 />
               ))}
             </div>

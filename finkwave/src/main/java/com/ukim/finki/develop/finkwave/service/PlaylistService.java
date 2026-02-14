@@ -1,28 +1,22 @@
 package com.ukim.finki.develop.finkwave.service;
 
+import com.ukim.finki.develop.finkwave.exceptions.MusicalEntityNotFoundException;
 import com.ukim.finki.develop.finkwave.exceptions.PlaylistNotFoundException;
 import com.ukim.finki.develop.finkwave.exceptions.UserNotFoundException;
-import com.ukim.finki.develop.finkwave.model.Listener;
-import com.ukim.finki.develop.finkwave.model.Playlist;
-import com.ukim.finki.develop.finkwave.model.SavedPlaylist;
-import com.ukim.finki.develop.finkwave.model.SavedPlaylistId;
+import com.ukim.finki.develop.finkwave.model.*;
 import com.ukim.finki.develop.finkwave.model.dto.BasicPlaylistDto;
 import com.ukim.finki.develop.finkwave.model.dto.PlaylistDto;
 import com.ukim.finki.develop.finkwave.model.dto.SongWithLinkDto;
+import com.ukim.finki.develop.finkwave.model.dto.statusDto.AddSongToPlaylistStatusDto;
 import com.ukim.finki.develop.finkwave.model.dto.statusDto.SavePlaylistStatusDto;
-import com.ukim.finki.develop.finkwave.repository.ListenerRepository;
-import com.ukim.finki.develop.finkwave.repository.PlaylistRepository;
-import com.ukim.finki.develop.finkwave.repository.SavedPlaylistRepository;
-import com.ukim.finki.develop.finkwave.repository.SongRepository;
+import com.ukim.finki.develop.finkwave.repository.*;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,6 +28,7 @@ public class PlaylistService {
     private final AuthService authService;
     private final SavedPlaylistRepository savedPlaylistRepository;
     private final ListenerRepository listenerRepository;
+    private final PlaylistSongRepository playlistSongRepository;
 
     public List<Playlist>findByCreatorId(Long id){
         return playlistRepository.findByCreatorId(id);
@@ -94,6 +89,38 @@ public class PlaylistService {
             isSaved=true;
         }
         return new SavePlaylistStatusDto(playlistId,isSaved);
+
+    }
+
+    public List<Long>getPlaylistIdsThatContainSong(Long songId){
+
+        Long currentUserId=authService.getCurrentUserIDOptional().orElse(null);
+        return playlistSongRepository.getPlaylistsIdsWithSong(songId,currentUserId);
+
+    }
+
+
+    public AddSongToPlaylistStatusDto addSongToPlaylist(Long playlistId, Long songId){
+        Playlist playlist=playlistRepository.findById(playlistId).orElseThrow(()->new PlaylistNotFoundException(playlistId));
+        Long currentUserId=authService.getCurrentUserID();
+        if (!Objects.equals(playlist.getCreatedBy().getId(), currentUserId)){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Cannot add songs to playlists NOT created by the current user!");
+        }
+        PlaylistSongId playlistSongId=new PlaylistSongId(songId,playlistId);
+
+        boolean isSongAddedToPlaylist;
+
+        if (playlistSongRepository.existsById(playlistSongId)){
+            playlistSongRepository.deleteById(playlistSongId);
+            isSongAddedToPlaylist=false;
+        }else {
+            Song song=songRepository.findById(songId).orElseThrow(
+                    ()->new MusicalEntityNotFoundException(String.format("Cannot find song with id %d.", songId)));
+
+            playlistSongRepository.save(new PlaylistSong(playlistSongId,song,playlist));
+            isSongAddedToPlaylist=true;
+        }
+        return new AddSongToPlaylistStatusDto(playlistId,isSongAddedToPlaylist);
 
     }
 

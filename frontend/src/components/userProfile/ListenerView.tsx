@@ -24,6 +24,9 @@ const ListenerView = ({
   const [items, setItems] = useState(likedEntities);
   const [createdItems, setCreatedItems] = useState(createdPlaylists);
   const [savedItems, setSavedItems] = useState(savedPlaylists);
+  const [openDropdownSongId, setOpenDropdownSongId] = useState<number | null>(
+    null,
+  );
 
   const likedSongs = items.filter((e) => e.type === "SONG");
   const likedAlbums = items.filter((e) => e.type === "ALBUM");
@@ -257,6 +260,8 @@ const ListenerView = ({
                 }}
                 index={index + 1}
                 onLikeToggle={() => handleLike(song.id, song.title)}
+                isDropdownOpen={openDropdownSongId === song.id}
+                onDropdownToggle={setOpenDropdownSongId}
               />
             ))}
           </div>

@@ -2,7 +2,9 @@ package com.ukim.finki.develop.finkwave.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.Hibernate;
 
@@ -12,6 +14,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @Embeddable
+@NoArgsConstructor
 public class PlaylistSongId implements Serializable {
     private static final long serialVersionUID = -1096457880126729057L;
     @Column(name = "song_id", nullable = false)
@@ -19,6 +22,11 @@ public class PlaylistSongId implements Serializable {
 
     @Column(name = "playlist_id", nullable = false)
     private Long playlistId;
+
+    public PlaylistSongId(Long songId, Long playlistId) {
+        this.songId = songId;
+        this.playlistId = playlistId;
+    }
 
     @Override
     public boolean equals(Object o) {

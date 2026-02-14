@@ -13,7 +13,6 @@ import type {
   MusicalEntity,
   Playlist,
 } from "../utils/types";
-import { useCreatedPlaylists } from "../context/playlistContext";
 
 interface FollowStatus {
   isFollowing: boolean;
@@ -37,8 +36,7 @@ type UserProfile = Artist | Listener;
 const UserDetail = () => {
   const { username: usernameParam } = useParams();
   const { user: currentUser } = useAuth();
-  const { createdPlaylists: currentUserCreatedPlaylists } =
-    useCreatedPlaylists();
+
   const navigate = useNavigate();
   const [user, setUser] = useState<UserProfile | null>(null);
   const [error, setError] = useState<string | null>(null);

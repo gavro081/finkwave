@@ -16,7 +16,7 @@ interface PlaylistContextType {
   createdPlaylists: BasicPlaylist[] | undefined;
   setCreatedPlaylists: Dispatch<SetStateAction<BasicPlaylist[] | undefined>>;
   isLoading: boolean;
-  refreshPlaylists: () => Promise<void>;
+  refreshPlaylists: (addedSong: boolean) => Promise<void>;
 }
 
 interface PlaylistProviderProps {
@@ -27,7 +27,7 @@ const PlaylistContext = createContext<PlaylistContextType>({
   createdPlaylists: undefined,
   setCreatedPlaylists: () => {},
   isLoading: false,
-  refreshPlaylists: async () => {},
+  refreshPlaylists: async (addedSong: boolean) => {},
 });
 
 const PlaylistProvider = ({ children }: PlaylistProviderProps) => {
@@ -37,8 +37,10 @@ const PlaylistProvider = ({ children }: PlaylistProviderProps) => {
   >(undefined);
   const [isLoading, setIsLoading] = useState(false);
 
-  const fetchCreatedPlaylists = async () => {
-    setIsLoading(true);
+  const fetchCreatedPlaylists = async (addedSong: boolean) => {
+    if (!addedSong) {
+      setIsLoading(true);
+    }
     try {
       const data = await axiosInstance.get<BasicPlaylist[]>("/playlists/user");
       setCreatedPlaylists(data.data);
@@ -51,7 +53,7 @@ const PlaylistProvider = ({ children }: PlaylistProviderProps) => {
 
   useEffect(() => {
     if (user) {
-      fetchCreatedPlaylists();
+      fetchCreatedPlaylists(false);
     } else {
       setCreatedPlaylists(undefined);
     }

@@ -47,7 +47,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
     try {
       await axiosInstance.post("/playlists", { name: playlistName });
       toast.success("Playlist created successfully!");
-      await refreshPlaylists();
+      await refreshPlaylists(false);
     } catch (error) {
       toast.error(getErrorMessage(error));
     }

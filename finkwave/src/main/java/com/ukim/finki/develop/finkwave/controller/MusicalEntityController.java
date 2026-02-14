@@ -1,6 +1,6 @@
 package com.ukim.finki.develop.finkwave.controller;
 
-import com.ukim.finki.develop.finkwave.model.dto.LikeStatusDto;
+import com.ukim.finki.develop.finkwave.model.dto.statusDto.LikeStatusDto;
 import com.ukim.finki.develop.finkwave.model.dto.PublishAlbumRequestDto;
 import com.ukim.finki.develop.finkwave.model.dto.PublishSongRequestDto;
 import com.ukim.finki.develop.finkwave.service.LikeService;

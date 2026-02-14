@@ -2,14 +2,12 @@ package com.ukim.finki.develop.finkwave.controller;
 
 import com.ukim.finki.develop.finkwave.model.dto.BasicPlaylistDto;
 import com.ukim.finki.develop.finkwave.model.dto.PlaylistDto;
+import com.ukim.finki.develop.finkwave.model.dto.statusDto.SavePlaylistStatusDto;
 import com.ukim.finki.develop.finkwave.service.PlaylistService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -27,6 +25,11 @@ public class PlaylistController {
     @GetMapping("/user")
     public HttpEntity<List<BasicPlaylistDto>> getUserBasicPlaylists(){
         return ResponseEntity.ok(playlistService.getBasicPlaylists());
+    }
+
+    @PostMapping("/{id}/save")
+    public HttpEntity<SavePlaylistStatusDto>savePlaylist(@PathVariable Long id) throws Exception {
+        return ResponseEntity.ok(playlistService.savePlaylist(id));
     }
 
 }

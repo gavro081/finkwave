@@ -6,7 +6,7 @@ import com.ukim.finki.develop.finkwave.model.Like;
 import com.ukim.finki.develop.finkwave.model.LikeId;
 import com.ukim.finki.develop.finkwave.model.Listener;
 import com.ukim.finki.develop.finkwave.model.MusicalEntity;
-import com.ukim.finki.develop.finkwave.model.dto.LikeStatusDto;
+import com.ukim.finki.develop.finkwave.model.dto.statusDto.LikeStatusDto;
 import com.ukim.finki.develop.finkwave.model.dto.MusicalEntityDto;
 import com.ukim.finki.develop.finkwave.repository.*;
 import lombok.AllArgsConstructor;

@@ -6,7 +6,7 @@ import com.ukim.finki.develop.finkwave.model.Artist;
 import com.ukim.finki.develop.finkwave.model.Follow;
 import com.ukim.finki.develop.finkwave.model.FollowId;
 import com.ukim.finki.develop.finkwave.model.NonAdminUser;
-import com.ukim.finki.develop.finkwave.model.dto.FollowStatusDto;
+import com.ukim.finki.develop.finkwave.model.dto.statusDto.FollowStatusDto;
 import com.ukim.finki.develop.finkwave.model.dto.NonAdminUserDto;
 import com.ukim.finki.develop.finkwave.repository.ArtistRepository;
 import com.ukim.finki.develop.finkwave.repository.FollowRepository;
@@ -15,7 +15,6 @@ import com.ukim.finki.develop.finkwave.service.mappers.NonAdminUserMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;

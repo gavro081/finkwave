@@ -6,6 +6,7 @@ import com.ukim.finki.develop.finkwave.model.Listener;
 
 import com.ukim.finki.develop.finkwave.model.dto.*;
 import com.ukim.finki.develop.finkwave.model.NonAdminUser;
+import com.ukim.finki.develop.finkwave.model.dto.statusDto.FollowStatusDto;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

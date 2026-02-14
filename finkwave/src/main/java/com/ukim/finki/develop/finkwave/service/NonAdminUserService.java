@@ -3,6 +3,7 @@ package com.ukim.finki.develop.finkwave.service;
 import com.ukim.finki.develop.finkwave.exceptions.UserNotFoundException;
 import com.ukim.finki.develop.finkwave.model.*;
 import com.ukim.finki.develop.finkwave.model.dto.*;
+import com.ukim.finki.develop.finkwave.model.dto.statusDto.FollowStatusDto;
 import com.ukim.finki.develop.finkwave.repository.*;
 import com.ukim.finki.develop.finkwave.service.mappers.NonAdminUserMapper;
 import lombok.AllArgsConstructor;
@@ -122,14 +123,15 @@ public class NonAdminUserService {
     }
 
 
-    private PlaylistDto mapToPlaylistDto(Playlist p, Set<Long> savedBy) {
+    private PlaylistDto mapToPlaylistDto(Playlist p, Set<Long> visitorSavedPlaylistIds) {
         return new PlaylistDto(
                 p.getId(),
                 p.getName(),
                 p.getCover(),
                 p.getCreatedBy().getNonAdminUser().getUser().getFullName(),
+                p.getCreatedBy().getNonAdminUser().getUser().getUsername(),
                 null,
-                savedBy.contains(p.getId())
+                visitorSavedPlaylistIds.contains(p.getId())
         );
     }
     private String determineType(Long id) {

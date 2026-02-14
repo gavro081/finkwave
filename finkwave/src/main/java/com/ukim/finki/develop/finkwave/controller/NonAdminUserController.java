@@ -1,6 +1,6 @@
 package com.ukim.finki.develop.finkwave.controller;
 
-import com.ukim.finki.develop.finkwave.model.dto.FollowStatusDto;
+import com.ukim.finki.develop.finkwave.model.dto.statusDto.FollowStatusDto;
 import com.ukim.finki.develop.finkwave.model.dto.NonAdminUserDto;
 import com.ukim.finki.develop.finkwave.service.FollowService;
 import com.ukim.finki.develop.finkwave.service.NonAdminUserService;

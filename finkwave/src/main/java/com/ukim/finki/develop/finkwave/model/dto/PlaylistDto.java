@@ -14,6 +14,7 @@ public class PlaylistDto {
     private String name;
     private String cover;
     private String creatorName;
+    private String creatorUsername;
     private List<SongWithLinkDto>songsInPlaylist;
     private Boolean isSavedByCurrentUser;
 

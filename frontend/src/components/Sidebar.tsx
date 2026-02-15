@@ -272,6 +272,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSuccess={() => refreshPlaylists(false)}
+        songId={null}
       />
     </>
   );

@@ -6,6 +6,7 @@ import com.ukim.finki.develop.finkwave.model.dto.statusDto.AddSongToPlaylistStat
 import com.ukim.finki.develop.finkwave.model.dto.statusDto.SavePlaylistStatusDto;
 import com.ukim.finki.develop.finkwave.service.PlaylistService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,9 +40,13 @@ public class PlaylistController {
         return ResponseEntity.ok(playlistService.addSongToPlaylist(playlistId,songId));
     }
 
-    @PostMapping()
-    public HttpEntity<List<BasicPlaylistDto>>createPlaylist(@RequestParam String playlistName){
-        playlistService.createPlaylist(playlistName);
+    @PostMapping
+    public ResponseEntity<List<BasicPlaylistDto>> createPlaylist(
+            @RequestParam String playlistName,
+            @RequestParam(required = false) Long songId
+    ) {
+        playlistService.createPlaylist(playlistName,songId);
+
         return ResponseEntity.ok(playlistService.getBasicPlaylists());
     }
 
@@ -50,6 +55,13 @@ public class PlaylistController {
         return ResponseEntity.ok(playlistService.savePlaylist(id));
     }
 
+
+
+    @DeleteMapping("/{id}")
+    public HttpEntity<Void>deletePlaylist(@PathVariable Long id){
+        playlistService.deletePlaylist(id);
+        return ResponseEntity.noContent().build();
+    }
 
 
 }

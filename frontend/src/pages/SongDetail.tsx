@@ -118,12 +118,6 @@ const SongDetail = () => {
     }
   };
 
-  const handleCreateNewPlaylist = () => {
-    console.log(`Creating new playlist for song ${song?.id}`);
-    // TODO: actual playlist creation
-    setShowPlaylistDropdown(false);
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-linear-to-br from-[#1e1e2e] to-[#0f0f1e] flex items-center justify-center">
@@ -342,7 +336,6 @@ const SongDetail = () => {
                       songId={song.id}
                       isOpen={showPlaylistDropdown}
                       onClose={() => setShowPlaylistDropdown(false)}
-                      onCreateNewPlaylist={handleCreateNewPlaylist}
                       direction="below"
                     />
                   </div>

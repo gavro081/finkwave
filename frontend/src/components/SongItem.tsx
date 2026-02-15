@@ -67,12 +67,6 @@ const SongItem = ({
 
   const isPlaying = currentSong?.id === song.id;
 
-  const handleCreateNewPlaylist = () => {
-    console.log(`Creating new playlist for song ${song.id}`);
-    // TODO: Implement actual playlist creation
-    setPlaylistOpen(false);
-  };
-
   const subtitleParts: string[] = [];
   if (label) subtitleParts.push(label);
   if (song.releasedBy) subtitleParts.push(song.releasedBy);
@@ -239,7 +233,6 @@ const SongItem = ({
           position={dropdownPosition}
           usePortal={true}
           direction={dropdownDirection}
-          onCreateNewPlaylist={handleCreateNewPlaylist}
         />
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { Album, Bookmark, Heart, ListMusic, Music } from "lucide-react";
+import { Album, Bookmark, Heart, ListMusic, Music, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -6,6 +6,7 @@ import axiosInstance, { baseURL } from "../../api/axiosInstance";
 import type { MusicalEntity, Playlist } from "../../utils/types";
 import SongItem from "../SongItem";
 import { useAuth } from "../../context/authContext";
+import { useCreatedPlaylists } from "../../context/playlistContext";
 
 interface ListenerViewProps {
   likedEntities: MusicalEntity[] | [];
@@ -19,6 +20,7 @@ const ListenerView = ({
   savedPlaylists,
 }: ListenerViewProps) => {
   const navigate = useNavigate();
+  const { refreshPlaylists } = useCreatedPlaylists();
   const { username: usernameParam } = useParams();
   const { user: currentUser } = useAuth();
   const [items, setItems] = useState(likedEntities);
@@ -88,6 +90,24 @@ const ListenerView = ({
     }
   };
 
+  const handleDeletePlaylist = async (
+    e: React.MouseEvent,
+    playlistId: number,
+    playlistName: string,
+  ) => {
+    e.stopPropagation();
+
+    try {
+      await axiosInstance.delete(`/playlists/${playlistId}`);
+      refreshPlaylists(false);
+
+      setCreatedItems((prev) => prev.filter((p) => p.id !== playlistId));
+      toast.success(`Deleted "${playlistName}"`);
+    } catch (err: any) {
+      toast.error(err.response?.data?.error || "Failed to delete playlist");
+    }
+  };
+
   const handleLike = async (id: number, title: string) => {
     try {
       const response = await axiosInstance.post(`/musical-entity/${id}/like`);
@@ -141,7 +161,17 @@ const ListenerView = ({
                       (e.target as HTMLImageElement).src = "/favicon.png";
                     }}
                   />
-                  {!isOwnProfile &&
+                  {isOwnProfile ? (
+                    <button
+                      onClick={(e) =>
+                        handleDeletePlaylist(e, playlist.id, playlist.name)
+                      }
+                      className="absolute top-2 right-2 p-2 bg-black/70 hover:bg-red-600/90 rounded-full shadow-md transition-all duration-200 opacity-0 group-hover:opacity-100 cursor-pointer"
+                      title="Delete playlist"
+                    >
+                      <Trash2 className="w-5 h-5 text-gray-400 hover:text-white transition-colors" />
+                    </button>
+                  ) : (
                     currentUser?.username != playlist.creatorUsername && (
                       <button
                         onClick={(e) =>
@@ -160,7 +190,8 @@ const ListenerView = ({
                           }`}
                         />
                       </button>
-                    )}
+                    )
+                  )}
                 </div>
                 <p className="text-sm font-semibold text-white truncate group-hover:text-[#1db954] transition-colors">
                   {playlist.name}

@@ -7,6 +7,7 @@ const CreatePlaylistModal = ({
   isOpen,
   onClose,
   onSuccess,
+  songId,
 }: CreatePlaylistModalProps) => {
   const [playlistName, setPlaylistName] = useState("");
   const [isClosing, setIsClosing] = useState(false);
@@ -38,11 +39,15 @@ const CreatePlaylistModal = ({
 
     setIsSubmitting(true);
     try {
-      await axiosInstance.post(
-        `/playlists?playlistName=${encodeURIComponent(playlistName.trim())}`,
-      );
+      await axiosInstance.post("/playlists", null, {
+        params: {
+          playlistName: playlistName.trim(),
+          ...(songId != null && { songId }),
+        },
+      });
+
       toast.success("Playlist created successfully!");
-      onSuccess();
+      await onSuccess();
       handleClose();
     } catch (err: any) {
       setError(err?.response?.data?.error || "Failed to create playlist");

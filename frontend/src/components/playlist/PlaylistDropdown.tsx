@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import axiosInstance from "../../api/axiosInstance";
 import { useCreatedPlaylists } from "../../context/playlistContext";
+import CreatePlaylistModal from "./CreatePlaylistModal";
 
 interface PlaylistDropdownProps {
   songId: number;
@@ -12,8 +13,6 @@ interface PlaylistDropdownProps {
   usePortal?: boolean;
 
   direction?: "above" | "below";
-
-  onCreateNewPlaylist?: () => void;
 }
 
 const PlaylistDropdown = ({
@@ -23,16 +22,14 @@ const PlaylistDropdown = ({
   position,
   usePortal = false,
   direction = "above",
-  onCreateNewPlaylist,
 }: PlaylistDropdownProps) => {
   const { createdPlaylists, refreshPlaylists } = useCreatedPlaylists();
   const [containingPlaylistIds, setContainingPlaylistIds] = useState<number[]>(
     [],
   );
   const [loading, setLoading] = useState(false);
-  const [processingPlaylistId, setProcessingPlaylistId] = useState<
-    number | null
-  >(null);
+  const [processingIds, setProcessingIds] = useState<Set<number>>(new Set());
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -74,9 +71,9 @@ const PlaylistDropdown = ({
   }, [isOpen, onClose]);
 
   const handleTogglePlaylist = async (playlistId: number, songId: number) => {
-    if (processingPlaylistId !== null) return;
+    if (processingIds.has(playlistId)) return;
 
-    setProcessingPlaylistId(playlistId);
+    setProcessingIds((prev) => new Set(prev).add(playlistId));
 
     try {
       const response = await axiosInstance.post<{
@@ -103,27 +100,33 @@ const PlaylistDropdown = ({
     } finally {
       refreshPlaylists(true);
       setTimeout(() => {
-        setProcessingPlaylistId(null);
+        setProcessingIds((prev) => {
+          const next = new Set(prev);
+          next.delete(playlistId);
+          return next;
+        });
       }, 500);
     }
   };
 
   const handleCreateNew = () => {
-    onCreateNewPlaylist?.();
     onClose();
+    setIsModalOpen(true);
   };
 
-  if (!isOpen) return null;
+  const handleModalSuccess = async () => {
+    await refreshPlaylists(false);
+  };
 
   const inlinePositionClass =
     direction === "below"
       ? "absolute left-0 top-full mt-2"
       : "absolute right-0 bottom-full mb-2";
 
-  const dropdownContent = (
+  const dropdownContent = !isOpen ? null : (
     <div
       ref={dropdownRef}
-      className={`${usePortal ? "fixed" : inlinePositionClass} w-56 bg-[#282828] rounded-lg shadow-2xl py-2 z-[9999] border border-white/10 max-h-60 overflow-y-auto custom-scrollbar`}
+      className={`${usePortal ? "fixed" : inlinePositionClass} w-56 bg-[#282828] rounded-lg shadow-2xl py-2 z-9999 border border-white/10 max-h-60 overflow-y-auto custom-scrollbar`}
       style={
         usePortal && position
           ? {
@@ -146,23 +149,23 @@ const PlaylistDropdown = ({
         </div>
       ) : createdPlaylists && createdPlaylists.length > 0 ? (
         createdPlaylists.map((playlist) => {
-          const isProcessing = processingPlaylistId === playlist.id;
+          const isProcessing = processingIds.has(playlist.id);
           const isChecked = containingPlaylistIds.includes(playlist.id);
 
           return (
             <label
               key={playlist.id}
-              className={`flex items-center px-4 py-2 hover:bg-white/10 transition-colors group/item ${
+              className={`flex items-center gap-1.5 px-4 py-2 hover:bg-white/10 transition-colors group/item ${
                 isProcessing ? "pointer-events-none" : "cursor-pointer"
               }`}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="relative flex items-center justify-center">
+              <div className="relative flex items-center justify-center  shrink-0">
                 <input
                   type="checkbox"
                   className="peer sr-only"
                   checked={isChecked}
-                  disabled={processingPlaylistId !== null}
+                  disabled={isProcessing}
                   onChange={() => handleTogglePlaylist(playlist.id, songId)}
                 />
                 <div
@@ -171,7 +174,7 @@ const PlaylistDropdown = ({
                       ? "border-[#1db954] animate-pulse"
                       : isChecked
                         ? "bg-[#1db954] border-[#1db954]"
-                        : "border-gray-500"
+                        : "border-gray-500 text=wjot"
                   }`}
                 >
                   {isProcessing && (
@@ -181,11 +184,11 @@ const PlaylistDropdown = ({
                   )}
                 </div>
                 <svg
-                  className={`absolute w-3 h-3  transition-opacity ${
+                  className={`absolute w-3 h-3 transition-opacity ${
                     isChecked && !isProcessing ? "opacity-100" : "opacity-0"
                   }`}
                   fill="none"
-                  stroke="currentColor"
+                  stroke="white"
                   strokeWidth="3"
                   viewBox="0 0 24 24"
                 >
@@ -197,7 +200,7 @@ const PlaylistDropdown = ({
                 </svg>
               </div>
               <span
-                className={`ml-3 text-sm truncate transition-all ${
+                className={`text-sm truncate transition-all ${
                   isProcessing
                     ? "text-[#1db954] animate-pulse"
                     : "text-gray-200 group-hover/item:text-white"
@@ -205,11 +208,6 @@ const PlaylistDropdown = ({
               >
                 {playlist.name}
               </span>
-              {isProcessing && (
-                <span className="ml-auto text-xs text-[#1db954] animate-pulse">
-                  •••
-                </span>
-              )}
             </label>
           );
         })
@@ -244,9 +242,26 @@ const PlaylistDropdown = ({
     </div>
   );
 
-  return usePortal
-    ? createPortal(dropdownContent, document.body)
-    : dropdownContent;
+  const dropdown = dropdownContent
+    ? usePortal
+      ? createPortal(dropdownContent, document.body)
+      : dropdownContent
+    : null;
+
+  return (
+    <>
+      {dropdown}
+      {createPortal(
+        <CreatePlaylistModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onSuccess={handleModalSuccess}
+          songId={songId}
+        />,
+        document.body,
+      )}
+    </>
+  );
 };
 
 export default PlaylistDropdown;

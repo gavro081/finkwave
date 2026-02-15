@@ -77,12 +77,6 @@ const LandingPage = () => {
     }
   };
 
-  const handleCreateNewPlaylist = (songId: number) => {
-    console.log(`Creating new playlist for song ${songId}`);
-    // TODO: Implement actual playlist creation
-    setOpenPlaylistDropdown(null);
-  };
-
   const performSearch = async (query: string, category: SearchCategory) => {
     if (!query.trim()) return;
 
@@ -272,7 +266,7 @@ const LandingPage = () => {
                     <button
                       key={cat.value}
                       onClick={() => handleCategorySwitch(cat.value)}
-                      className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                      className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors cursor-pointer ${
                         searchCategory === cat.value
                           ? "bg-[#1db954] text-black"
                           : "bg-white/10 text-white hover:bg-white/20"
@@ -487,9 +481,6 @@ const LandingPage = () => {
                                 songId={song.id}
                                 isOpen={openPlaylistDropdown === song.id}
                                 onClose={() => setOpenPlaylistDropdown(null)}
-                                onCreateNewPlaylist={() =>
-                                  handleCreateNewPlaylist(song.id)
-                                }
                                 direction="above"
                               />
                             </div>

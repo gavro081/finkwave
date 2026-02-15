@@ -73,7 +73,8 @@ export interface SidebarProps {
 export interface CreatePlaylistModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess: () => void | Promise<void>;
+  songId?: number | null;
 }
 
 export interface SongContribution {

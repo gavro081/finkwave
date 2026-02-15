@@ -39,6 +39,13 @@ public class GlobalExceptionHandler {
                 .body(Map.of("error", ex.getMessage()));
     }
 
+    @ExceptionHandler(NotAuthorizedException.class)
+    public ResponseEntity<Map<String, String>> handleNotAuthorizedAction(NotAuthorizedException ex) {
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("error", ex.getMessage()));
+    }
+
     @ExceptionHandler(FollowException.class)
     public ResponseEntity<Map<String, String>> handleSelfFollow(FollowException ex) {
         return ResponseEntity

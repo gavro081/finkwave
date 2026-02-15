@@ -1,9 +1,6 @@
 package com.ukim.finki.develop.finkwave.service;
 
-import com.ukim.finki.develop.finkwave.exceptions.MusicalEntityNotFoundException;
-import com.ukim.finki.develop.finkwave.exceptions.PlaylistAlreadyExistsException;
-import com.ukim.finki.develop.finkwave.exceptions.PlaylistNotFoundException;
-import com.ukim.finki.develop.finkwave.exceptions.UserNotFoundException;
+import com.ukim.finki.develop.finkwave.exceptions.*;
 import com.ukim.finki.develop.finkwave.model.*;
 import com.ukim.finki.develop.finkwave.model.dto.BasicPlaylistDto;
 import com.ukim.finki.develop.finkwave.model.dto.PlaylistDto;
@@ -102,17 +99,24 @@ public class PlaylistService {
 
     }
 
-    public void createPlaylist(String playlistName){
+
+    public void createPlaylist(String playlistName, Long songId){
         Long currentUserId=authService.getCurrentUserID();
 
         Optional<Playlist>playlistOptional=playlistRepository.getPlaylistByName(playlistName,currentUserId);
         if (playlistOptional.isPresent()){
-            throw new PlaylistAlreadyExistsException("You already have a playlist named "+playlistName);
+            throw new PlaylistAlreadyExistsException("You already have a playlist named '"+playlistName+"'");
         }
         Listener listener=listenerRepository.findById(currentUserId).orElseThrow(
                 UserNotFoundException::new
         );
-        playlistRepository.save(new Playlist(null,playlistName,listener));
+        Playlist playlist=playlistRepository.save(new Playlist(null,playlistName,listener));
+        if (songId!=null){
+
+            addSongToPlaylist(playlist.getId(),songId);
+        }
+
+
 
     }
 
@@ -138,6 +142,20 @@ public class PlaylistService {
             isSongAddedToPlaylist=true;
         }
         return new AddSongToPlaylistStatusDto(playlistId,isSongAddedToPlaylist);
+
+    }
+
+    public void deletePlaylist(Long id){
+        Playlist playlist=playlistRepository.findById(id).orElseThrow(
+                ()->new PlaylistNotFoundException(id)
+        );
+
+        if (!playlist.getCreatedBy().getId().equals(authService.getCurrentUserID())){
+            throw new NotAuthorizedException("CANNOT delete a playlist created by another user!");
+        }
+
+        playlistRepository.deleteById(id);
+
 
     }
 

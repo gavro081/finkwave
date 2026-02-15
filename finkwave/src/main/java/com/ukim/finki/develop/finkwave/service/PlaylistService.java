@@ -1,6 +1,7 @@
 package com.ukim.finki.develop.finkwave.service;
 
 import com.ukim.finki.develop.finkwave.exceptions.MusicalEntityNotFoundException;
+import com.ukim.finki.develop.finkwave.exceptions.PlaylistAlreadyExistsException;
 import com.ukim.finki.develop.finkwave.exceptions.PlaylistNotFoundException;
 import com.ukim.finki.develop.finkwave.exceptions.UserNotFoundException;
 import com.ukim.finki.develop.finkwave.model.*;
@@ -92,10 +93,26 @@ public class PlaylistService {
 
     }
 
+
+
     public List<Long>getPlaylistIdsThatContainSong(Long songId){
 
         Long currentUserId=authService.getCurrentUserIDOptional().orElse(null);
         return playlistSongRepository.getPlaylistsIdsWithSong(songId,currentUserId);
+
+    }
+
+    public void createPlaylist(String playlistName){
+        Long currentUserId=authService.getCurrentUserID();
+
+        Optional<Playlist>playlistOptional=playlistRepository.getPlaylistByName(playlistName,currentUserId);
+        if (playlistOptional.isPresent()){
+            throw new PlaylistAlreadyExistsException("You already have a playlist named "+playlistName);
+        }
+        Listener listener=listenerRepository.findById(currentUserId).orElseThrow(
+                UserNotFoundException::new
+        );
+        playlistRepository.save(new Playlist(null,playlistName,listener));
 
     }
 

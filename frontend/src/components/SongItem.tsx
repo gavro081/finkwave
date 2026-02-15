@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { baseURL } from "../api/axiosInstance";
 import { usePlayer } from "../context/playerContext";
 import { toEmbedUrl } from "../utils/utils";
-import PlaylistDropdown from "./PlaylistDropdown";
+import PlaylistDropdown from "./playlist/PlaylistDropdown";
 
 export interface SongItemData {
   id: number;

@@ -43,16 +43,6 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
     }
   }, [user]);
 
-  const handleCreatePlaylist = async (playlistName: string) => {
-    try {
-      await axiosInstance.post("/playlists", { name: playlistName });
-      toast.success("Playlist created successfully!");
-      await refreshPlaylists(false);
-    } catch (error) {
-      toast.error(getErrorMessage(error));
-    }
-  };
-
   const isLoading = songsLoading || playlistsLoading;
 
   return (
@@ -281,7 +271,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
       <CreatePlaylistModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSubmit={handleCreatePlaylist}
+        onSuccess={() => refreshPlaylists(false)}
       />
     </>
   );

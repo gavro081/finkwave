@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import axiosInstance from "../api/axiosInstance";
-import { useCreatedPlaylists } from "../context/playlistContext";
+import axiosInstance from "../../api/axiosInstance";
+import { useCreatedPlaylists } from "../../context/playlistContext";
 
 interface PlaylistDropdownProps {
   songId: number;

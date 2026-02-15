@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance, { baseURL } from "../api/axiosInstance";
-import PlaylistDropdown from "../components/PlaylistDropdown";
+import PlaylistDropdown from "../components/playlist/PlaylistDropdown";
 import AlbumResult from "../components/search/AlbumResult";
 import SongResult from "../components/search/SongResult";
 import UserResult from "../components/search/UserResult";

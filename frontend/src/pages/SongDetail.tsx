@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import axiosInstance, { baseURL } from "../api/axiosInstance";
-import PlaylistDropdown from "../components/PlaylistDropdown";
+import PlaylistDropdown from "../components/playlist/PlaylistDropdown";
 import { useAuth } from "../context/authContext";
 import { usePlayer } from "../context/playerContext";
 import type { SongDetail as SongDetailType } from "../utils/types";

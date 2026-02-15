@@ -39,6 +39,11 @@ public class PlaylistController {
         return ResponseEntity.ok(playlistService.addSongToPlaylist(playlistId,songId));
     }
 
+    @PostMapping()
+    public HttpEntity<List<BasicPlaylistDto>>createPlaylist(@RequestParam String playlistName){
+        playlistService.createPlaylist(playlistName);
+        return ResponseEntity.ok(playlistService.getBasicPlaylists());
+    }
 
     @PostMapping("/{id}/save")
     public HttpEntity<SavePlaylistStatusDto>savePlaylist(@PathVariable Long id) throws Exception {

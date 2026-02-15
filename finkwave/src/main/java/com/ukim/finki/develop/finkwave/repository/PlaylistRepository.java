@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import com.ukim.finki.develop.finkwave.model.Playlist;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PlaylistRepository extends JpaRepository<Playlist, Long> {
@@ -32,4 +33,13 @@ public interface PlaylistRepository extends JpaRepository<Playlist, Long> {
     WHERE p.createdBy.id = :userId
     """)
     List<BasicPlaylistDto> getPlaylistsByIdIs(@Param("userId") Long userId);
+
+    @Query("""
+                SELECT p
+                FROM Playlist p
+                WHERE p.name=:name AND p.createdBy.id=:currentUserId
+            
+            """)
+    Optional<Playlist>getPlaylistByName(@Param("name") String name,
+                                        @Param("currentUserId") Long currentUserId);
 }

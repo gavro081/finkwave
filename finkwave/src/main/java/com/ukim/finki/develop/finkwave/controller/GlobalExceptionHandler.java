@@ -3,6 +3,7 @@ package com.ukim.finki.develop.finkwave.controller;
 import java.util.Map;
 
 import com.ukim.finki.develop.finkwave.exceptions.*;
+import com.ukim.finki.develop.finkwave.repository.PlaylistRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -56,6 +57,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleMusicalEntityNotFound(MusicalEntityNotFoundException ex) {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
+                .body(Map.of("error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(PlaylistAlreadyExistsException.class)
+    public ResponseEntity<Map<String, String>> handlePlaylistAlreadyExits(PlaylistAlreadyExistsException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
                 .body(Map.of("error", ex.getMessage()));
     }
 

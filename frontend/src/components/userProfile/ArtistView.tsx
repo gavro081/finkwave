@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import axiosInstance, { baseURL } from "../../api/axiosInstance";
 import type { ArtistContribution } from "../../utils/types";
 import SongItem from "../SongItem";
+import { useAuth } from "../../context/authContext";
 
 interface ArtistViewProps {
   contributions: ArtistContribution[];

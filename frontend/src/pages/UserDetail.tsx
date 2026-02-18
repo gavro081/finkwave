@@ -258,7 +258,7 @@ const UserDetail = () => {
             </div>
 
             {/* Follow button - hidden on own profile */}
-            {!isOwnProfile && (
+            {currentUser && !isOwnProfile && (
               <div className="mt-4">
                 <button
                   onClick={handleFollow}

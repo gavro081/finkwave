@@ -121,7 +121,7 @@ public class AuthService {
         String username=authentication.getName();
 
         return userRepository.findByUsername(username).map(User::getId)
-                .orElseThrow(UserNotFoundException::new);
+                .orElseThrow(UnauthenticatedException::new);
     }
 
     public Optional<Long> getCurrentUserIDOptional(){

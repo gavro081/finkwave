@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { baseURL } from "../../api/axiosInstance";
 import type { BaseNonAdminUser } from "../../utils/types";
 import { useEffect } from "react";
+import { useAuth } from "../../context/authContext";
 
 interface ModalProps {
   title: string;
@@ -17,6 +18,7 @@ const UserListModal = ({
   onFollowToggle,
 }: ModalProps) => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => {
@@ -71,17 +73,18 @@ const UserListModal = ({
                     <p className="text-sm text-gray-400">@{u.username}</p>
                   </div>
                 </div>
-
-                <button
-                  onClick={() => onFollowToggle(u.username)}
-                  className={`px-4 py-1.5 text-sm font-medium rounded-full transition-colors cursor-pointer ${
-                    u.isFollowedByCurrentUser
-                      ? "bg-white/10 text-white hover:bg-white/20"
-                      : "bg-[#1db954] text-black hover:bg-[#1ed760]"
-                  }`}
-                >
-                  {u.isFollowedByCurrentUser ? "Following" : "Follow"}
-                </button>
+                {user && (
+                  <button
+                    onClick={() => onFollowToggle(u.username)}
+                    className={`px-4 py-1.5 text-sm font-medium rounded-full transition-colors cursor-pointer ${
+                      u.isFollowedByCurrentUser
+                        ? "bg-white/10 text-white hover:bg-white/20"
+                        : "bg-[#1db954] text-black hover:bg-[#1ed760]"
+                    }`}
+                  >
+                    {u.isFollowedByCurrentUser ? "Following" : "Follow"}
+                  </button>
+                )}
               </div>
             ))
           )}

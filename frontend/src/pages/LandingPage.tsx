@@ -13,6 +13,7 @@ import type {
   Song,
 } from "../utils/types";
 import { toEmbedUrl } from "../utils/utils";
+import { useAuth } from "../context/authContext";
 
 const CATEGORIES: { value: SearchCategory; label: string }[] = [
   { value: "songs", label: "Songs" },
@@ -24,10 +25,10 @@ const CATEGORIES: { value: SearchCategory; label: string }[] = [
 const LandingPage = () => {
   const navigate = useNavigate();
   const { play, currentSong } = usePlayer();
+  const { user } = useAuth();
   const [songs, setSongs] = useState<Song[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // search state
   const [searchInput, setSearchInput] = useState("");
   const [activeQuery, setActiveQuery] = useState("");
   const [searchCategory, setSearchCategory] = useState<SearchCategory>("songs");
@@ -35,7 +36,6 @@ const LandingPage = () => {
   const [searchLoading, setSearchLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
 
-  // playlist dropdown state
   const [openPlaylistDropdown, setOpenPlaylistDropdown] = useState<
     number | null
   >(null);
@@ -414,77 +414,79 @@ const LandingPage = () => {
                           >
                             {song.releasedBy}
                           </p>
-                          <div className="flex items-center justify-between mt-4 pt-3 border-t border-white/10">
-                            {/* Like button */}
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                toggleLike(song.id);
-                              }}
-                              className="text-gray-400 hover:text-[#1db954] transition-colors cursor-pointer"
-                              aria-label={
-                                song.isLikedByCurrentUser
-                                  ? "Unlike song"
-                                  : "Like song"
-                              }
-                            >
-                              {song.isLikedByCurrentUser ? (
-                                <svg
-                                  className="w-6 h-6 fill-[#1db954]"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                                </svg>
-                              ) : (
-                                <svg
-                                  className="w-6 h-6"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                                  />
-                                </svg>
-                              )}
-                            </button>
-
-                            {/* Add to playlist button */}
-                            <div className="relative">
+                          {user && (
+                            <div className="flex items-center justify-between mt-4 pt-3 border-t border-white/10">
+                              {/* Like button */}
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  togglePlaylistDropdown(song.id);
+                                  toggleLike(song.id);
                                 }}
                                 className="text-gray-400 hover:text-[#1db954] transition-colors cursor-pointer"
-                                aria-label="Add to playlist"
+                                aria-label={
+                                  song.isLikedByCurrentUser
+                                    ? "Unlike song"
+                                    : "Like song"
+                                }
                               >
-                                <svg
-                                  className="w-6 h-6"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M12 4v16m8-8H4"
-                                  />
-                                </svg>
+                                {song.isLikedByCurrentUser ? (
+                                  <svg
+                                    className="w-6 h-6 fill-[#1db954]"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                                  </svg>
+                                ) : (
+                                  <svg
+                                    className="w-6 h-6"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                                    />
+                                  </svg>
+                                )}
                               </button>
 
-                              <PlaylistDropdown
-                                songId={song.id}
-                                isOpen={openPlaylistDropdown === song.id}
-                                onClose={() => setOpenPlaylistDropdown(null)}
-                                direction="above"
-                              />
+                              {/* Add to playlist button */}
+                              <div className="relative">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    togglePlaylistDropdown(song.id);
+                                  }}
+                                  className="text-gray-400 hover:text-[#1db954] transition-colors cursor-pointer"
+                                  aria-label="Add to playlist"
+                                >
+                                  <svg
+                                    className="w-6 h-6"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M12 4v16m8-8H4"
+                                    />
+                                  </svg>
+                                </button>
+
+                                <PlaylistDropdown
+                                  songId={song.id}
+                                  isOpen={openPlaylistDropdown === song.id}
+                                  onClose={() => setOpenPlaylistDropdown(null)}
+                                  direction="above"
+                                />
+                              </div>
                             </div>
-                          </div>
+                          )}
                         </div>
                       </div>
                     ))}

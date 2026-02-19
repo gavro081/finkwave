@@ -406,25 +406,27 @@ const SongDetail = () => {
                 </span>
               )}
             </h2>
-            <button
-              onClick={() => setShowReviewModal(true)}
-              className="flex items-center gap-2 bg-[#1db954] hover:bg-[#1ed760] text-black text-sm font-semibold px-4 py-2 rounded-full transition-colors"
-            >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+            {user != null && (
+              <button
+                onClick={() => setShowReviewModal(true)}
+                className="flex items-center gap-2 bg-[#1db954] hover:bg-[#1ed760] text-black text-sm font-semibold px-4 py-2 rounded-full transition-colors"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
-              Add Review
-            </button>
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 4v16m8-8H4"
+                  />
+                </svg>
+                Add Review
+              </button>
+            )}
           </div>
 
           {song.reviews.length === 0 ? (

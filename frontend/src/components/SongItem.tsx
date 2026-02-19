@@ -1,9 +1,10 @@
-import { useRef, useState } from "react";
+import { use, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { baseURL } from "../api/axiosInstance";
 import { usePlayer } from "../context/playerContext";
 import { toEmbedUrl } from "../utils/utils";
 import PlaylistDropdown from "./playlist/PlaylistDropdown";
+import { useAuth } from "../context/authContext";
 
 export interface SongItemData {
   id: number;
@@ -49,6 +50,7 @@ const SongItem = ({
 }: SongItemProps) => {
   const navigate = useNavigate();
   const { play, currentSong } = usePlayer();
+  const { user } = useAuth();
   const [internalOpen, setInternalOpen] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
   const [dropdownDirection, setDropdownDirection] = useState<"above" | "below">(
@@ -164,7 +166,7 @@ const SongItem = ({
       )}
 
       {/* Like button */}
-      {onLikeToggle && (
+      {user && onLikeToggle && (
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -186,55 +188,59 @@ const SongItem = ({
       )}
 
       {/* Three-dot menu */}
-      <div className="relative">
-        <button
-          ref={buttonRef}
-          onClick={(e) => {
-            e.stopPropagation();
-            if (playlistOpen) {
-              setPlaylistOpen(false);
-            } else {
-              if (buttonRef.current) {
-                const rect = buttonRef.current.getBoundingClientRect();
-                const spaceBelow = window.innerHeight - rect.bottom;
-                const dropdownHeight = 260;
+      {user && (
+        <div className="relative">
+          <button
+            ref={buttonRef}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (playlistOpen) {
+                setPlaylistOpen(false);
+              } else {
+                if (buttonRef.current) {
+                  const rect = buttonRef.current.getBoundingClientRect();
+                  const spaceBelow = window.innerHeight - rect.bottom;
+                  const dropdownHeight = 260;
 
-                if (spaceBelow < dropdownHeight) {
-                  setDropdownDirection("above");
-                  setDropdownPosition({
-                    top: rect.top - 8,
-                    left: rect.right - 224,
-                  });
-                } else {
-                  setDropdownDirection("below");
-                  setDropdownPosition({
-                    top: rect.bottom + 8,
-                    left: rect.right - 224,
-                  });
+                  if (spaceBelow < dropdownHeight) {
+                    setDropdownDirection("above");
+                    setDropdownPosition({
+                      top: rect.top - 8,
+                      left: rect.right - 224,
+                    });
+                  } else {
+                    setDropdownDirection("below");
+                    setDropdownPosition({
+                      top: rect.bottom + 8,
+                      left: rect.right - 224,
+                    });
+                  }
                 }
+                setPlaylistOpen(true);
               }
-              setPlaylistOpen(true);
-            }
-          }}
-          className="p-2 hover:bg-white/10 rounded-full transition-colors cursor-pointer text-gray-400 hover:text-white"
-          aria-label="More options"
-        >
-          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-            <circle cx="12" cy="5" r="1.5" />
-            <circle cx="12" cy="12" r="1.5" />
-            <circle cx="12" cy="19" r="1.5" />
-          </svg>
-        </button>
+            }}
+            className="p-2 hover:bg-white/10 rounded-full transition-colors cursor-pointer text-gray-400 hover:text-white"
+            aria-label="More options"
+          >
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <circle cx="12" cy="5" r="1.5" />
+              <circle cx="12" cy="12" r="1.5" />
+              <circle cx="12" cy="19" r="1.5" />
+            </svg>
+          </button>
 
-        <PlaylistDropdown
-          songId={song.id}
-          isOpen={playlistOpen}
-          onClose={() => setPlaylistOpen(false)}
-          position={dropdownPosition}
-          usePortal={true}
-          direction={dropdownDirection}
-        />
-      </div>
+          <PlaylistDropdown
+            songId={song.id}
+            isOpen={playlistOpen}
+            onClose={() => setPlaylistOpen(false)}
+            position={dropdownPosition}
+            usePortal={true}
+            direction={dropdownDirection}
+          />
+        </div>
+      )}
+
+      {/* Three-dot menu */}
     </div>
   );
 };

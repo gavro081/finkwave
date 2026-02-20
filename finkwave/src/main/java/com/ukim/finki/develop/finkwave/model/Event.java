@@ -35,12 +35,6 @@ public class Event {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "creator_artist_id")
-    private Artist creatorArtist;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "creator_admin_id")
-    private Admin creatorAdmin;
-
+    @JoinColumn(name = "creator_id")
+    private User creatorUser;
 }

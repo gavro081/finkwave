@@ -79,22 +79,32 @@ public interface SongRepository extends JpaRepository<Song, Long> {
     List<SongDto> findTopByListens(@Param("currentUserId")Long currentUserId);
 
     @Query("""
-        SELECT NEW com.ukim.finki.develop.finkwave.model.dto.SongDto(
-            s.id,
-            s.musicalEntities.title,
-            s.musicalEntities.genre,
-            'SONG',
-            s.musicalEntities.releasedBy.nonAdminUser.user.fullName,
-            s.musicalEntities.releasedBy.nonAdminUser.user.username,
-            s.musicalEntities.cover,
-            (EXISTS (SELECT 1 FROM Like l WHERE l.musicalEntity.id = s.id AND l.listener.id = :currentUserId)),
-            s.album.musicalEntities.title,
-            s.album.musicalEntities.id,
-            s.link
-        )
-        FROM Song s
-        WHERE s.musicalEntities.title ILIKE '%' || :searchTerm || '%'
-    """)
+    SELECT NEW com.ukim.finki.develop.finkwave.model.dto.SongDto(
+        s.id,
+        me.title,
+        me.genre,
+        'SONG',
+        u.fullName,
+        u.username,
+        me.cover,
+        (EXISTS (
+            SELECT 1 FROM Like l
+            WHERE l.musicalEntity.id = s.id
+              AND l.listener.id = :currentUserId
+        )),
+        albumMe.title,
+        a.id,
+        s.link
+    )
+    FROM Song s
+    JOIN s.musicalEntities me
+    JOIN me.releasedBy rb
+    JOIN rb.nonAdminUser nau
+    JOIN nau.user u
+    LEFT JOIN s.album a
+    LEFT JOIN a.musicalEntities albumMe
+    WHERE me.title ILIKE CONCAT('%', :searchTerm, '%')
+""")
     List<SongDto> searchSongs(@Param("currentUserId")Long currentUserId, @Param("searchTerm") String searchTerm);
 
 

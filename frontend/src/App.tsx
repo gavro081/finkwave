@@ -12,7 +12,7 @@ import MiniPlayer from "./components/MiniPlayer";
 import Sidebar from "./components/Sidebar";
 import { useAuth } from "./context/authContext";
 import { usePlayer } from "./context/playerContext";
-import AllUsers from "./pages/AllUsers";
+// import AllUsers from "./pages/AllUsers";
 import LandingPage from "./pages/LandingPage";
 import Login from "./pages/Login";
 import MusicalCollection from "./pages/MusicalCollection";
@@ -94,10 +94,10 @@ const router = createBrowserRouter([
 				path: "/login",
 				element: <Login />,
 			},
-			{
-				path: "/users",
-				element: <AllUsers />,
-			},
+			// {
+			// 	path: "/users",
+			// 	element: <AllUsers />,
+			// },
 			{
 				path: "/users/:username",
 				element: <UserDetail />,

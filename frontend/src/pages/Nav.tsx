@@ -55,7 +55,7 @@ const Nav = ({ isSidebarOpen = false, onToggleSidebar }: NavProps) => {
 				{onToggleSidebar && user && (
 					<button
 						onClick={onToggleSidebar}
-						className="text-white hover:text-[#1db954] transition-colors p-2"
+						className="text-white hover:text-[#1db954] transition-colors p-2 cursor-pointer"
 						aria-label="Toggle sidebar"
 					>
 						<svg
